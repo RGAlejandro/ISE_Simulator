@@ -1,0 +1,181 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  plan      Plan     @default(FREE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscription   Subscription?
+  writtenExams   WrittenExam[]
+  oralExams      OralExam[]
+  dailyUsage     DailyUsage[]
+
+  @@index([clerkId])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  plan                 Plan               @default(FREE)
+  status               SubscriptionStatus @default(INACTIVE)
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+}
+
+model WrittenExam {
+  id          String     @id @default(cuid())
+  userId      String
+  level       ExamLevel
+  content     Json
+  status      ExamStatus @default(IN_PROGRESS)
+  score       Float?
+  startedAt   DateTime   @default(now())
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses WrittenResponse[]
+
+  @@index([userId])
+}
+
+model WrittenResponse {
+  id         String          @id @default(cuid())
+  examId     String
+  taskType   WrittenTaskType
+  taskNumber Int
+  response   String          @db.Text
+  aiFeedback String?         @db.Text
+  score      Float?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  exam WrittenExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@index([examId])
+}
+
+model OralExam {
+  id           String     @id @default(cuid())
+  userId       String
+  level        ExamLevel
+  status       ExamStatus @default(IN_PROGRESS)
+  overallScore Float?
+  startedAt    DateTime   @default(now())
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchanges OralExchange[]
+  feedback  OralFeedback[]
+
+  @@index([userId])
+}
+
+model OralExchange {
+  id        String       @id @default(cuid())
+  examId    String
+  taskType  OralTaskType
+  role      Role
+  content   String       @db.Text
+  audioUrl  String?
+  order     Int
+  createdAt DateTime     @default(now())
+
+  exam OralExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@index([examId])
+}
+
+model OralFeedback {
+  id        String       @id @default(cuid())
+  examId    String
+  taskType  OralTaskType
+  feedback  Json
+  score     Float?
+  createdAt DateTime     @default(now())
+
+  exam OralExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@index([examId])
+}
+
+model DailyUsage {
+  id           String   @id @default(cuid())
+  userId       String
+  date         DateTime @db.Date
+  writtenCount Int      @default(0)
+  oralCount    Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+enum Plan {
+  FREE
+  PRO
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum ExamLevel {
+  ISE_FOUNDATION
+  ISE_I
+  ISE_II
+  ISE_III
+  ISE_IV
+}
+
+enum ExamStatus {
+  IN_PROGRESS
+  COMPLETED
+  EVALUATED
+}
+
+enum WrittenTaskType {
+  READING_1
+  READING_2
+  READING_INTO_WRITING
+  EXTENDED_WRITING
+}
+
+enum OralTaskType {
+  TOPIC
+  COLLABORATIVE
+  CONVERSATION
+  LISTENING
+}
+
+enum Role {
+  EXAMINER
+  CANDIDATE
+}
