@@ -51,20 +51,23 @@ export async function getDailyUsage(userId: string): Promise<UserUsage> {
   const isPro = user?.plan === "ADMIN" || (user?.plan === "PRO" && user?.subscription?.status === "ACTIVE");
   const writtenCount = usage?.writtenCount ?? 0;
   const oralCount = usage?.oralCount ?? 0;
+  const listeningCount = usage?.listeningCount ?? 0;
 
   return {
     writtenCount,
     oralCount,
+    listeningCount,
     canTakeWritten: isPro || writtenCount < FREE_DAILY_LIMIT.written,
     canTakeOral: isPro || oralCount < FREE_DAILY_LIMIT.oral,
+    canTakeListening: isPro || listeningCount < FREE_DAILY_LIMIT.listening,
   };
 }
 
-export async function incrementUsage(userId: string, type: "written" | "oral") {
+export async function incrementUsage(userId: string, type: "written" | "oral" | "listening") {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const field = type === "written" ? "writtenCount" : "oralCount";
+  const field = type === "written" ? "writtenCount" : type === "oral" ? "oralCount" : "listeningCount";
 
   await prisma.dailyUsage.upsert({
     where: { userId_date: { userId, date: today } },

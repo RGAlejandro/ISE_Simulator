@@ -1,4 +1,6 @@
 export type ExamLevel = "ISE_FOUNDATION" | "ISE_I" | "ISE_II" | "ISE_III" | "ISE_IV";
+export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export type GrammarExerciseType = "gap_fill" | "mcq" | "error_correction";
 export type WrittenTaskType = "READING_1" | "READING_2" | "READING_INTO_WRITING" | "EXTENDED_WRITING";
 export type OralTaskType = "TOPIC" | "COLLABORATIVE" | "CONVERSATION" | "LISTENING";
 export type Plan = "FREE" | "PRO";
@@ -96,6 +98,7 @@ export interface WritingTask {
   prompt: string;
   wordLimit: { min: number; max: number };
   bulletPoints?: string[];
+  writingType?: string;
 }
 
 export interface WrittenExamContent {
@@ -129,6 +132,61 @@ export interface OralFeedbackData {
 export interface UserUsage {
   writtenCount: number;
   oralCount: number;
+  listeningCount: number;
   canTakeWritten: boolean;
   canTakeOral: boolean;
+  canTakeListening: boolean;
+}
+
+export interface GapFillQuestion {
+  id: string;
+  type: "gap_fill";
+  sentence: string;
+  hint?: string;
+  correctAnswer: string;
+  grammarPoint?: string;
+}
+
+export interface McqQuestion {
+  id: string;
+  type: "mcq";
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  grammarPoint?: string;
+}
+
+export interface ErrorCorrectionQuestion {
+  id: string;
+  type: "error_correction";
+  sentence: string;
+  correctAnswer: string;
+  grammarPoint?: string;
+}
+
+export type GrammarQuestion = GapFillQuestion | McqQuestion | ErrorCorrectionQuestion;
+
+export interface GrammarQuestionResult {
+  questionId: string;
+  isCorrect: boolean;
+  userAnswer: string;
+  correctAnswer: string;
+  explanation: string;
+}
+
+export interface ListeningRound1Feedback {
+  score: number;
+  mainIdeaCaptured: boolean;
+  informationTypeIdentified: boolean;
+  comments: string;
+  missedPoints: string[];
+}
+
+export interface ListeningRound2Feedback {
+  score: number;
+  accuracyScore: number;
+  completenessScore: number;
+  comments: string;
+  capturedDetails: string[];
+  missedDetails: string[];
 }

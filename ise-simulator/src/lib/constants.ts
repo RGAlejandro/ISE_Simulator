@@ -23,6 +23,7 @@ export const ORAL_TASKS = [
 export const FREE_DAILY_LIMIT = {
   written: 1,
   oral: 1,
+  listening: 3,
 };
 
 export const EXAM_DURATIONS: Record<string, number> = {
