@@ -1,6 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+export function getGenAI() {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
+  return new GoogleGenerativeAI(apiKey);
+}
 
 // Fallback models in order of preference
 const MODELS = [
@@ -32,7 +36,7 @@ async function tryWithFallback<T>(
 }
 
 export function getGeminiModel(jsonMode = false) {
-  return genAI.getGenerativeModel({
+  return getGenAI().getGenerativeModel({
     model: MODELS[0],
     generationConfig: {
       temperature: 0.8,
@@ -43,7 +47,7 @@ export function getGeminiModel(jsonMode = false) {
 
 export async function generateText(prompt: string, options?: { temperature?: number; maxTokens?: number }) {
   return tryWithFallback(async (modelName) => {
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: modelName,
       generationConfig: {
         temperature: options?.temperature ?? 0.7,
@@ -57,7 +61,7 @@ export async function generateText(prompt: string, options?: { temperature?: num
 
 export async function generateJSON(prompt: string, options?: { temperature?: number }) {
   return tryWithFallback(async (modelName) => {
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: modelName,
       generationConfig: {
         temperature: options?.temperature ?? 0.7,
@@ -75,7 +79,7 @@ export async function generateChat(
   options?: { temperature?: number; maxTokens?: number }
 ) {
   return tryWithFallback(async (modelName) => {
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: modelName,
       generationConfig: {
         temperature: options?.temperature ?? 0.7,
@@ -94,7 +98,7 @@ export async function generateChatJSON(
   options?: { temperature?: number }
 ) {
   return tryWithFallback(async (modelName) => {
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: modelName,
       generationConfig: {
         temperature: options?.temperature ?? 0.7,
