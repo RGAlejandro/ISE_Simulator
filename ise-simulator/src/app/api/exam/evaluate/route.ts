@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateJSON } from "@/lib/gemini";
+import { generateJSON } from "@/lib/ai-provider";
 import { getEvaluateWritingPrompt } from "@/lib/prompts/written-exam";
 import { getCurrentUser } from "@/lib/user";
 import type { ExamLevel, WrittenExamContent } from "@/types";

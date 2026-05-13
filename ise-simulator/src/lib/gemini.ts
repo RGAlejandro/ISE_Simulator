@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export function getGenAI() {
+function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
   return new GoogleGenerativeAI(apiKey);
@@ -24,7 +24,7 @@ async function tryWithFallback<T>(
       return result;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`Model ${modelName} failed: ${msg.slice(0, 120)}`);
+      console.warn(`[Gemini] Model ${modelName} failed: ${msg.slice(0, 120)}`);
       lastError = err;
       // Only retry on 503/overloaded/quota errors
       if (!msg.includes("503") && !msg.includes("overloaded") && !msg.includes("high demand") && !msg.includes("RESOURCE_EXHAUSTED")) {
@@ -35,17 +35,10 @@ async function tryWithFallback<T>(
   throw lastError;
 }
 
-export function getGeminiModel(jsonMode = false) {
-  return getGenAI().getGenerativeModel({
-    model: MODELS[0],
-    generationConfig: {
-      temperature: 0.8,
-      ...(jsonMode ? { responseMimeType: "application/json" } : {}),
-    },
-  });
-}
-
-export async function generateText(prompt: string, options?: { temperature?: number; maxTokens?: number }) {
+export async function geminiGenerateText(
+  prompt: string,
+  options?: { temperature?: number; maxTokens?: number }
+): Promise<string> {
   return tryWithFallback(async (modelName) => {
     const model = getGenAI().getGenerativeModel({
       model: modelName,
@@ -59,7 +52,10 @@ export async function generateText(prompt: string, options?: { temperature?: num
   });
 }
 
-export async function generateJSON(prompt: string, options?: { temperature?: number }) {
+export async function geminiGenerateJSON(
+  prompt: string,
+  options?: { temperature?: number }
+): Promise<unknown> {
   return tryWithFallback(async (modelName) => {
     const model = getGenAI().getGenerativeModel({
       model: modelName,
@@ -73,11 +69,11 @@ export async function generateJSON(prompt: string, options?: { temperature?: num
   });
 }
 
-export async function generateChat(
+export async function geminiGenerateChat(
   systemPrompt: string,
   userPrompt: string,
   options?: { temperature?: number; maxTokens?: number }
-) {
+): Promise<string> {
   return tryWithFallback(async (modelName) => {
     const model = getGenAI().getGenerativeModel({
       model: modelName,
@@ -92,11 +88,11 @@ export async function generateChat(
   });
 }
 
-export async function generateChatJSON(
+export async function geminiGenerateChatJSON(
   systemPrompt: string,
   userPrompt: string,
   options?: { temperature?: number }
-) {
+): Promise<unknown> {
   return tryWithFallback(async (modelName) => {
     const model = getGenAI().getGenerativeModel({
       model: modelName,

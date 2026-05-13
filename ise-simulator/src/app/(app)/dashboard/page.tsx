@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   ]);
 
   const recentExams = [
-    ...recentWritten.map((e) => ({
+    ...recentWritten.map((e: typeof recentWritten[number]) => ({
       id: e.id,
       type: "written" as const,
       level: e.level,
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
       score: e.score,
       createdAt: e.createdAt.toISOString(),
     })),
-    ...recentOral.map((e) => ({
+    ...recentOral.map((e: typeof recentOral[number]) => ({
       id: e.id,
       type: "oral" as const,
       level: e.level,
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
       createdAt: e.createdAt.toISOString(),
     })),
   ]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a: { createdAt: string }, b: { createdAt: string }) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 10);
 
   return (

@@ -32,12 +32,12 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           overallScore: exam.overallScore,
           createdAt: exam.createdAt.toISOString(),
         }}
-        feedback={exam.feedback.map((f) => ({
+        feedback={exam.feedback.map((f: typeof exam.feedback[number]) => ({
           taskType: f.taskType,
           feedback: f.feedback as Record<string, unknown>,
           score: f.score,
         }))}
-        exchanges={exam.exchanges.map((e) => ({
+        exchanges={exam.exchanges.map((e: typeof exam.exchanges[number]) => ({
           taskType: e.taskType,
           role: e.role,
           content: e.content,
@@ -63,7 +63,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         score: exam.score,
         createdAt: exam.createdAt.toISOString(),
       }}
-      responses={exam.responses.map((r) => ({
+      responses={exam.responses.map((r: typeof exam.responses[number]) => ({
         taskType: r.taskType,
         taskNumber: r.taskNumber,
         response: r.response,

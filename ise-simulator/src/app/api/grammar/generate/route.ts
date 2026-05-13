@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { generateJSON } from "@/lib/gemini";
+import { generateJSON } from "@/lib/ai-provider";
 import { generateGrammarPrompt } from "@/lib/prompts/grammar";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user";

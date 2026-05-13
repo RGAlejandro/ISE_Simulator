@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getDailyUsage, incrementUsage } from "@/lib/user";
-import { generateJSON } from "@/lib/gemini";
+import { generateJSON } from "@/lib/ai-provider";
 import { generateListeningPrompt } from "@/lib/prompts/listening";
 import type { ExamLevel } from "@/types";
 

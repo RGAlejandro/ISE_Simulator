@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { getGenAI } from "@/lib/gemini";
+import { generateChat } from "@/lib/ai-provider";
 
 const SYSTEM_PROMPT = `You are "ISE Assistant", a helpful AI tutor embedded in ISE Simulator — a web app that helps students prepare for the Trinity College London ISE (Integrated Skills in English) exams.
 
@@ -52,22 +52,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Build the full conversation as a single prompt for Gemini
-  const conversationHistory = messages
+  const fullPrompt = `${SYSTEM_PROMPT}${userContextBlock}`;
+
+  const conversationText = messages
     .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
     .join("\n\n");
 
-  const fullPrompt = `${SYSTEM_PROMPT}${userContextBlock}\n\n---\n\n${conversationHistory}\n\nAssistant:`;
-
   try {
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+    const text = await generateChat(fullPrompt, conversationText, {
+      temperature: 0.7,
+      maxTokens: 1024,
     });
-
-    const result = await model.generateContent(fullPrompt);
-    const text = result.response.text();
 
     return NextResponse.json({ message: text });
   } catch (err) {
