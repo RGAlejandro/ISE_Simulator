@@ -88,19 +88,11 @@ export function ListeningClient({
   const store = useListeningStore();
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const passageAudioRef = useRef<HTMLAudioElement | null>(null);
   const [textInput, setTextInput] = useState("");
   const [showTextFallback, setShowTextFallback] = useState(false);
   const [notesInput, setNotesInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-
-  // Load speech synthesis voices
-  useEffect(() => {
-    const loadVoices = () => setVoices(window.speechSynthesis.getVoices());
-    loadVoices();
-    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
-    return () => window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
-  }, []);
 
   // Initialize store
   useEffect(() => {
@@ -123,40 +115,52 @@ export function ListeningClient({
     return () => {
       store.reset();
       if (timerRef.current) clearInterval(timerRef.current);
+      if (passageAudioRef.current) passageAudioRef.current.pause();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getEnglishVoice = useCallback(() => {
-    return (
-      voices.find((v) => v.lang.startsWith("en-GB")) ||
-      voices.find((v) => v.lang.startsWith("en")) ||
-      null
-    );
-  }, [voices]);
-
   const playPassage = useCallback(
-    (onEnd: () => void) => {
+    async (onEnd: () => void) => {
       store.setPlaying(true);
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(passageText);
-      utterance.lang = "en-GB";
-      utterance.rate = 0.88;
-      utterance.pitch = 1;
-      const voice = getEnglishVoice();
-      if (voice) utterance.voice = voice;
 
-      utterance.onend = () => {
+      if (passageAudioRef.current) {
+        passageAudioRef.current.pause();
+        passageAudioRef.current = null;
+      }
+
+      try {
+        const res = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: passageText }),
+        });
+
+        if (!res.ok) throw new Error("TTS failed");
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        passageAudioRef.current = audio;
+
+        audio.onended = () => {
+          store.setPlaying(false);
+          URL.revokeObjectURL(url);
+          onEnd();
+        };
+        audio.onerror = () => {
+          store.setPlaying(false);
+          URL.revokeObjectURL(url);
+          onEnd();
+        };
+
+        await audio.play();
+      } catch {
         store.setPlaying(false);
         onEnd();
-      };
-      utterance.onerror = () => {
-        store.setPlaying(false);
-        onEnd();
-      };
-      window.speechSynthesis.speak(utterance);
+      }
     },
-    [passageText, store, getEnglishVoice]
+    [passageText, store]
   );
 
   const startTimer = useCallback(() => {

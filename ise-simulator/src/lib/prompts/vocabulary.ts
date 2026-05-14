@@ -102,3 +102,35 @@ Rules:
 - Exactly 5 items in the array
 - No text outside the JSON`;
 }
+
+export function generateWordDetailsPrompt(english: string, level: CefrBand): string {
+  return `You are a British English lexicographer producing a vocabulary detail card for an English learner at CEFR level ${level}.
+
+Word: "${english}"
+
+Generate a structured profile of this word. Use British English spellings and conventions.
+
+Return ONLY valid JSON:
+{
+  "ipa": "/səbˈstænʃieɪt/",
+  "synonyms": ["confirm", "verify", "corroborate"],
+  "antonyms": ["refute", "disprove"],
+  "examples": [
+    "A real, natural sentence using the word.",
+    "Another distinct, realistic example.",
+    "A third example showing different context."
+  ],
+  "collocations": ["substantiate a claim", "substantiate an allegation"],
+  "register": "formal"
+}
+
+Rules:
+- "ipa": British English IPA transcription wrapped in slashes
+- "synonyms": 3-5 close-meaning words at or near the same CEFR level
+- "antonyms": 2-3 opposing-meaning words (empty array if no clear antonym)
+- "examples": exactly 3 distinct, natural sentences using the word — NOT definitions
+- "collocations": 2-4 common multi-word patterns the word appears in
+- "register": one of "formal" | "neutral" | "informal" | "literary" | "technical"
+- All content in British English, natural and idiomatic
+- No text outside the JSON`;
+}

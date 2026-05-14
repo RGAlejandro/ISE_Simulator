@@ -21,7 +21,10 @@ model User {
   oralExams          OralExam[]
   listeningSessions  ListeningSession[]
   grammarSessions    GrammarSession[]
+  vocabularyLists    VocabularyList[]
+  savedWords         SavedWord[]
   dailyUsage         DailyUsage[]
+  paperSubmissions   PaperSubmission[]
 
   @@index([clerkId])
 }
@@ -55,8 +58,9 @@ model WrittenExam {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  responses WrittenResponse[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses        WrittenResponse[]
+  paperSubmissions PaperSubmission[]
 
   @@index([userId])
 }
@@ -165,6 +169,59 @@ model GrammarSession {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model VocabularyList {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  emoji     String   @default("📚")
+  color     String   @default("blue")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  words SavedWord[]
+
+  @@index([userId])
+}
+
+model SavedWord {
+  id           String   @id @default(cuid())
+  userId       String
+  listId       String?
+  english      String
+  spanish      String
+  example      String   @db.Text
+  partOfSpeech String?
+  level        String
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list VocabularyList? @relation(fields: [listId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, english])
+  @@index([userId])
+  @@index([listId])
+}
+
+model PaperSubmission {
+  id        String    @id @default(cuid())
+  userId    String
+  examId    String
+  level     ExamLevel
+  feedback  Json?
+  score     Float?
+  status    String    @default("PENDING")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exam WrittenExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([examId])
 }
 
 model DailyUsage {

@@ -56,6 +56,7 @@ export default async function DashboardPage() {
       recentExams={recentExams}
       totalExams={totalWritten + totalOral}
       levels={EXAM_LEVELS as unknown as Array<{ value: string; label: string; cefr: string; color: string }>}
+      isPro={user.plan === "PRO" || user.plan === "ADMIN"}
     />
   );
 }

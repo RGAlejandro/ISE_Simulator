@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PenTool, Mic, BarChart2, Trophy, Loader2 } from "lucide-react";
+import { PenTool, Mic, BarChart2, Trophy, Loader2, ChevronRight, Upload, FileText, Lock } from "lucide-react";
+import Link from "next/link";
 import type { UserUsage } from "@/types";
 
 interface DashboardClientProps {
   user: { name: string | null; email: string; plan: string };
   usage: UserUsage;
+  isPro: boolean;
   recentExams: Array<{
     id: string;
     type: "written" | "oral";
@@ -24,13 +26,126 @@ interface DashboardClientProps {
   levels: Array<{ value: string; label: string; cefr: string; color: string }>;
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  IN_PROGRESS: "In Progress",
-  COMPLETED: "Completed",
-  EVALUATED: "Evaluated",
+const LEVEL_SHORT: Record<string, string> = {
+  ISE_FOUNDATION: "Foundation (A2)",
+  ISE_I: "ISE I (B1)",
+  ISE_II: "ISE II (B2)",
+  ISE_III: "ISE III (C1)",
+  ISE_IV: "ISE IV (C2)",
 };
 
-export function DashboardClient({ user, usage, recentExams, totalExams, levels }: DashboardClientProps) {
+function ExamRow({ exam, isPro }: {
+  exam: { id: string; type: "written" | "oral"; level: string; status: string; score: number | null; createdAt: string };
+  isPro: boolean;
+}) {
+  const isWritten = exam.type === "written";
+  const isEvaluated = exam.status === "EVALUATED";
+  const isInProgress = exam.status === "IN_PROGRESS";
+
+  const resultsHref = isWritten
+    ? `/results/${exam.id}`
+    : `/results/${exam.id}?type=oral`;
+  const continueHref = isWritten
+    ? `/exam/written/${exam.id}`
+    : `/exam/oral/${exam.id}`;
+  const submitPaperHref = `/exam/paper/${exam.id}/submit`;
+
+  const bandLabel = (score: number | null) => {
+    if (score === null) return null;
+    if (score >= 80) return { label: "Distinction", cls: "text-purple-600 dark:text-purple-400" };
+    if (score >= 65) return { label: "Merit", cls: "text-blue-600 dark:text-blue-400" };
+    if (score >= 50) return { label: "Pass", cls: "text-green-600 dark:text-green-400" };
+    return { label: "Fail", cls: "text-red-500" };
+  };
+  const band = bandLabel(exam.score);
+
+  return (
+    <Card className="overflow-hidden hover:shadow-md transition-shadow">
+      <CardContent className="p-0">
+        <div className="flex items-stretch">
+          {/* Color stripe */}
+          <div className={`w-1 flex-shrink-0 ${isWritten ? "bg-blue-500" : "bg-purple-500"}`} />
+
+          <div className="flex-1 flex items-center gap-4 px-4 py-3 flex-wrap">
+            {/* Icon + title */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className={`h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                isWritten ? "bg-blue-100 dark:bg-blue-900" : "bg-purple-100 dark:bg-purple-900"
+              }`}>
+                {isWritten
+                  ? <PenTool className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  : <Mic className="h-4 w-4 text-purple-600 dark:text-purple-400" />}
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                  {LEVEL_SHORT[exam.level] ?? exam.level}
+                  <span className="ml-2 text-xs text-zinc-400 font-normal">{isWritten ? "Written" : "Oral"}</span>
+                </p>
+                <p className="text-xs text-zinc-500">{new Date(exam.createdAt).toLocaleDateString("en-GB")}</p>
+              </div>
+            </div>
+
+            {/* Score + band */}
+            {exam.score !== null && (
+              <div className="text-right flex-shrink-0">
+                <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{Math.round(exam.score)}%</p>
+                {band && <p className={`text-xs font-medium ${band.cls}`}>{band.label}</p>}
+              </div>
+            )}
+
+            {/* Status + CTAs */}
+            <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+              {isEvaluated ? (
+                <>
+                  <Badge variant="success" className="text-xs">Evaluated</Badge>
+                  {!isPro && (
+                    <span className="flex items-center gap-1 text-xs text-zinc-400">
+                      <Lock className="h-3 w-3" /> Full feedback: Pro
+                    </span>
+                  )}
+                  <Link href={resultsHref}>
+                    <Button size="sm" variant="outline" className="gap-1.5">
+                      View Results <ChevronRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </>
+              ) : isInProgress ? (
+                <>
+                  <Badge variant="warning" className="text-xs">In Progress</Badge>
+                  <Link href={continueHref}>
+                    <Button size="sm" className="gap-1.5">
+                      {isWritten ? <FileText className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                      Continue
+                    </Button>
+                  </Link>
+                  {isWritten && (
+                    <Link href={submitPaperHref}>
+                      <Button size="sm" variant="outline" className="gap-1.5">
+                        <Upload className="h-3.5 w-3.5" /> Submit Paper
+                      </Button>
+                    </Link>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Badge variant="default" className="text-xs">Completed</Badge>
+                  <Link href={resultsHref}>
+                    <Button size="sm" variant="outline" className="gap-1.5">
+                      View <ChevronRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+
+export function DashboardClient({ user, usage, isPro, recentExams, totalExams, levels }: DashboardClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [oralLoading, setOralLoading] = useState<string | null>(null);
@@ -318,63 +433,13 @@ export function DashboardClient({ user, usage, recentExams, totalExams, levels }
       {/* Recent Exams */}
       {recentExams.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
-            Recent Exams
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">My Exams</h2>
+            <span className="text-sm text-zinc-500">{recentExams.length} recent</span>
+          </div>
           <div className="space-y-3">
             {recentExams.map((exam) => (
-              <Card key={exam.id}>
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-4">
-                    {exam.type === "oral" ? (
-                      <Mic className="h-5 w-5 text-purple-400" />
-                    ) : (
-                      <PenTool className="h-5 w-5 text-zinc-400" />
-                    )}
-                    <div>
-                      <p className="font-medium text-zinc-900 dark:text-zinc-50">
-                        {exam.level.replace("_", " ")}
-                        <span className="ml-2 text-xs text-zinc-400 font-normal">
-                          {exam.type === "oral" ? "Oral" : "Written"}
-                        </span>
-                      </p>
-                      <p className="text-sm text-zinc-500">
-                        {new Date(exam.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge
-                      variant={
-                        exam.status === "EVALUATED" ? "success" :
-                        exam.status === "COMPLETED" ? "default" : "warning"
-                      }
-                    >
-                      {STATUS_LABEL[exam.status] ?? exam.status}
-                    </Badge>
-                    {exam.score != null && (
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-50">
-                        {exam.score}%
-                      </span>
-                    )}
-                    {exam.status === "EVALUATED" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            exam.type === "oral"
-                              ? `/results/${exam.id}?type=oral`
-                              : `/results/${exam.id}`
-                          )
-                        }
-                      >
-                        View Results
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <ExamRow key={exam.id} exam={exam} isPro={isPro} />
             ))}
           </div>
         </div>

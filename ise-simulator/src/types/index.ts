@@ -138,6 +138,42 @@ export interface UserUsage {
   canTakeListening: boolean;
 }
 
+export interface VocabCard {
+  english: string;
+  partOfSpeech: string;
+  spanish: string;
+  example: string;
+}
+
+export interface SavedWordData {
+  id: string;
+  english: string;
+  spanish: string;
+  example: string;
+  partOfSpeech: string | null;
+  level: string;
+  notes: string | null;
+  listId: string | null;
+  createdAt: string;
+}
+
+export interface VocabularyListData {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  wordCount: number;
+}
+
+export interface WordDetails {
+  ipa: string;
+  synonyms: string[];
+  antonyms: string[];
+  examples: string[];
+  collocations: string[];
+  register: string;
+}
+
 export interface GapFillQuestion {
   id: string;
   type: "gap_fill";

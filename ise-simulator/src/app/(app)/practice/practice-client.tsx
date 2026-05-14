@@ -146,7 +146,7 @@ export function PracticeClient({ isPro, listeningCount, canTakeListening }: Prac
             </CardContent>
           </Card>
 
-          {/* Grammar Exercises — LIVE */}
+          {/* Grammar Exercises */}
           <Card className="relative overflow-hidden border-2 hover:border-green-300 dark:hover:border-green-700 transition-colors">
             <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-transparent dark:from-green-950 pointer-events-none" />
             <CardHeader className="relative pb-2">
@@ -177,7 +177,7 @@ export function PracticeClient({ isPro, listeningCount, canTakeListening }: Prac
             </CardContent>
           </Card>
 
-          {/* Vocabulary Flashcards — LIVE */}
+          {/* Vocabulary Flashcards */}
           <Card className="relative overflow-hidden border-2 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-transparent dark:from-purple-950 pointer-events-none" />
             <CardHeader className="relative pb-2">
@@ -205,9 +205,15 @@ export function PracticeClient({ isPro, listeningCount, canTakeListening }: Prac
                   Open Flashcards
                 </Button>
               </Link>
+              <Link href="/vocabulary/saved" className="block text-center">
+                <span className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+                  View saved words →
+                </span>
+              </Link>
             </CardContent>
           </Card>
         </div>
+
       </div>
     </div>
   );

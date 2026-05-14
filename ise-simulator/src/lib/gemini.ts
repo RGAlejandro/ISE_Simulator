@@ -92,6 +92,27 @@ export async function generateChat(
   });
 }
 
+export async function generateWithFileData(
+  prompt: string,
+  fileData: { data: string; mimeType: string },
+  options?: { temperature?: number }
+) {
+  return tryWithFallback(async (modelName) => {
+    const model = getGenAI().getGenerativeModel({
+      model: modelName,
+      generationConfig: {
+        temperature: options?.temperature ?? 0.3,
+        responseMimeType: "application/json",
+      },
+    });
+    const result = await model.generateContent([
+      { inlineData: { data: fileData.data, mimeType: fileData.mimeType } },
+      prompt,
+    ]);
+    return JSON.parse(result.response.text());
+  });
+}
+
 export async function generateChatJSON(
   systemPrompt: string,
   userPrompt: string,
