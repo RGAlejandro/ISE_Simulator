@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateChat, generateChatJSON } from "@/lib/gemini";
+import { generateChat, generateChatJSON } from "@/lib/ai-provider";
 import { getCurrentUser } from "@/lib/user";
 import {
   getOralExaminerSystemPrompt,
@@ -56,9 +56,9 @@ export async function POST(req: NextRequest) {
     });
 
     // Build conversation history for this task
-    const taskExchanges = exam.exchanges.filter((e) => e.taskType === taskType);
+    const taskExchanges = exam.exchanges.filter((e: typeof exam.exchanges[number]) => e.taskType === taskType);
     const conversationHistory = [
-      ...taskExchanges.map((e) => `${e.role === "EXAMINER" ? "Examiner" : "Candidate"}: ${e.content}`),
+      ...taskExchanges.map((e: typeof exam.exchanges[number]) => `${e.role === "EXAMINER" ? "Examiner" : "Candidate"}: ${e.content}`),
       `Candidate: ${candidateText}`,
     ].join("\n");
 
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
     } else if (taskType === "LISTENING") {
       // Find the listening questions from the stored data
       const listeningExchange = exam.exchanges.find(
-        (e) => e.taskType === "LISTENING" && e.role === "EXAMINER"
+        (e: typeof exam.exchanges[number]) => e.taskType === "LISTENING" && e.role === "EXAMINER"
       );
       let questions: string[] = [];
       if (listeningExchange) {
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
       }
 
       const questionIndex = Math.floor(
-        taskExchanges.filter((e) => e.role === "CANDIDATE").length
+        taskExchanges.filter((e: typeof exam.exchanges[number]) => e.role === "CANDIDATE").length
       );
 
       if (questionIndex >= questions.length || taskExchangeCount >= 8) {

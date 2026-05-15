@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { getGenAI } from "@/lib/gemini";
+import { generateChat } from "@/lib/ai-provider";
 
 const FREE_CHAT_DAILY_LIMIT = 20;
 
@@ -69,21 +69,18 @@ export async function POST(req: NextRequest) {
 
   const userContextBlock = `\n\nUSER CONTEXT:\n- Name: ${user.name ?? "unknown"}\n- Plan: ${isPro ? "Pro (full access)" : `Free (limited daily exams; chat limited to ${FREE_CHAT_DAILY_LIMIT} messages per session)`}\n- Exam level preference: not stored (ask them if relevant)`;
 
-  const conversationHistory = messages
+  const fullPrompt = `${SYSTEM_PROMPT}${userContextBlock}`;
+
+  const conversationText = messages
     .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
     .join("\n\n");
 
-  const fullPrompt = `${SYSTEM_PROMPT}${userContextBlock}\n\n---\n\n${conversationHistory}\n\nAssistant:`;
-
   try {
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: { temperature: 0.7, maxOutputTokens: isPro ? 1024 : 512 },
+    const text = await generateChat(fullPrompt, conversationText, {
+      temperature: 0.7,
+      maxTokens: isPro ? 1024 : 512,
     });
 
-    const result = await model.generateContent(fullPrompt);
-    const text = result.response.text();
     return NextResponse.json({ message: text });
   } catch (err) {
     console.error("Chat API error:", err);

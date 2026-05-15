@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { generateJSON } from "@/lib/gemini";
+import { generateJSON } from "@/lib/ai-provider";
 import { generateAdaptiveVocabularyPrompt } from "@/lib/prompts/vocabulary";
 
 export async function POST(req: Request) {

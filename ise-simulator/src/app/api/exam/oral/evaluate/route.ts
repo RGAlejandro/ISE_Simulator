@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateJSON } from "@/lib/gemini";
+import { generateJSON } from "@/lib/ai-provider";
 import { getCurrentUser } from "@/lib/user";
 import { getOralEvaluationPrompt } from "@/lib/prompts/oral-exam";
 import type { ExamLevel, OralTaskType } from "@/types";
@@ -39,17 +39,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Exam not found" }, { status: 404 });
     }
 
-    const model = "gemini-2.0-flash";
     const feedbackResults: Record<string, unknown> = {};
     let totalScore = 0;
 
     // Evaluate each task type
     for (const taskType of TASK_TYPES) {
-      const taskExchanges = exam.exchanges.filter((e) => e.taskType === taskType);
+      const taskExchanges = exam.exchanges.filter((e: typeof exam.exchanges[number]) => e.taskType === taskType);
       if (taskExchanges.length === 0) continue;
 
       const transcript = taskExchanges
-        .map((e) => {
+        .map((e: typeof exam.exchanges[number]) => {
           if (e.taskType === "LISTENING" && e.role === "EXAMINER") {
             try {
               const data = JSON.parse(e.content);

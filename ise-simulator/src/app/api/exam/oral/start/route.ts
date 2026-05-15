@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { generateChat } from "@/lib/gemini";
+import { generateChat } from "@/lib/ai-provider";
 import { getCurrentUser, getDailyUsage, incrementUsage } from "@/lib/user";
 import {
   getOralExaminerSystemPrompt,
