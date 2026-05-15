@@ -86,9 +86,9 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       };
 
       const taskHeader = (num: number, name: string) => {
-        font(12, "bold");
+        font(11, "bold");
         doc.setTextColor(0);
-        doc.text(`TASK ${num}  ${name}`, ML, y);
+        doc.text(`Task ${num}  --  ${name}`, ML, y);
         y += 5;
         solidLine(ML, y, W - MR);
         y += 8;
@@ -261,10 +261,14 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
 
       // Instructions box
       const instrItems = [
-        "1.  Answer ALL questions in Tasks 1 and 2.",
-        "2.  Complete ONE writing task in Task 3 and ONE in Task 4.",
-        "3.  Write your answers clearly in the spaces provided.",
-        "4.  Texts for Task 3 are taken from Task 2.",
+        "1.  Write your name, candidate number and centre on the front of this exam paper.",
+        "2.  You must not open this exam paper until instructed to do so.",
+        "3.  This exam paper has four tasks. Complete all tasks.",
+        "4.  Use blue or black pen, not pencil.",
+        "5.  Write your answers on the exam paper.",
+        "6.  Do all rough work on the exam paper. Cross through any work you do not want marked.",
+        "7.  You must not use a dictionary in this exam.",
+        "8.  You must not use correction fluid on the exam paper.",
       ];
       font(9.5, "bold");
       doc.setTextColor(0);
@@ -282,14 +286,18 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       doc.setTextColor(0);
       doc.text("Information for candidates", ML, y);
       y += 6;
-      const infoItems = [
-        "Time allowed: 2 hours 30 minutes",
-        "This exam paper has four tasks.",
-        "Task 1 and Task 2 have 15 questions each. Tasks 3 and 4 are writing tasks.",
-      ];
       font(9, "normal");
-      for (const item of infoItems) {
-        doc.text(`•  ${item}`, ML + 3, y);
+      doc.text("You are advised to spend about:", ML + 3, y);
+      y += 5.5;
+      const timings = [
+        "20 minutes on Task 1",
+        "20 minutes on Task 2",
+        "40 minutes on Task 3",
+        "40 minutes on Task 4",
+      ];
+      for (const t of timings) {
+        doc.text("w", ML + 5, y);
+        doc.text(t, ML + 12, y);
         y += 5.5;
       }
 
@@ -297,30 +305,40 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       // TASK 1 — LONG READING
       // ────────────────────────────────────────────────────────────
       addPage(true);
-      taskHeader(1, "Long Reading");
+      taskHeader(1, "Long reading");
 
       font(9, "normal");
       doc.setTextColor(0);
-      doc.text("Read the following passage and answer Questions 1–15.", ML, y);
+      const t1intro = `Read the following text and answer Questions 1\u201315.`;
+      doc.text(t1intro, ML, y);
       y += 9;
 
       font(12, "bold");
       doc.text(content.reading1.title, ML, y);
       y += 9;
 
+      // Pre-calculate total paragraph block height to keep all 5 on one page
+      {
+        font(9, "normal");
+        let totalParaH = 0;
+        for (const p of content.reading1.paragraphs) {
+          const ls = doc.splitTextToSize(p.text, TW - 14) as string[];
+          totalParaH += ls.length * 4.8 + 11 + 5; // content block + separator gap
+        }
+        if (y + totalParaH > FOOT_Y) addPage();
+      }
+
       for (const p of content.reading1.paragraphs) {
         font(9, "normal");
         const paraLines = doc.splitTextToSize(p.text, TW - 14) as string[];
-        const blockH = paraLines.length * 4.8 + 5;
-        check(blockH + 6);
 
         font(9, "bold");
         doc.setTextColor(0);
-        doc.text(`${p.number}`, ML + 2, y + 5);
+        doc.text(`Paragraph ${p.number}`, ML + 2, y + 5);
 
         font(9, "normal");
-        let py = y + 5;
-        for (const ln of paraLines) { doc.text(ln, ML + 12, py); py += 4.8; }
+        let py = y + 11;
+        for (const ln of paraLines) { doc.text(ln, ML + 5, py); py += 4.8; }
         y = py + 1;
 
         lw(0.15);
@@ -330,6 +348,9 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
         y += 4;
       }
       y += 3;
+
+      // Questions always start on a fresh page (reading text on one side, answers on the other)
+      addPage();
 
       // Q1–5 paragraph matching
       qHeader("Questions 1–5", content.reading1.paragraphMatching.instructions);
@@ -370,12 +391,14 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       // TASK 2 — MULTI-TEXT READING
       // ────────────────────────────────────────────────────────────
       addPage();
-      taskHeader(2, "Multi-Text Reading");
+      taskHeader(2, "Multi-text reading");
 
       font(9, "normal");
       doc.setTextColor(0);
-      doc.text(`Topic: ${content.reading2.topic}`, ML, y);
-      y += 9;
+      const t2intro = `In this section there are four short texts for you to read and some questions for you to answer.`;
+      const t2introLines = doc.splitTextToSize(t2intro, TW) as string[];
+      for (const ln of t2introLines) { doc.text(ln, ML, y); y += 5; }
+      y += 4;
 
       // Q16–20 FIRST — text matching with right-margin blank
       qHeader("Questions 16–20", content.reading2.textMatching.instructions);
@@ -400,13 +423,43 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
         y += 5;
       }
 
-      // Texts A, B, C, D
+      // Texts A & B (first two) — same page as Q16-20
       font(10, "bold");
       doc.setTextColor(0);
       doc.text("Texts", ML, y);
       y += 7;
 
-      for (const t of content.reading2.texts) {
+      for (const t of content.reading2.texts.slice(0, 2)) {
+        font(9, "normal");
+        const bodyLines = doc.splitTextToSize(t.content, TW - 6) as string[];
+        const boxH = bodyLines.length * 4.8 + 12;
+        check(boxH + 6);
+
+        font(9, "bold");
+        doc.setTextColor(0);
+        doc.text(`Text ${t.letter}:  ${t.title}`, ML, y);
+        if (t.source) {
+          font(7.5, "normal");
+          gray(90);
+          doc.text(
+            `${t.source}${t.author ? `  —  ${t.author}` : ""}`,
+            W - MR, y, { align: "right" }
+          );
+          doc.setTextColor(0);
+        }
+        y += 5;
+
+        borderBox(ML, y, TW, boxH - 6);
+        font(9, "normal");
+        let ty = y + 6;
+        for (const ln of bodyLines) { doc.text(ln, ML + 3, ty); ty += 4.8; }
+        y += boxH - 4;
+      }
+
+      // New page: Texts C & D + Q21-25
+      addPage();
+
+      for (const t of content.reading2.texts.slice(2)) {
         font(9, "normal");
         const bodyLines = doc.splitTextToSize(t.content, TW - 6) as string[];
         const boxH = bodyLines.length * 4.8 + 12;
@@ -434,7 +487,7 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       }
       y += 4;
 
-      // Q21–25 statement selection
+      // Q21–25 statement selection (same page as texts C & D)
       qHeader("Questions 21–25", content.reading2.statementSelection.instructions);
       {
         const stmts2 = content.reading2.statementSelection.statements;
@@ -447,6 +500,9 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
         const leftItems2 = Array.from({ length: 5 }, (_, i) => ({ num: 21 + i }));
         twoColSection(leftItems2, "Statements", rendered2, Math.round(TW * 0.33));
       }
+
+      // New page: Q26–30 gap fill alone
+      addPage();
 
       // Q26–30 gap fill
       qHeader("Questions 26–30", `${content.reading2.gapFill.instructions} Each answer must be 1–3 words.`);
@@ -515,18 +571,26 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
         const LS = 9;
         while (y + LS <= FOOT_Y) { dottedLine(ML, y, W - MR); y += LS; }
 
-        // Writing lines page 2
+        // Writing lines page 2 + review instruction
         addPage();
-        while (y + LS <= FOOT_Y - 14) { dottedLine(ML, y, W - MR); y += LS; }
+        while (y + LS <= FOOT_Y - 28) { dottedLine(ML, y, W - MR); y += LS; }
         y += 6;
         font(8.5, "normal");
         doc.setTextColor(0);
         doc.text("Word count:", ML, y);
         dottedLine(ML + 26, y, ML + 76);
+        y += 12;
+        font(8, "italic");
+        gray(80);
+        const reviewType = task.writingType ?? "writing";
+        const reviewNote = `When you have finished your ${reviewType}, spend 2\u20133 minutes reading through what you have written. Make sure you have covered all the points and check your language and organisation.`;
+        const reviewLines = doc.splitTextToSize(reviewNote, TW) as string[];
+        for (const ln of reviewLines) { doc.text(ln, ML, y); y += 4.8; }
+        doc.setTextColor(0);
       };
 
-      writingSection(3, "Reading into Writing", content.readingIntoWriting);
-      writingSection(4, "Extended Writing", content.extendedWriting);
+      writingSection(3, "Reading into writing", content.readingIntoWriting);
+      writingSection(4, "Extended writing", content.extendedWriting);
 
       // ────────────────────────────────────────────────────────────
       // PAGE FOOTERS

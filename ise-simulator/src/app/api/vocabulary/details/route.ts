@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { generateJSON } from "@/lib/gemini";
+import { generateJSON } from "@/lib/ai-provider";
 import { generateWordDetailsPrompt, type CefrBand } from "@/lib/prompts/vocabulary";
 
 const VALID_LEVELS: CefrBand[] = ["A1", "A2", "B1", "B2", "C1", "C2"];

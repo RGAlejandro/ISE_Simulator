@@ -243,6 +243,18 @@ function Reading1Task({ reading, answers, onAnswer }: {
         ))}
       </div>
 
+      {/* Page break visual */}
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t-2 border-dashed border-zinc-300 dark:border-zinc-700" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-3 py-1 bg-white dark:bg-zinc-900 text-xs font-medium text-zinc-400 rounded-full border border-zinc-300 dark:border-zinc-700 uppercase tracking-wider">
+            Turn over — Questions
+          </span>
+        </div>
+      </div>
+
       {/* Q1–5 Paragraph Matching */}
       <QSection title="Questions 1–5" instructions={reading.paragraphMatching.instructions}>
         {/* Options */}
@@ -315,31 +327,7 @@ function Reading2Task({ reading, answers, onAnswer }: {
         <p className="text-sm text-zinc-500 mt-1">Topic: <span className="font-medium">{reading.topic}</span></p>
       </div>
 
-      {/* 4 texts */}
-      <div className="space-y-4">
-        {reading.texts.map((t) => (
-          <div key={t.letter} className="border border-zinc-200 dark:border-zinc-700 rounded overflow-hidden">
-            <div className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 px-4 py-2.5 flex items-center gap-3 flex-wrap">
-              <Badge className="bg-[#001a57] text-white text-xs shrink-0">{t.letter}</Badge>
-              <span className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">{t.title}</span>
-              <Badge variant="outline" className="text-xs ml-auto">{t.source}</Badge>
-              {t.author && <span className="text-xs text-zinc-400">by {t.author}</span>}
-            </div>
-            <div className="px-5 py-4">
-              {t.isGraph && t.graphData ? (
-                <div className="space-y-3">
-                  <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t.content}</p>
-                  <SimpleBarChart data={t.graphData} />
-                </div>
-              ) : (
-                <p className="text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">{t.content}</p>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Q16–20 Text Matching */}
+      {/* Q16–20 Text Matching FIRST — read questions before texts, as in real Trinity exam */}
       <QSection title="Questions 16–20" instructions={reading.textMatching.instructions}>
         <div className="border border-zinc-200 dark:border-zinc-700 rounded overflow-hidden">
           <div className="grid grid-cols-[1fr_auto] text-xs font-bold uppercase tracking-wider text-zinc-500 bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
@@ -367,7 +355,67 @@ function Reading2Task({ reading, answers, onAnswer }: {
         </div>
       </QSection>
 
-      {/* Q21–25 Statement Selection */}
+      {/* Texts A & B — same "page" as Q16-20 */}
+      <div className="space-y-4">
+        {reading.texts.slice(0, 2).map((t) => (
+          <div key={t.letter} className="border border-zinc-200 dark:border-zinc-700 rounded overflow-hidden">
+            <div className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 px-4 py-2.5 flex items-center gap-3 flex-wrap">
+              <Badge className="bg-[#001a57] text-white text-xs shrink-0">{t.letter}</Badge>
+              <span className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">{t.title}</span>
+              <Badge variant="outline" className="text-xs ml-auto">{t.source}</Badge>
+              {t.author && <span className="text-xs text-zinc-400">by {t.author}</span>}
+            </div>
+            <div className="px-5 py-4">
+              {t.isGraph && t.graphData ? (
+                <div className="space-y-3">
+                  <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t.content}</p>
+                  <SimpleBarChart data={t.graphData} />
+                </div>
+              ) : (
+                <p className="text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">{t.content}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Page break visual */}
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t-2 border-dashed border-zinc-300 dark:border-zinc-700" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-3 py-1 bg-white dark:bg-zinc-900 text-xs font-medium text-zinc-400 rounded-full border border-zinc-300 dark:border-zinc-700 uppercase tracking-wider">
+            Turn over — next page
+          </span>
+        </div>
+      </div>
+
+      {/* Texts C & D */}
+      <div className="space-y-4">
+        {reading.texts.slice(2).map((t) => (
+          <div key={t.letter} className="border border-zinc-200 dark:border-zinc-700 rounded overflow-hidden">
+            <div className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 px-4 py-2.5 flex items-center gap-3 flex-wrap">
+              <Badge className="bg-[#001a57] text-white text-xs shrink-0">{t.letter}</Badge>
+              <span className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">{t.title}</span>
+              <Badge variant="outline" className="text-xs ml-auto">{t.source}</Badge>
+              {t.author && <span className="text-xs text-zinc-400">by {t.author}</span>}
+            </div>
+            <div className="px-5 py-4">
+              {t.isGraph && t.graphData ? (
+                <div className="space-y-3">
+                  <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t.content}</p>
+                  <SimpleBarChart data={t.graphData} />
+                </div>
+              ) : (
+                <p className="text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">{t.content}</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Q21–25 Statement Selection — same "page" as C & D */}
       <QSection title="Questions 21–25" instructions={reading.statementSelection.instructions}>
         <StatementGrid
           section={reading.statementSelection}
@@ -377,7 +425,19 @@ function Reading2Task({ reading, answers, onAnswer }: {
         />
       </QSection>
 
-      {/* Q26–30 Gap Fill */}
+      {/* Page break visual */}
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t-2 border-dashed border-zinc-300 dark:border-zinc-700" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-3 py-1 bg-white dark:bg-zinc-900 text-xs font-medium text-zinc-400 rounded-full border border-zinc-300 dark:border-zinc-700 uppercase tracking-wider">
+            Turn over — next page
+          </span>
+        </div>
+      </div>
+
+      {/* Q26–30 Gap Fill — separate "page" */}
       <QSection title="Questions 26–30" instructions={`${reading.gapFill.instructions} (1–3 words each)`}>
         <GapFillGrid section={reading.gapFill} startNumber={26} answers={answers} onAnswer={onAnswer} />
       </QSection>
