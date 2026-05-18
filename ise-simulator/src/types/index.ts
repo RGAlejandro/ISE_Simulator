@@ -33,10 +33,14 @@ export interface StatementSelectionSection {
 export interface GapFillSection {
   type: "gap_fill";
   instructions: string;
+  /** Optional notes title (e.g., "Technology in homes") shown above the bullets. Trinity uses this for Q26-30. */
+  notesTitle?: string;
   questions: {
     id: string;
     sentence: string; // sentence with _______ for the gap
     correctAnswer: string; // 1-3 words from the text
+    /** Optional group heading (e.g., "Past", "Now", "Future"). Consecutive questions sharing the heading form a group. */
+    sectionHeading?: string;
   }[];
 }
 

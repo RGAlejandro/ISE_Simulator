@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, Mic, Star } from "lucide-react";
+import { useT } from "@/components/i18n/language-provider";
 
 function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0);
@@ -209,6 +210,7 @@ function DemoWindow() {
 }
 
 export function HeroSection() {
+  const t = useT();
   return (
     <section className="relative overflow-hidden min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50/40 to-purple-50/20 dark:from-zinc-950 dark:via-blue-950/20 dark:to-purple-950/10">
 
@@ -229,8 +231,8 @@ export function HeroSection() {
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-indigo-100/20 dark:bg-indigo-900/10 blur-3xl pointer-events-none"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
           {/* LEFT — Text + CTA */}
           <div className="space-y-8">
@@ -247,7 +249,7 @@ export function HeroSection() {
                   transition={{ duration: 2.5, repeat: Infinity }}
                   className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0"
                 />
-                AI-Powered Trinity ISE Preparation
+                {t("landing.hero.badge")}
               </div>
             </motion.div>
 
@@ -258,11 +260,10 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl xl:text-6xl leading-[1.1]"
             >
-              Pass your{" "}
+              {t("landing.hero.title")}{" "}
               <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Trinity ISE
+                {t("landing.hero.titleAccent")}
               </span>
-              {" "}exam with an AI examiner
             </motion.h1>
 
             {/* Subtext */}
@@ -272,7 +273,7 @@ export function HeroSection() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 max-w-lg"
             >
-              Unlimited unique ISE exams from Foundation to ISE IV. Practice written, oral, listening, grammar — all with instant AI feedback that tells you exactly where to improve.
+              {t("landing.hero.subtitle")}
             </motion.p>
 
             {/* CTAs */}
@@ -284,13 +285,13 @@ export function HeroSection() {
             >
               <Link href="/sign-up">
                 <Button size="lg" className="text-base px-8 gap-2 w-full sm:w-auto shadow-lg shadow-blue-200 dark:shadow-blue-900/50">
-                  Start Practicing Free
+                  {t("landing.hero.ctaPrimary")}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="#features">
                 <Button variant="outline" size="lg" className="text-base px-8 w-full sm:w-auto bg-white/80 dark:bg-zinc-900/80 backdrop-blur">
-                  Explore Features
+                  {t("landing.hero.ctaSecondary")}
                 </Button>
               </Link>
             </motion.div>
@@ -386,7 +387,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm"
+          className="mt-12 sm:mt-16 lg:mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm"
         >
           {[
             { to: 5, suffix: "", label: "ISE Levels", sub: "Foundation to ISE IV" },
@@ -394,8 +395,8 @@ export function HeroSection() {
             { to: 100, suffix: "%", label: "AI Content", sub: "Unique every session" },
             { to: 30, suffix: "s", label: "Feedback Time", sub: "Instant AI evaluation" },
           ].map((item, i) => (
-            <div key={i} className="bg-white dark:bg-zinc-900 px-6 py-6 text-center">
-              <div className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 tabular-nums">
+            <div key={i} className="bg-white dark:bg-zinc-900 px-3 sm:px-6 py-4 sm:py-6 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-50 tabular-nums">
                 <CountUp to={item.to} suffix={item.suffix} />
               </div>
               <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mt-1">{item.label}</div>

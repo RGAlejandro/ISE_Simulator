@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MousePointerClick, Brain, Trophy } from "lucide-react";
+import { useT } from "@/components/i18n/language-provider";
 
 /* ── Preview 1: Module Selector ─────────────────────────── */
 function ModulePreview() {
@@ -275,25 +276,26 @@ function StepCard({ step, idx }: { step: StepDef; idx: number }) {
 
 /* ── Main export ────────────────────────────────────────── */
 export function HowItWorksSection() {
+  const t = useT();
   return (
-    <section className="py-28 bg-zinc-50 dark:bg-zinc-900 overflow-hidden">
+    <section className="py-14 sm:py-20 lg:py-28 bg-zinc-50 dark:bg-zinc-900 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-16 lg:mb-20"
         >
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-            How it works
+            {t("landing.howItWorks.title")}
           </h2>
           <p className="mt-4 text-lg text-zinc-500 dark:text-zinc-400">
-            From zero to exam-ready in three simple steps
+            {t("landing.howItWorks.subtitle")}
           </p>
         </motion.div>
 
-        <div className="relative grid grid-cols-1 gap-12 md:grid-cols-3">
+        <div className="relative grid grid-cols-1 gap-8 sm:gap-10 md:gap-12 md:grid-cols-3">
 
           {/* Animated connecting line (desktop only) */}
           <div className="hidden md:block absolute top-8 left-[calc(16.666%+1rem)] right-[calc(16.666%+1rem)] h-0.5">

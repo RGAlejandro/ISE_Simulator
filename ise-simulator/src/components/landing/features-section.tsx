@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PenTool, Mic, Volume2, BookMarked, BookOpen, CheckCircle2, XCircle } from "lucide-react";
+import { useT } from "@/components/i18n/language-provider";
 
 type TabId = "written" | "oral" | "listening" | "vocabulary" | "grammar";
 
@@ -133,7 +134,7 @@ function OralPreview() {
                 transition={{ duration: 0.6, repeat: Infinity }}
                 className="h-2.5 w-2.5 rounded-full bg-red-400 flex-shrink-0"
               />
-              <div className="flex items-end gap-0.5">
+              <div className="flex items-end gap-0.5 h-7 overflow-hidden">
                 {[3, 6, 4, 8, 5, 7, 3, 6, 9, 5, 7, 4].map((h, i) => (
                   <motion.div
                     key={i}
@@ -198,7 +199,7 @@ function ListeningPreview() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-end gap-0.5">
+          <div className="flex items-end gap-0.5 h-7 overflow-hidden">
             {[2, 4, 6, 3, 7, 5, 8, 4, 6, 3, 5, 7, 4, 6].map((h, i) => (
               <motion.div
                 key={i}
@@ -363,9 +364,10 @@ const PREVIEWS: Record<TabId, React.ReactNode> = {
 export function FeaturesSection() {
   const [active, setActive] = useState<TabId>("written");
   const activeTab = TABS.find((t) => t.id === active)!;
+  const t = useT();
 
   return (
-    <section id="features" className="py-28 bg-white dark:bg-zinc-950">
+    <section id="features" className="py-14 sm:py-20 lg:py-28 bg-white dark:bg-zinc-950">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -373,13 +375,13 @@ export function FeaturesSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-14 lg:mb-16"
         >
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-            Everything you need to pass your ISE
+            {t("landing.features.title")}
           </h2>
           <p className="mt-4 text-lg text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
-            Five practice modules covering every part of the Trinity ISE exam — all AI-powered, all unlimited.
+            {t("landing.features.subtitle")}
           </p>
         </motion.div>
 

@@ -101,10 +101,12 @@ Generate a reading about "${topicChoice}".
 
 Then generate 3 question sections:
 
-**Questions 1-5 (Paragraph Matching):**
-- Provide 6 summary options (A to F). Each is a one-sentence summary.
-- 5 of them match paragraphs 1-5 exactly. 1 is a DISTRACTOR (does not match any paragraph).
-- The candidate must match each paragraph (1-5) to the correct letter (A-F).
+**Questions 1-5 (Paragraph Matching — Trinity-style):**
+- Provide 6 title options (A to F). Each option is a SHORT noun-phrase title (3-8 words MAX, NO full sentences, NO trailing period).
+- Examples of valid titles: "The birth of advertising", "The power of words", "The impact of television", "A deep-rooted shift in advertising culture".
+- INVALID: full sentences, explanations, statements with subjects + verbs ("Advertising became more visual in the 1900s." ← too long).
+- 5 of them are the BEST title for paragraphs 1-5. 1 is a DISTRACTOR (does not match any paragraph).
+- The candidate must match each paragraph (1-5) to the correct title (A-F).
 
 **Questions 6-10 (Statement Selection):**
 - Provide 8 statements (A to H) related to the text.
@@ -134,15 +136,20 @@ Then generate 3 question sections:
 **Questions 21-25 (Statement Selection):**
 - Same format as Questions 6-10: 8 statements (A-H), 5 correct, 3 false.
 
-**Questions 26-30 (Gap Fill):**
-- Same format as Questions 11-15: 5 sentences with gaps, answers from the texts.
+**Questions 26-30 (Gap Fill — Trinity "Notes" style):**
+- The 5 questions form a STRUCTURED NOTES sheet (not a flat list).
+- Provide a "notesTitle" for the overall topic (e.g., "Technology in homes", "Climate change", "Modern education").
+- Group the 5 questions into 2-3 sections using "sectionHeading" (e.g., "Past" / "Now" / "Future", or "Causes" / "Effects" / "Solutions", or "Advantages" / "Disadvantages"). Each consecutive question with the same heading belongs to that group.
+- Each question is a sentence with _______ for the gap.
+- Answers must be exact words/phrases (max 3 words) from texts A–D.
 
 ═══════════════════════════════════════════
 TASKS 3 & 4 — WRITING
 ═══════════════════════════════════════════
 
-**Task 3 (Reading into Writing):** Write a **${riwType}** that requires the candidate to synthesise information from BOTH readings.
-The task prompt MUST clearly state the writing type (e.g. "Write an ${riwType}...").
+**Task 3 (Reading into Writing):** Write a **${riwType}** that requires the candidate to synthesise information from READING 2 ONLY (the four short texts A–D from Task 2).
+DO NOT reference Reading 1 (the Long Reading text). Task 3 ALWAYS uses the multi-text reading (texts A–D) as its source material.
+The task prompt MUST clearly state the writing type (e.g. "Write an ${riwType}...") and MUST instruct the candidate to use information from texts A–D.
 Word limit: ${desc.writingWordLimit.riw.min}-${desc.writingWordLimit.riw.max} words.
 
 **Task 4 (Extended Writing):** Write a **${ewType}** on an independent topic related to the exam theme.
@@ -245,19 +252,20 @@ OUTPUT JSON SCHEMA (follow EXACTLY):
     "gapFill": {
       "type": "gap_fill",
       "instructions": "Complete each sentence with 1-3 words from the texts.",
+      "notesTitle": "Overall topic title for the notes (e.g. 'Technology in homes')",
       "questions": [
-        { "id": "r2_gf1", "sentence": "...", "correctAnswer": "..." },
-        { "id": "r2_gf2", "sentence": "...", "correctAnswer": "..." },
-        { "id": "r2_gf3", "sentence": "...", "correctAnswer": "..." },
-        { "id": "r2_gf4", "sentence": "...", "correctAnswer": "..." },
-        { "id": "r2_gf5", "sentence": "...", "correctAnswer": "..." }
+        { "id": "r2_gf1", "sentence": "Inventions like _______ helped complete domestic tasks.", "correctAnswer": "...", "sectionHeading": "Past" },
+        { "id": "r2_gf2", "sentence": "...", "correctAnswer": "...", "sectionHeading": "Past" },
+        { "id": "r2_gf3", "sentence": "...", "correctAnswer": "...", "sectionHeading": "Now" },
+        { "id": "r2_gf4", "sentence": "...", "correctAnswer": "...", "sectionHeading": "Now" },
+        { "id": "r2_gf5", "sentence": "...", "correctAnswer": "...", "sectionHeading": "Future" }
       ]
     }
   },
   "readingIntoWriting": {
     "title": "string",
     "writingType": "${riwType}",
-    "prompt": "detailed writing instructions clearly stating to write a ${riwType}, referencing both readings",
+    "prompt": "detailed writing instructions clearly stating to write a ${riwType}, referencing texts A–D from Task 2 (Multi-text reading) ONLY — do NOT mention or reference Reading 1 (the Long Reading text)",
     "wordLimit": { "min": ${desc.writingWordLimit.riw.min}, "max": ${desc.writingWordLimit.riw.max} },
     "bulletPoints": ["point 1", "point 2", "point 3"]
   },

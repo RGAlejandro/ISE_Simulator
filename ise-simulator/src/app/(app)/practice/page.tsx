@@ -11,7 +11,11 @@ export default async function PracticePage() {
   return (
     <PracticeClient
       isPro={user.plan === "PRO" || user.plan === "ADMIN"}
+      writtenCount={usage.writtenCount}
+      oralCount={usage.oralCount}
       listeningCount={usage.listeningCount}
+      canTakeWritten={usage.canTakeWritten}
+      canTakeOral={usage.canTakeOral}
       canTakeListening={usage.canTakeListening}
     />
   );
