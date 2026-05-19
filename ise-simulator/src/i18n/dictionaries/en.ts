@@ -406,6 +406,7 @@ export const en = {
       title: "How it works",
       subtitle: "From zero to exam-ready in three simple steps",
       hoverHint: "hover to preview",
+      tapHint: "tap to preview",
       step1Title: "Choose your module",
       step1Desc: "Pick your ISE level and the skill you want to practise — written exam, oral simulation, listening, grammar, or vocabulary flashcards.",
       step2Title: "Practice with AI",
@@ -450,8 +451,12 @@ export const en = {
       button: "Start Free Exam",
     },
   },
-  footer: {
-    tagline: "Practice for your Trinity ISE exams with AI-powered simulations. Written and oral exam practice with real-time feedback.",
+  vocab: {
+    stillLearning: "Still learning",
+    knowIt: "Know it",
+    tapToReveal: "Tap the card to see the translation",
+  },
+  footer: { tagline: "Written and oral exam practice with real-time feedback.",
     product: "Product",
     examLevels: "Exam Levels",
     copyright: "All rights reserved. This application is not affiliated with Trinity College London.",

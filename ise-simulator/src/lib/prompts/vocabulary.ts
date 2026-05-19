@@ -47,9 +47,16 @@ const SCORE_DESCRIPTORS: Record<CefrBand, { complexity: string; examples: string
   },
 };
 
+const TRANSLATION_LANG: Record<string, { name: string; hint: string; noWordNote: string }> = {
+  es: { name: "Spanish",  hint: "traducción en español (1-4 palabras)",   noWordNote: "Do NOT put the Spanish word inside the example"  },
+  fr: { name: "French",   hint: "traduction en français (1-4 mots)",      noWordNote: "Do NOT put the French word inside the example"   },
+};
+const DEFAULT_TRANSLATION_LANG = TRANSLATION_LANG.es;
+
 export function generateAdaptiveVocabularyPrompt(
   score: number,
-  alreadySeen: string[]
+  alreadySeen: string[],
+  locale = "es"
 ): string {
   const { cefr } = scoreToLevel(score);
   const desc = SCORE_DESCRIPTORS[cefr];
@@ -69,7 +76,9 @@ export function generateAdaptiveVocabularyPrompt(
       ? `\n\nDo NOT use any of these words (already shown this session): ${alreadySeen.slice(-60).join(", ")}`
       : "";
 
-  return `You are generating vocabulary flashcards for an adaptive English learning app for Spanish speakers.
+  const lang = TRANSLATION_LANG[locale] ?? DEFAULT_TRANSLATION_LANG;
+
+  return `You are generating vocabulary flashcards for an adaptive English learning app for ${lang.name} speakers.
 
 Current difficulty level: ${cefr} (${desc.complexity})
 ${positionHint}
@@ -88,7 +97,7 @@ Return ONLY valid JSON:
     {
       "english": "the word or phrase",
       "partOfSpeech": "noun|verb|adjective|adverb|phrase|idiom",
-      "spanish": "traducción en español (1-4 palabras)",
+      "translation": "${lang.hint}",
       "example": "Natural English sentence showing how to use this word correctly"
     }
   ]
@@ -96,9 +105,9 @@ Return ONLY valid JSON:
 
 Rules:
 - "english": base form (infinitive for verbs, singular for nouns)
-- "spanish": most common Spanish translation, concise
+- "translation": most common ${lang.name} translation, concise
 - "example": clear real usage — NOT a definition, NOT a translation
-- Do NOT put the Spanish word inside the example
+- ${lang.noWordNote}
 - Exactly 5 items in the array
 - No text outside the JSON`;
 }

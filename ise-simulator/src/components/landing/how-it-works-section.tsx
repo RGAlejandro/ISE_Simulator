@@ -147,6 +147,7 @@ type StepDef = {
   title: string;
   description: string;
   hoverHint: string;
+  tapHint: string;
   color: string;
   ring: string;
   iconBg: string;
@@ -162,6 +163,7 @@ const steps: StepDef[] = [
     title: "Choose your module",
     description: "Pick your ISE level and the skill you want to practise — written exam, oral simulation, listening, grammar, or vocabulary flashcards.",
     hoverHint: "hover to preview",
+    tapHint: "tap to preview",
     color: "bg-blue-500",
     ring: "ring-blue-500/40",
     iconBg: "bg-blue-500/10",
@@ -175,6 +177,7 @@ const steps: StepDef[] = [
     title: "Practice with AI",
     description: "The AI generates unique content every session. Speak to the examiner, fill in your answers, flip vocab cards — fully interactive.",
     hoverHint: "hover to preview",
+    tapHint: "tap to preview",
     color: "bg-purple-500",
     ring: "ring-purple-500/40",
     iconBg: "bg-purple-500/10",
@@ -188,6 +191,7 @@ const steps: StepDef[] = [
     title: "Get instant feedback",
     description: "Receive detailed scores on grammar, vocabulary, task fulfillment, and more. Know exactly what to fix before exam day.",
     hoverHint: "hover to preview",
+    tapHint: "tap to preview",
     color: "bg-emerald-500",
     ring: "ring-emerald-500/40",
     iconBg: "bg-emerald-500/10",
@@ -227,11 +231,12 @@ function StepCard({ step, idx }: { step: StepDef; idx: number }) {
         />
       </div>
 
-      {/* Icon box — hover target for preview popup */}
+      {/* Icon box — hover/tap target for preview popup */}
       <div
         className="relative mb-4"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        onClick={() => setHovered(v => !v)}
       >
         <div
           className={`h-16 w-16 rounded-2xl ${step.iconBg} flex items-center justify-center ring-2 ${step.ring} cursor-pointer transition-all duration-300 ${
@@ -241,9 +246,10 @@ function StepCard({ step, idx }: { step: StepDef; idx: number }) {
           <Icon className={`h-7 w-7 ${step.iconColor} transition-transform duration-300 ${hovered ? "scale-110" : ""}`} />
         </div>
 
-        {/* Hover hint */}
+        {/* Hover/tap hint */}
         <p className={`absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] text-zinc-500 transition-opacity duration-200 ${hovered ? "opacity-0" : "opacity-100"}`}>
-          {step.hoverHint}
+          <span className="hidden md:inline">{step.hoverHint}</span>
+          <span className="md:hidden">{step.tapHint}</span>
         </p>
 
         {/* Animated popup */}
@@ -288,18 +294,21 @@ export function HowItWorksSection() {
       title: t("landing.howItWorks.step1Title"),
       description: t("landing.howItWorks.step1Desc"),
       hoverHint: t("landing.howItWorks.hoverHint"),
+      tapHint: t("landing.howItWorks.tapHint"),
     },
     {
       ...steps[1],
       title: t("landing.howItWorks.step2Title"),
       description: t("landing.howItWorks.step2Desc"),
       hoverHint: t("landing.howItWorks.hoverHint"),
+      tapHint: t("landing.howItWorks.tapHint"),
     },
     {
       ...steps[2],
       title: t("landing.howItWorks.step3Title"),
       description: t("landing.howItWorks.step3Desc"),
       hoverHint: t("landing.howItWorks.hoverHint"),
+      tapHint: t("landing.howItWorks.tapHint"),
     },
   ];
 

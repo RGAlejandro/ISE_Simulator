@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Flashcard, LEVEL_COLORS } from "@/components/vocabulary/flashcard";
 import { WordDetailsDialog } from "@/components/vocabulary/word-details-dialog";
 import { useEnglishTTS } from "@/hooks/use-english-tts";
+import { useI18n } from "@/components/i18n/language-provider";
 import { ArrowLeft, CheckCircle, XCircle, RotateCcw, Trophy, BookOpen } from "lucide-react";
 import type { CefrBand } from "@/lib/prompts/vocabulary";
 import type { VocabCard } from "@/types";
@@ -44,6 +45,7 @@ export function StudyClient({ listName, listEmoji, cards: initialCards }: Props)
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const { speak, isPlaying } = useEnglishTTS();
+  const { dict } = useI18n();
 
   const currentCard = cards[index];
   const progress = useMemo(() => (cards.length > 0 ? (index / cards.length) * 100 : 0), [index, cards.length]);
@@ -130,19 +132,19 @@ export function StudyClient({ listName, listEmoji, cards: initialCards }: Props)
                   onClick={() => handleAnswer(false)}
                 >
                   <XCircle className="h-5 w-5" />
-                  Still learning
+                  {dict.vocab.stillLearning}
                 </Button>
                 <Button
                   className="gap-2 h-12 bg-green-600 hover:bg-green-700 text-white"
                   onClick={() => handleAnswer(true)}
                 >
                   <CheckCircle className="h-5 w-5" />
-                  Know it
+                  {dict.vocab.knowIt}
                 </Button>
               </div>
             ) : (
               <div className="h-12 flex items-center justify-center text-sm text-zinc-400">
-                Tap the card to see the translation
+                {dict.vocab.tapToReveal}
               </div>
             )}
           </div>

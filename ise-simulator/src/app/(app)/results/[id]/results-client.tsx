@@ -54,7 +54,7 @@ export function ResultsClient({ exam, responses, isPro }: ResultsClientProps) {
       <Card className="mb-8">
         <CardContent className="flex flex-col items-center py-10">
           <Trophy className={`h-16 w-16 mb-4 ${bandColor}`} />
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-50">
             {exam.score != null ? `${exam.score}%` : "Pending"}
           </h1>
           <Badge

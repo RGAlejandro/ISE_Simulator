@@ -74,10 +74,10 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
           {!isSignedIn ? (
             <>
               <SignInButton mode="modal">
-                <Button variant="ghost" size="sm">{t("nav.signIn")}</Button>
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex">{t("nav.signIn")}</Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm">{t("nav.getStarted")}</Button>
+                <Button size="sm" className="hidden sm:inline-flex">{t("nav.getStarted")}</Button>
               </SignUpButton>
             </>
           ) : (
@@ -90,8 +90,9 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="md:hidden p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 active:bg-zinc-200 dark:active:bg-zinc-700"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -100,17 +101,17 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
 
       {/* Mobile nav */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-3 space-y-1">
+        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-3 space-y-1 animate-in slide-in-from-top-2 duration-200">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "block px-3 py-2 rounded-md text-sm font-medium",
+                "block px-3 py-3 rounded-lg text-sm font-medium transition-colors active:bg-zinc-200 dark:active:bg-zinc-700",
                 pathname === link.href
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-zinc-600 hover:bg-zinc-100"
+                  ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
               )}
             >
               {link.label}
@@ -121,10 +122,10 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
               href="/admin"
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium",
+                "flex items-center gap-1.5 px-3 py-3 rounded-lg text-sm font-medium transition-colors active:bg-purple-100 dark:active:bg-purple-900/40",
                 pathname?.startsWith("/admin")
                   ? "bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
-                  : "text-purple-600 hover:bg-purple-50 dark:text-purple-300"
+                  : "text-purple-600 hover:bg-purple-50 dark:text-purple-300 dark:hover:bg-purple-950/40"
               )}
             >
               <ShieldCheck className="h-4 w-4" />
@@ -132,14 +133,14 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
             </Link>
           )}
           {!isSignedIn && (
-            <div className="flex gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800 mt-2">
+            <div className="flex gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800 mt-2">
               <SignInButton mode="modal">
-                <Button variant="ghost" size="sm" className="flex-1" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" size="sm" className="flex-1 h-11 text-sm" onClick={() => setMobileOpen(false)}>
                   {t("nav.signIn")}
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm" className="flex-1" onClick={() => setMobileOpen(false)}>
+                <Button size="sm" className="flex-1 h-11 text-sm" onClick={() => setMobileOpen(false)}>
                   {t("nav.getStarted")}
                 </Button>
               </SignUpButton>

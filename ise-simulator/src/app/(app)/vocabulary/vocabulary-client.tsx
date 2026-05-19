@@ -11,6 +11,7 @@ import { SaveToListDialog } from "@/components/vocabulary/save-to-list-dialog";
 import { WordDetailsDialog } from "@/components/vocabulary/word-details-dialog";
 import { useEnglishTTS } from "@/hooks/use-english-tts";
 import { useToast } from "@/components/ui/toaster";
+import { useI18n } from "@/components/i18n/language-provider";
 import { scoreToLevel, levelToStartScore, SCORE_TO_LEVEL, type CefrBand } from "@/lib/prompts/vocabulary";
 import type { VocabCard, VocabularyListData } from "@/types";
 import {
@@ -46,7 +47,10 @@ export function VocabularyClient() {
   const [scoreHistory, setScoreHistory] = useState<number[]>([]);
   const [lastDelta, setLastDelta] = useState<"up" | "down" | "same" | null>(null);
   const [missedWords, setMissedWords] = useState<string[]>([]);
+  const [answerFlash, setAnswerFlash] = useState<"correct" | "wrong" | null>(null);
+  const [isExiting, setIsExiting] = useState(false);
   const seenWordsRef = useRef<string[]>([]);
+  const prevLocaleRef = useRef<string | null>(null);
 
   // Save / lists state
   const [lists, setLists] = useState<VocabularyListData[]>([]);
@@ -57,6 +61,7 @@ export function VocabularyClient() {
   const currentCard = cards[cardIndex];
   const currentLevel = scoreToLevel(score);
 
+  const { dict, locale } = useI18n();
   const { show } = useToast();
   const ttsErrorShownRef = useRef(false);
   const handleTtsError = useCallback((msg: string) => {
@@ -107,7 +112,7 @@ export function VocabularyClient() {
       const res = await fetch("/api/vocabulary/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ score: nextScore, alreadySeen: seen }),
+        body: JSON.stringify({ score: nextScore, alreadySeen: seen, locale }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
@@ -119,7 +124,16 @@ export function VocabularyClient() {
       setError(err instanceof Error ? err.message : "Failed to load cards. Try again.");
       setPhase(seen.length === 0 ? "setup" : "studying");
     }
-  }, []);
+  }, [locale]);
+
+  // Re-fetch when the user changes language mid-session
+  useEffect(() => {
+    const prev = prevLocaleRef.current;
+    prevLocaleRef.current = locale;
+    if (prev !== null && prev !== locale && phase === "studying") {
+      fetchNextBatch(score, seenWordsRef.current);
+    }
+  }, [locale, phase, score, fetchNextBatch]);
 
   const handleStart = useCallback(() => {
     if (!selectedStart) return;
@@ -135,28 +149,40 @@ export function VocabularyClient() {
   }, [selectedStart, fetchNextBatch]);
 
   const handleAnswer = useCallback((knew: boolean) => {
-    if (!currentCard) return;
+    if (!currentCard || isExiting) return;
 
-    seenWordsRef.current = [...seenWordsRef.current, currentCard.english];
+    const card = currentCard;
+    const currentScore = score;
+    const currentIndex = cardIndex;
+    const currentCardsLen = cards.length;
 
-    setTotalSeen((n) => n + 1);
-    if (knew) setTotalKnown((n) => n + 1);
-    else setMissedWords((prev) => [...prev, currentCard.english]);
+    setAnswerFlash(knew ? "correct" : "wrong");
+    setIsExiting(true);
 
-    const delta = knew ? SCORE_DELTA_CORRECT : -SCORE_DELTA_WRONG;
-    const newScore = Math.min(100, Math.max(0, score + delta));
-    setScore(newScore);
-    setScoreHistory((h) => [...h, newScore]);
-    setLastDelta(newScore > score ? "up" : newScore < score ? "down" : "same");
+    setTimeout(() => {
+      seenWordsRef.current = [...seenWordsRef.current, card.english];
+      setTotalSeen((n) => n + 1);
+      if (knew) setTotalKnown((n) => n + 1);
+      else setMissedWords((prev) => [...prev, card.english]);
 
-    const nextIndex = cardIndex + 1;
-    if (nextIndex < cards.length) {
-      setCardIndex(nextIndex);
-      setIsFlipped(false);
-    } else {
-      fetchNextBatch(newScore, seenWordsRef.current);
-    }
-  }, [currentCard, score, cardIndex, cards.length, fetchNextBatch]);
+      const delta = knew ? SCORE_DELTA_CORRECT : -SCORE_DELTA_WRONG;
+      const newScore = Math.min(100, Math.max(0, currentScore + delta));
+      setScore(newScore);
+      setScoreHistory((h) => [...h, newScore]);
+      setLastDelta(newScore > currentScore ? "up" : newScore < currentScore ? "down" : "same");
+
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < currentCardsLen) {
+        setCardIndex(nextIndex);
+        setIsFlipped(false);
+      } else {
+        fetchNextBatch(newScore, seenWordsRef.current);
+      }
+
+      setAnswerFlash(null);
+      setIsExiting(false);
+    }, 300);
+  }, [currentCard, isExiting, score, cardIndex, cards.length, fetchNextBatch]);
 
   const handleStop = useCallback(() => setPhase("done"), []);
 
@@ -184,7 +210,7 @@ export function VocabularyClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           english: currentCard.english,
-          spanish: currentCard.spanish,
+          spanish: currentCard.translation,
           example: currentCard.example,
           partOfSpeech: currentCard.partOfSpeech,
           level: currentLevel.cefr,
@@ -415,38 +441,49 @@ export function VocabularyClient() {
               </div>
             )}
 
-            <Flashcard
-              card={currentCard}
-              isFlipped={isFlipped}
-              onFlip={() => setIsFlipped((f) => !f)}
-              onSpeak={speak}
-              isPlaying={isPlaying}
-              isSaved={isCurrentSaved}
-              onToggleSave={() => setSaveOpen(true)}
-              onOpenDetails={() => setDetailsOpen(true)}
-            />
+            <div className={`transition-all duration-300 ease-in-out ${
+              isExiting ? "opacity-0 scale-95 -translate-y-1" : "opacity-100 scale-100 translate-y-0"
+            }`}>
+              <Flashcard
+                key={cardIndex}
+                card={currentCard}
+                isFlipped={isFlipped}
+                onFlip={() => { if (!isExiting) setIsFlipped((f) => !f); }}
+                onSpeak={speak}
+                isPlaying={isPlaying}
+                isSaved={isCurrentSaved}
+                onToggleSave={() => setSaveOpen(true)}
+                onOpenDetails={() => setDetailsOpen(true)}
+              />
+            </div>
 
             {isFlipped ? (
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="outline"
-                  className="gap-2 h-12 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+                  className={`gap-2 h-12 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 transition-all duration-150 active:scale-95 ${
+                    answerFlash === "wrong" ? "scale-95 bg-red-100 dark:bg-red-950 shadow-inner" : ""
+                  }`}
+                  disabled={isExiting}
                   onClick={() => handleAnswer(false)}
                 >
                   <XCircle className="h-5 w-5" />
-                  Still learning
+                  {dict.vocab.stillLearning}
                 </Button>
                 <Button
-                  className="gap-2 h-12 bg-green-600 hover:bg-green-700 text-white"
+                  className={`gap-2 h-12 bg-green-600 hover:bg-green-700 text-white transition-all duration-150 active:scale-95 ${
+                    answerFlash === "correct" ? "scale-95 brightness-110 shadow-inner" : ""
+                  }`}
+                  disabled={isExiting}
                   onClick={() => handleAnswer(true)}
                 >
                   <CheckCircle className="h-5 w-5" />
-                  Know it
+                  {dict.vocab.knowIt}
                 </Button>
               </div>
             ) : (
               <div className="h-12 flex items-center justify-center text-sm text-zinc-400">
-                Tap the card to see the translation
+                {dict.vocab.tapToReveal}
               </div>
             )}
 

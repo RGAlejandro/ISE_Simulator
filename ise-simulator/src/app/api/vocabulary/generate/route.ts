@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { score, alreadySeen = [] } = body as { score: number; alreadySeen?: string[] };
+    const { score, alreadySeen = [], locale = "es" } = body as { score: number; alreadySeen?: string[]; locale?: string };
 
     if (typeof score !== "number" || score < 0 || score > 100) {
       return NextResponse.json({ error: "Invalid score" }, { status: 400 });
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid alreadySeen" }, { status: 400 });
     }
 
-    const prompt = generateAdaptiveVocabularyPrompt(score, alreadySeen);
+    const prompt = generateAdaptiveVocabularyPrompt(score, alreadySeen, locale);
     const data = await generateJSON(prompt, { temperature: 0.85 });
 
     if (!Array.isArray(data?.cards) || data.cards.length === 0) {
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       (c: unknown) =>
         typeof c === "object" && c !== null &&
         typeof (c as Record<string, unknown>).english === "string" &&
-        typeof (c as Record<string, unknown>).spanish === "string" &&
+        typeof (c as Record<string, unknown>).translation === "string" &&
         typeof (c as Record<string, unknown>).example === "string"
     );
 

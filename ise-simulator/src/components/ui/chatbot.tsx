@@ -115,8 +115,12 @@ export function ChatBot() {
     }
   }
 
-  const panelWidth = expanded ? "w-[min(680px,calc(100vw-2rem))]" : "w-[360px] max-w-[calc(100vw-2rem)]";
-  const messagesHeight = expanded ? "max-h-[calc(100vh-260px)] min-h-[400px]" : "max-h-[400px] min-h-[200px]";
+  const panelDesktop = expanded
+    ? "sm:w-[min(680px,calc(100vw-2rem))]"
+    : "sm:w-[360px] sm:max-w-[calc(100vw-2rem)]";
+  const messagesHeight = expanded
+    ? "max-h-[calc(100dvh-120px)] sm:max-h-[calc(100vh-260px)] min-h-[200px] sm:min-h-[400px]"
+    : "max-h-[calc(100dvh-120px)] sm:max-h-[400px] min-h-[200px]";
 
   return (
     <>
@@ -124,8 +128,10 @@ export function ChatBot() {
       {open && (
         <div
           className={cn(
-            "fixed bottom-20 right-4 z-50 flex flex-col rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden transition-all duration-300",
-            panelWidth
+            "fixed z-50 flex flex-col shadow-2xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden transition-all duration-300",
+            // Mobile: full-screen; Desktop: floating panel
+            "inset-0 sm:inset-auto sm:bottom-20 sm:right-4 sm:rounded-2xl sm:border",
+            panelDesktop
           )}
         >
           {/* Header */}
@@ -143,7 +149,7 @@ export function ChatBot() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setExpanded((v) => !v)}
-                className="text-white/70 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
+                className="hidden sm:block text-white/70 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
                 aria-label={expanded ? "Reducir chat" : "Expandir chat"}
                 title={expanded ? "Reducir" : "Expandir"}
               >
@@ -224,13 +230,13 @@ export function ChatBot() {
         </div>
       )}
 
-      {/* Floating button */}
+      {/* Floating button — hidden on mobile when chat is open (full-screen) */}
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "fixed bottom-4 right-4 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200",
           open
-            ? "bg-zinc-600 hover:bg-zinc-700 text-white"
+            ? "bg-zinc-600 hover:bg-zinc-700 text-white hidden sm:flex"
             : "bg-gradient-to-br from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 text-white shadow-sky-200 dark:shadow-none"
         )}
         aria-label={open ? "Cerrar asistente" : "Abrir asistente ISE"}

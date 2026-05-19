@@ -136,7 +136,7 @@ export function Flashcard({
                 {card.partOfSpeech}
               </Badge>
               <p className="text-3xl font-bold text-blue-700 dark:text-blue-200 leading-tight">
-                {card.spanish}
+                {card.translation}
               </p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">
                 {card.english}

@@ -107,14 +107,14 @@ export function ExamListRow({ exam, isPro }: {
 
       {/* Score */}
       {exam.score !== null && (
-        <div className="hidden sm:block text-right shrink-0 mr-2">
-          <p className="text-base font-bold tabular-nums text-zinc-900 dark:text-zinc-100 leading-tight">{Math.round(exam.score)}%</p>
-          {band && <p className={cn("text-[10px] font-medium uppercase tracking-wide", band.cls)}>{band.label}</p>}
+        <div className="text-right shrink-0 mr-2">
+          <p className="text-sm sm:text-base font-bold tabular-nums text-zinc-900 dark:text-zinc-100 leading-tight">{Math.round(exam.score)}%</p>
+          {band && <p className={cn("text-[10px] font-medium uppercase tracking-wide hidden sm:block", band.cls)}>{band.label}</p>}
         </div>
       )}
 
       {/* Status badge */}
-      <div className="hidden md:block shrink-0">
+      <div className="hidden sm:block shrink-0">
         {isEvaluated  && <Badge variant="success" className="text-[10px]">{t("dashboard.exam.evaluated")}</Badge>}
         {isInProgress && <Badge variant="warning" className="text-[10px]">{t("dashboard.exam.inProgress")}</Badge>}
         {!isEvaluated && !isInProgress && <Badge variant="default" className="text-[10px]">{t("dashboard.exam.completed")}</Badge>}
@@ -264,7 +264,7 @@ export function DashboardClient({ user, isPro, recentExams, totalExams, stats, u
         </Link>
 
         {/* KPI Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           <Kpi
             label={t("dashboard.kpi.streak")}
             value={stats.streak}

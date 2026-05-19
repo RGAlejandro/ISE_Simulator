@@ -212,23 +212,23 @@ function DemoWindow() {
 export function HeroSection() {
   const t = useT();
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50/40 to-purple-50/20 dark:from-zinc-950 dark:via-blue-950/20 dark:to-purple-950/10">
+    <section className="relative overflow-hidden min-h-[calc(100dvh-4rem)] sm:min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50/40 to-purple-50/20 dark:from-zinc-950 dark:via-blue-950/20 dark:to-purple-950/10">
 
-      {/* Animated background orbs */}
+      {/* Animated background orbs — scaled down on mobile */}
       <motion.div
         animate={{ y: [0, -40, 0], x: [0, 20, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-16 right-[5%] h-[500px] w-[500px] rounded-full bg-blue-200/30 dark:bg-blue-800/15 blur-3xl pointer-events-none"
+        className="absolute top-16 right-[5%] h-[250px] w-[250px] sm:h-[500px] sm:w-[500px] rounded-full bg-blue-200/30 dark:bg-blue-800/15 blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ y: [0, 30, 0], x: [0, -15, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute bottom-0 left-[5%] h-[400px] w-[400px] rounded-full bg-purple-200/30 dark:bg-purple-800/15 blur-3xl pointer-events-none"
+        className="absolute bottom-0 left-[5%] h-[200px] w-[200px] sm:h-[400px] sm:w-[400px] rounded-full bg-purple-200/30 dark:bg-purple-800/15 blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.35, 0.2] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-indigo-100/20 dark:bg-indigo-900/10 blur-3xl pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] sm:h-[600px] sm:w-[600px] rounded-full bg-indigo-100/20 dark:bg-indigo-900/10 blur-3xl pointer-events-none"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 w-full">
@@ -350,7 +350,7 @@ export function HeroSection() {
               initial={{ opacity: 0, x: -20, y: 10 }}
               animate={{ opacity: 1, x: 0, y: 0 }}
               transition={{ delay: 1.1, duration: 0.5 }}
-              className="absolute -bottom-5 -left-6 z-20 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-zinc-100 dark:border-zinc-700 px-4 py-3 flex items-center gap-2.5"
+              className="absolute -bottom-5 -left-6 z-20 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-zinc-100 dark:border-zinc-700 px-4 py-3 hidden sm:flex items-center gap-2.5"
             >
               <div className="h-9 w-9 rounded-xl bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -366,7 +366,7 @@ export function HeroSection() {
               initial={{ opacity: 0, x: 20, y: -10 }}
               animate={{ opacity: 1, x: 0, y: 0 }}
               transition={{ delay: 1.3, duration: 0.5 }}
-              className="absolute -top-5 -right-6 z-20 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-zinc-100 dark:border-zinc-700 px-4 py-3 flex items-center gap-2.5"
+              className="absolute -top-5 -right-6 z-20 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-zinc-100 dark:border-zinc-700 px-4 py-3 hidden sm:flex items-center gap-2.5"
             >
               <div className="h-9 w-9 rounded-xl bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
                 <Mic className="h-5 w-5 text-blue-600 dark:text-blue-400" />

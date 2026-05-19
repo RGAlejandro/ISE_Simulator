@@ -21,7 +21,7 @@ export default async function StudyListPage({ params }: { params: Promise<{ list
   const cards: (VocabCard & { id: string; level: CefrBand })[] = list.words.map((w) => ({
     id: w.id,
     english: w.english,
-    spanish: w.spanish,
+    translation: w.spanish,
     example: w.example,
     partOfSpeech: w.partOfSpeech ?? "word",
     level: (w.level as CefrBand) ?? "B1",

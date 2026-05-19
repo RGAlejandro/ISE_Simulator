@@ -69,7 +69,7 @@ function ScoreCircle({ score, total }: { score: number; total: number }) {
   const color = pct >= 70 ? "text-green-600 dark:text-green-400" : pct >= 50 ? "text-yellow-600 dark:text-yellow-400" : "text-red-500";
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className={`text-4xl font-bold ${color}`}>{score}</span>
+      <span className={`text-3xl sm:text-4xl font-bold ${color}`}>{score}</span>
       <span className="text-xs text-zinc-500">/ {total}</span>
       <Badge variant="outline" className={`text-xs ${color}`}>{pct}%</Badge>
     </div>

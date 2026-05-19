@@ -145,7 +145,8 @@ export interface UserUsage {
 export interface VocabCard {
   english: string;
   partOfSpeech: string;
-  spanish: string;
+  /** Native-language translation — language depends on the user's locale at generation time */
+  translation: string;
   example: string;
 }
 

@@ -352,9 +352,9 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-start sm:items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">
             Oral Exam — {level.replace("_", " ")}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -375,7 +375,7 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
           </span>
         </div>
         <Progress value={taskProgress} className="h-2" />
-        <div className="mt-2 flex justify-between">
+        <div className="mt-2 flex justify-between overflow-x-auto gap-2">
           {TASK_ORDER.map((task, i) => (
             <div
               key={task}
@@ -411,7 +411,7 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
           <CardTitle className="text-sm font-medium text-zinc-500">Conversation</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="h-[400px] overflow-y-auto p-4 space-y-4">
+          <div className="h-[50vh] sm:h-[400px] min-h-[200px] overflow-y-auto p-4 space-y-4">
             {store.messages.map((msg) => (
               <div
                 key={msg.id}

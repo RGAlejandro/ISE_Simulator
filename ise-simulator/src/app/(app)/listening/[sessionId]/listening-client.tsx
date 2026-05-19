@@ -335,11 +335,11 @@ export function ListeningClient({
 
         {/* Progress steps */}
         <div className="space-y-2">
-          <div className="flex justify-between text-xs text-zinc-500">
+          <div className="flex justify-between text-xs text-zinc-500 overflow-x-auto gap-2">
             {PHASE_STEPS.map((step, i) => (
               <span
                 key={step.key}
-                className={
+                className={`whitespace-nowrap ${
                   i <= currentStepIndex
                     ? "text-blue-600 font-medium dark:text-blue-400"
                     : "text-zinc-400"

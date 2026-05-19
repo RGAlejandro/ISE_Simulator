@@ -408,6 +408,7 @@ export const es: Dictionary = {
       title: "Cómo funciona",
       subtitle: "De cero a listo en tres pasos simples",
       hoverHint: "pasar el ratón para ver",
+      tapHint: "toca para ver",
       step1Title: "Elige tu módulo",
       step1Desc: "Elige tu nivel ISE y la habilidad que quieres practicar: examen escrito, simulación oral, listening, gramática o tarjetas de vocabulario.",
       step2Title: "Practica con IA",
@@ -452,8 +453,12 @@ export const es: Dictionary = {
       button: "Empezar examen gratis",
     },
   },
-  footer: {
-    tagline: "Practica para tus exámenes Trinity ISE con simulaciones IA. Práctica de examen escrito y oral con feedback en tiempo real.",
+  vocab: {
+    stillLearning: "Aún aprendiendo",
+    knowIt: "Lo sé",
+    tapToReveal: "Toca la tarjeta para ver la traducción",
+  },
+  footer: { tagline: "con simulaciones IA. Práctica de examen escrito y oral con feedback en tiempo real.",
     product: "Producto",
     examLevels: "Niveles del examen",
     copyright: "Todos los derechos reservados. Esta aplicación no está afiliada a Trinity College London.",
