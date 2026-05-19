@@ -23,6 +23,23 @@ interface Props {
   level: string;
 }
 
+function isContentValid(content: WrittenExamContent): boolean {
+  try {
+    return !!(
+      content?.reading1?.paragraphMatching?.instructions &&
+      content?.reading1?.statementSelection?.instructions &&
+      content?.reading1?.gapFill?.instructions &&
+      content?.reading2?.textMatching?.instructions &&
+      content?.reading2?.statementSelection?.instructions &&
+      content?.reading2?.gapFill?.instructions &&
+      content?.readingIntoWriting &&
+      content?.extendedWriting
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function WrittenExamClient({ examId, content, level }: Props) {
   const router = useRouter();
   const [currentTask, setCurrentTask] = useState(0);
@@ -76,6 +93,29 @@ export function WrittenExamClient({ examId, content, level }: Props) {
   }, [timeRemaining, handleSubmit]);
 
   const levelLabel = level.replace(/_/g, " ");
+
+  if (!isContentValid(content)) {
+    return (
+      <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-8 text-center space-y-4">
+          <div className="text-4xl">⚠️</div>
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Exam generation incomplete</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            This exam was not fully generated — some sections are missing. This can happen when the AI model
+            returns an incomplete response. Please delete this exam and generate a new one.
+          </p>
+          <div className="flex gap-3 justify-center pt-2">
+            <Link href="/dashboard">
+              <Button variant="outline">Back to Dashboard</Button>
+            </Link>
+            <form action={`/api/exam/${examId}/delete`} method="POST">
+              <Button type="submit" variant="destructive">Delete &amp; Retry</Button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950">

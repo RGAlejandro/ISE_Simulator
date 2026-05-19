@@ -64,7 +64,7 @@ export async function groqGenerateText(
 
 export async function groqGenerateJSON(
   prompt: string,
-  options?: { temperature?: number }
+  options?: { temperature?: number; maxTokens?: number }
 ): Promise<unknown> {
   return tryGroqModels(async (modelName) => {
     const response = await getGroq().chat.completions.create({
@@ -77,6 +77,7 @@ export async function groqGenerateJSON(
         { role: "user", content: prompt },
       ],
       temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 8192,
       response_format: { type: "json_object" },
     });
     const text = response.choices[0]?.message?.content ?? "{}";
@@ -106,7 +107,7 @@ export async function groqGenerateChat(
 export async function groqGenerateChatJSON(
   systemPrompt: string,
   userPrompt: string,
-  options?: { temperature?: number }
+  options?: { temperature?: number; maxTokens?: number }
 ): Promise<unknown> {
   return tryGroqModels(async (modelName) => {
     const response = await getGroq().chat.completions.create({
@@ -119,6 +120,7 @@ export async function groqGenerateChatJSON(
         { role: "user", content: userPrompt },
       ],
       temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 8192,
       response_format: { type: "json_object" },
     });
     const text = response.choices[0]?.message?.content ?? "{}";
