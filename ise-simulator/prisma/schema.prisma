@@ -1,30 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  name      String?
-  plan      Plan     @default(FREE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  subscription       Subscription?
-  writtenExams       WrittenExam[]
-  oralExams          OralExam[]
-  listeningSessions  ListeningSession[]
-  grammarSessions    GrammarSession[]
-  vocabularyLists    VocabularyList[]
-  savedWords         SavedWord[]
-  dailyUsage         DailyUsage[]
-  paperSubmissions   PaperSubmission[]
+  id                String             @id @default(cuid())
+  clerkId           String             @unique
+  email             String             @unique
+  name              String?
+  plan              Plan               @default(FREE)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  dailyUsage        DailyUsage[]
+  grammarSessions   GrammarSession[]
+  listeningSessions ListeningSession[]
+  oralExams         OralExam[]
+  paperSubmissions  PaperSubmission[]
+  savedWords        SavedWord[]
+  subscription      Subscription?
+  vocabularyLists   VocabularyList[]
+  writtenExams      WrittenExam[]
 
   @@index([clerkId])
 }
@@ -40,27 +39,25 @@ model Subscription {
   currentPeriodEnd     DateTime?
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([stripeCustomerId])
 }
 
 model WrittenExam {
-  id          String     @id @default(cuid())
-  userId      String
-  level       ExamLevel
-  content     Json
-  status      ExamStatus @default(IN_PROGRESS)
-  score       Float?
-  startedAt   DateTime   @default(now())
-  completedAt DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
+  id               String            @id @default(cuid())
+  userId           String
+  level            ExamLevel
+  content          Json
+  status           ExamStatus        @default(IN_PROGRESS)
+  score            Float?
+  startedAt        DateTime          @default(now())
+  completedAt      DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  paperSubmissions PaperSubmission[]
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   responses        WrittenResponse[]
-  paperSubmissions PaperSubmission[]
 
   @@index([userId])
 }
@@ -70,31 +67,29 @@ model WrittenResponse {
   examId     String
   taskType   WrittenTaskType
   taskNumber Int
-  response   String          @db.Text
-  aiFeedback String?         @db.Text
+  response   String
+  aiFeedback String?
   score      Float?
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
-
-  exam WrittenExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  exam       WrittenExam     @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   @@index([examId])
 }
 
 model OralExam {
-  id           String     @id @default(cuid())
+  id           String         @id @default(cuid())
   userId       String
   level        ExamLevel
-  status       ExamStatus @default(IN_PROGRESS)
+  status       ExamStatus     @default(IN_PROGRESS)
   overallScore Float?
-  startedAt    DateTime   @default(now())
+  startedAt    DateTime       @default(now())
   completedAt  DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exchanges OralExchange[]
-  feedback  OralFeedback[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchanges    OralExchange[]
+  feedback     OralFeedback[]
 
   @@index([userId])
 }
@@ -104,12 +99,11 @@ model OralExchange {
   examId    String
   taskType  OralTaskType
   role      Role
-  content   String       @db.Text
+  content   String
   audioUrl  String?
   order     Int
   createdAt DateTime     @default(now())
-
-  exam OralExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  exam      OralExam     @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   @@index([examId])
 }
@@ -121,34 +115,32 @@ model OralFeedback {
   feedback  Json
   score     Float?
   createdAt DateTime     @default(now())
-
-  exam OralExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  exam      OralExam     @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   @@index([examId])
 }
 
 model ListeningSession {
-  id             String     @id @default(cuid())
-  userId         String
-  level          ExamLevel
-  status         ExamStatus @default(IN_PROGRESS)
-  passageText      String     @db.Text
-  passageTitle     String
-  passageTopic     String
-  informationType  String     @default("")
-  round1Response String?    @db.Text
-  round1Feedback Json?
-  round1Score    Float?
-  round2Response String?    @db.Text
-  round2Feedback Json?
-  round2Score    Float?
-  overallScore   Float?
-  startedAt      DateTime   @default(now())
-  completedAt    DateTime?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String     @id @default(cuid())
+  userId          String
+  level           ExamLevel
+  status          ExamStatus @default(IN_PROGRESS)
+  passageText     String
+  passageTitle    String
+  passageTopic    String
+  round1Response  String?
+  round1Feedback  Json?
+  round1Score     Float?
+  round2Response  String?
+  round2Feedback  Json?
+  round2Score     Float?
+  overallScore    Float?
+  startedAt       DateTime   @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  informationType String     @default("")
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -165,41 +157,38 @@ model GrammarSession {
   completedAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model VocabularyList {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   userId    String
   name      String
-  emoji     String   @default("📚")
-  color     String   @default("blue")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  words SavedWord[]
+  emoji     String      @default("📚")
+  color     String      @default("blue")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  words     SavedWord[]
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model SavedWord {
-  id           String   @id @default(cuid())
+  id           String          @id @default(cuid())
   userId       String
   listId       String?
   english      String
   spanish      String
-  example      String   @db.Text
+  example      String
   partOfSpeech String?
   level        String
-  notes        String?  @db.Text
-  createdAt    DateTime @default(now())
-
-  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  list VocabularyList? @relation(fields: [listId], references: [id], onDelete: SetNull)
+  notes        String?
+  createdAt    DateTime        @default(now())
+  list         VocabularyList? @relation(fields: [listId], references: [id])
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, english])
   @@index([userId])
@@ -207,18 +196,17 @@ model SavedWord {
 }
 
 model PaperSubmission {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   userId    String
   examId    String
   level     ExamLevel
   feedback  Json?
   score     Float?
-  status    String    @default("PENDING")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exam WrittenExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  status    String      @default("PENDING")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  exam      WrittenExam @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([examId])
@@ -231,8 +219,7 @@ model DailyUsage {
   writtenCount   Int      @default(0)
   oralCount      Int      @default(0)
   listeningCount Int      @default(0)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
   @@index([userId, date])

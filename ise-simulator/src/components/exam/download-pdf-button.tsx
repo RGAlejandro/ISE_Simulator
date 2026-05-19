@@ -521,6 +521,23 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       // ────────────────────────────────────────────────────────────
       // TASK 1 — LONG READING
       // ────────────────────────────────────────────────────────────
+
+      // Pre-compute paragraph box BEFORE drawing anything so we never create an empty page.
+      // If the box is very tall it will simply overflow the page bottom (rare edge case).
+      const T1_BOX_PAD_X = 5, T1_BOX_PAD_Y = 4, T1_LABEL_FONT = 9, T1_BODY_FONT = 8.2;
+      const T1_LABEL_H = 4.5, T1_LINE_H = 3.9, T1_PARA_GAP = 2.8;
+      const T1_TEXT_W = TW - T1_BOX_PAD_X * 2;
+      font(T1_BODY_FONT, "normal");
+      const t1RenderedParas = content.reading1.paragraphs.map(p => ({
+        label: `Paragraph ${p.number}`,
+        lines: doc.splitTextToSize(p.text, T1_TEXT_W) as string[],
+      }));
+      let t1BoxH = T1_BOX_PAD_Y * 2;
+      for (let i = 0; i < t1RenderedParas.length; i++) {
+        t1BoxH += T1_LABEL_H + t1RenderedParas[i].lines.length * T1_LINE_H;
+        if (i < t1RenderedParas.length - 1) t1BoxH += T1_PARA_GAP;
+      }
+
       addPage(true);
       taskHeader(1, "Long reading", "Suggested time: 20 minutes  ·  15 marks");
 
@@ -532,58 +549,30 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       for (const ln of t1introLines) { doc.text(ln, ML, y); y += 5; }
       y += 5;
 
-      // Single shaded box containing ALL 5 paragraphs (compact to fit one page)
+      // Draw paragraph box (dimensions pre-computed above — no overflow check needed)
       {
-        const BOX_PAD_X = 5;
-        const BOX_PAD_Y = 4;
-        const LABEL_FONT = 9;
-        const BODY_FONT = 8.2;
-        const LABEL_H = 4.5;
-        const LINE_H = 3.9;
-        const PARA_GAP = 2.8;
-        const TEXT_W = TW - BOX_PAD_X * 2;
-
-        font(BODY_FONT, "normal");
-        const renderedParas = content.reading1.paragraphs.map(p => ({
-          label: `Paragraph ${p.number}`,
-          lines: doc.splitTextToSize(p.text, TEXT_W) as string[],
-        }));
-
-        let boxH = BOX_PAD_Y * 2;
-        for (let i = 0; i < renderedParas.length; i++) {
-          boxH += LABEL_H + renderedParas[i].lines.length * LINE_H;
-          if (i < renderedParas.length - 1) boxH += PARA_GAP;
-        }
-
-        // If doesn't fit current page, add fresh page (full header) for the box
-        if (y + boxH > FOOT_Y - 2) {
-          // Force fresh page only if box would overflow; otherwise stay
-          addPage();
-        }
-
-        // Shaded box w/ light gray fill + subtle border
         doc.setFillColor(244, 244, 246);
         doc.setDrawColor(180, 180, 180);
         lw(0.3);
-        doc.rect(ML, y, TW, boxH, "FD");
+        doc.rect(ML, y, TW, t1BoxH, "FD");
 
-        let py = y + BOX_PAD_Y;
-        for (let i = 0; i < renderedParas.length; i++) {
-          const { label, lines } = renderedParas[i];
-          font(LABEL_FONT, "bold");
+        let py = y + T1_BOX_PAD_Y;
+        for (let i = 0; i < t1RenderedParas.length; i++) {
+          const { label, lines } = t1RenderedParas[i];
+          font(T1_LABEL_FONT, "bold");
           doc.setTextColor(0);
-          doc.text(label, ML + BOX_PAD_X, py + 3.3);
-          py += LABEL_H;
+          doc.text(label, ML + T1_BOX_PAD_X, py + 3.3);
+          py += T1_LABEL_H;
 
-          font(BODY_FONT, "normal");
+          font(T1_BODY_FONT, "normal");
           for (const ln of lines) {
-            doc.text(ln, ML + BOX_PAD_X, py + 3);
-            py += LINE_H;
+            doc.text(ln, ML + T1_BOX_PAD_X, py + 3);
+            py += T1_LINE_H;
           }
-          if (i < renderedParas.length - 1) py += PARA_GAP;
+          if (i < t1RenderedParas.length - 1) py += T1_PARA_GAP;
         }
 
-        y += boxH + 6;
+        y += t1BoxH + 6;
       }
 
       // Questions always start on a fresh page (reading text on one side, answers on the other)

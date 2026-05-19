@@ -9,7 +9,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ise_user -d ise_simulator"]
       interval: 5s
@@ -38,6 +38,8 @@ services:
       CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      AI_PROVIDER_ORDER: ${AI_PROVIDER_ORDER:-groq,gemini,openrouter}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}

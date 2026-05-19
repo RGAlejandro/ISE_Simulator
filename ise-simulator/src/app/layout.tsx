@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { ToastProvider } from "@/components/ui/toaster";
@@ -37,11 +38,7 @@ export default function RootLayout({
       >
         <head>
           {/* Anti-flash: apply dark class before React hydrates */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `(function(){var t=localStorage.getItem('theme');if(t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}})();`,
-            }}
-          />
+          <Script id="theme-init" strategy="beforeInteractive" src="/theme-init.js" />
         </head>
         <body className="min-h-full flex flex-col">
           <ThemeProvider>

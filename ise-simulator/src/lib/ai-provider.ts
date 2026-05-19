@@ -10,6 +10,12 @@ import {
   geminiGenerateChat,
   geminiGenerateChatJSON,
 } from "./gemini";
+import {
+  openrouterGenerateText,
+  openrouterGenerateJSON,
+  openrouterGenerateChat,
+  openrouterGenerateChatJSON,
+} from "./openrouter";
 
 type Provider = {
   name: string;
@@ -22,26 +28,46 @@ type Provider = {
 };
 
 function getProviders(): Provider[] {
+  const allProviders: Record<string, Provider | null> = {
+    groq: process.env.GROQ_API_KEY
+      ? {
+          name: "Groq",
+          generateText: groqGenerateText,
+          generateJSON: groqGenerateJSON,
+          generateChat: groqGenerateChat,
+          generateChatJSON: groqGenerateChatJSON,
+        }
+      : null,
+    gemini: process.env.GEMINI_API_KEY
+      ? {
+          name: "Gemini",
+          generateText: geminiGenerateText,
+          generateJSON: geminiGenerateJSON,
+          generateChat: geminiGenerateChat,
+          generateChatJSON: geminiGenerateChatJSON,
+        }
+      : null,
+    openrouter: process.env.OPENROUTER_API_KEY
+      ? {
+          name: "OpenRouter",
+          generateText: openrouterGenerateText,
+          generateJSON: openrouterGenerateJSON,
+          generateChat: openrouterGenerateChat,
+          generateChatJSON: openrouterGenerateChatJSON,
+        }
+      : null,
+  };
+
+  // AI_PROVIDER_ORDER lets you set priority, e.g. "openrouter,gemini,groq"
+  // Default order: groq, gemini, openrouter
+  const order = (process.env.AI_PROVIDER_ORDER || "groq,gemini,openrouter")
+    .split(",")
+    .map((s) => s.trim().toLowerCase());
+
   const providers: Provider[] = [];
-
-  if (process.env.GROQ_API_KEY) {
-    providers.push({
-      name: "Groq",
-      generateText: groqGenerateText,
-      generateJSON: groqGenerateJSON,
-      generateChat: groqGenerateChat,
-      generateChatJSON: groqGenerateChatJSON,
-    });
-  }
-
-  if (process.env.GEMINI_API_KEY) {
-    providers.push({
-      name: "Gemini",
-      generateText: geminiGenerateText,
-      generateJSON: geminiGenerateJSON,
-      generateChat: geminiGenerateChat,
-      generateChatJSON: geminiGenerateChatJSON,
-    });
+  for (const key of order) {
+    const p = allProviders[key];
+    if (p) providers.push(p);
   }
 
   return providers;
@@ -57,7 +83,11 @@ function isRetryableError(msg: string): boolean {
     msg.includes("overloaded") ||
     msg.includes("capacity") ||
     msg.includes("RESOURCE_EXHAUSTED") ||
-    msg.includes("high demand")
+    msg.includes("high demand") ||
+    msg.includes("404") ||
+    msg.includes("No endpoints found") ||
+    msg.includes("json_validate_failed") ||
+    msg.includes("Failed to generate JSON")
   );
 }
 
@@ -101,7 +131,7 @@ export async function generateText(
 
 export async function generateJSON(
   prompt: string,
-  options?: { temperature?: number }
+  options?: { temperature?: number; maxTokens?: number }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,7 +149,7 @@ export async function generateChat(
 export async function generateChatJSON(
   systemPrompt: string,
   userPrompt: string,
-  options?: { temperature?: number }
+  options?: { temperature?: number; maxTokens?: number }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
