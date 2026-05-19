@@ -4,54 +4,58 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-const plans = [
-  {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "Perfect for getting started",
-    features: [
-      "1 written exam per day",
-      "1 oral exam per day",
-      "Basic score & pass/fail result",
-      "All ISE levels available",
-      "Reading auto-correction",
-    ],
-    notIncluded: [
-      "Detailed AI writing feedback",
-      "Oral pronunciation analysis",
-      "Progress analytics",
-      "Personalized study tips",
-    ],
-    cta: "Get Started",
-    href: "/sign-up",
-    highlighted: false,
-  },
-  {
-    name: "Pro",
-    price: "$9.99",
-    period: "/month",
-    yearlyPrice: "$89.99/year",
-    description: "Unlimited practice with full feedback",
-    features: [
-      "Unlimited written exams",
-      "Unlimited oral exams",
-      "Detailed AI feedback on writings",
-      "Grammar & vocabulary analysis",
-      "Pronunciation & fluency feedback",
-      "Progress analytics & radar charts",
-      "Personalized study recommendations",
-      "Priority AI (Gemini 2.5 Flash)",
-    ],
-    notIncluded: [],
-    cta: "Upgrade to Pro",
-    href: "/sign-up",
-    highlighted: true,
-  },
-];
+import { useT } from "@/components/i18n/language-provider";
 
 export function PricingSection() {
+  const t = useT();
+
+  const plans = [
+    {
+      name: t("landing.pricing.freeName"),
+      price: "$0",
+      period: t("landing.pricing.freePeriod"),
+      description: t("landing.pricing.freeDesc"),
+      features: [
+        t("landing.pricing.freeF1"),
+        t("landing.pricing.freeF2"),
+        t("landing.pricing.freeF3"),
+        t("landing.pricing.freeF4"),
+        t("landing.pricing.freeF5"),
+      ],
+      notIncluded: [
+        t("landing.pricing.freeN1"),
+        t("landing.pricing.freeN2"),
+        t("landing.pricing.freeN3"),
+        t("landing.pricing.freeN4"),
+      ],
+      cta: t("landing.pricing.freeCta"),
+      href: "/sign-up",
+      highlighted: false,
+      yearlyPrice: undefined as string | undefined,
+    },
+    {
+      name: t("landing.pricing.proName"),
+      price: "$9.99",
+      period: t("landing.pricing.proPeriod"),
+      yearlyPrice: t("landing.pricing.proYearly"),
+      description: t("landing.pricing.proDesc"),
+      features: [
+        t("landing.pricing.proF1"),
+        t("landing.pricing.proF2"),
+        t("landing.pricing.proF3"),
+        t("landing.pricing.proF4"),
+        t("landing.pricing.proF5"),
+        t("landing.pricing.proF6"),
+        t("landing.pricing.proF7"),
+        t("landing.pricing.proF8"),
+      ],
+      notIncluded: [] as string[],
+      cta: t("landing.pricing.proCta"),
+      href: "/sign-up",
+      highlighted: true,
+    },
+  ];
+
   return (
     <section id="pricing" className="py-14 sm:py-20 lg:py-24 bg-zinc-50 dark:bg-zinc-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -62,10 +66,10 @@ export function PricingSection() {
           className="text-center"
         >
           <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
-            Simple, transparent pricing
+            {t("landing.pricing.title")}
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-            Start free. Upgrade when you&apos;re ready for unlimited practice.
+            {t("landing.pricing.subtitle")}
           </p>
         </motion.div>
 
@@ -85,7 +89,7 @@ export function PricingSection() {
             >
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-1 text-sm font-medium text-white">
-                  Most Popular
+                  {t("landing.pricing.mostPopular")}
                 </div>
               )}
 
@@ -98,7 +102,7 @@ export function PricingSection() {
               </div>
               {plan.yearlyPrice && (
                 <p className="mt-1 text-sm text-green-600 dark:text-green-400">
-                  or {plan.yearlyPrice} (save 25%)
+                  {plan.yearlyPrice}
                 </p>
               )}
 

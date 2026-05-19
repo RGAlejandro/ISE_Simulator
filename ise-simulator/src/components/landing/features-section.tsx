@@ -7,46 +7,36 @@ import { useT } from "@/components/i18n/language-provider";
 
 type TabId = "written" | "oral" | "listening" | "vocabulary" | "grammar";
 
-const TABS: { id: TabId; label: string; icon: typeof PenTool; color: string; bg: string; description: string }[] = [
+const TAB_STATIC = [
   {
-    id: "written",
-    label: "Written Exam",
+    id: "written" as TabId,
     icon: PenTool,
     color: "text-blue-600 dark:text-blue-400",
     bg: "bg-blue-100 dark:bg-blue-900",
-    description: "Full ISE reading & writing simulation with AI-scored feedback across grammar, vocabulary, task fulfillment, and more.",
   },
   {
-    id: "oral",
-    label: "Oral Exam",
+    id: "oral" as TabId,
     icon: Mic,
     color: "text-purple-600 dark:text-purple-400",
     bg: "bg-purple-100 dark:bg-purple-900",
-    description: "Speak directly to an AI examiner. Complete all 4 oral tasks with real-time voice recognition and instant scoring.",
   },
   {
-    id: "listening",
-    label: "Listening",
+    id: "listening" as TabId,
     icon: Volume2,
     color: "text-cyan-600 dark:text-cyan-400",
     bg: "bg-cyan-100 dark:bg-cyan-900",
-    description: "Trinity-style two-round listening practice. AI reads the passage aloud, you summarize and take detailed notes.",
   },
   {
-    id: "vocabulary",
-    label: "Vocabulary",
+    id: "vocabulary" as TabId,
     icon: BookMarked,
     color: "text-pink-600 dark:text-pink-400",
     bg: "bg-pink-100 dark:bg-pink-900",
-    description: "Adaptive flashcards that get harder as you improve. English–Spanish flip cards from A1 to C2, infinite sessions.",
   },
   {
-    id: "grammar",
-    label: "Grammar",
+    id: "grammar" as TabId,
     icon: BookOpen,
     color: "text-green-600 dark:text-green-400",
     bg: "bg-green-100 dark:bg-green-900",
-    description: "AI-generated gap fills, MCQs, and error correction. 10 questions per session, unlimited practice at any CEFR level.",
   },
 ];
 
@@ -363,8 +353,17 @@ const PREVIEWS: Record<TabId, React.ReactNode> = {
 
 export function FeaturesSection() {
   const [active, setActive] = useState<TabId>("written");
-  const activeTab = TABS.find((t) => t.id === active)!;
   const t = useT();
+
+  const TABS = [
+    { ...TAB_STATIC[0], label: t("landing.features.writtenLabel"), description: t("landing.features.writtenDesc") },
+    { ...TAB_STATIC[1], label: t("landing.features.oralLabel"), description: t("landing.features.oralDesc") },
+    { ...TAB_STATIC[2], label: t("landing.features.listeningLabel"), description: t("landing.features.listeningDesc") },
+    { ...TAB_STATIC[3], label: t("landing.features.vocabularyLabel"), description: t("landing.features.vocabularyDesc") },
+    { ...TAB_STATIC[4], label: t("landing.features.grammarLabel"), description: t("landing.features.grammarDesc") },
+  ];
+
+  const activeTab = TABS.find((t) => t.id === active)!;
 
   return (
     <section id="features" className="py-14 sm:py-20 lg:py-28 bg-white dark:bg-zinc-950">

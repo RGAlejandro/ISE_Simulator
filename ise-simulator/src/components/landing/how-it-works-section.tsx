@@ -146,6 +146,7 @@ type StepDef = {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
+  hoverHint: string;
   color: string;
   ring: string;
   iconBg: string;
@@ -160,6 +161,7 @@ const steps: StepDef[] = [
     icon: MousePointerClick,
     title: "Choose your module",
     description: "Pick your ISE level and the skill you want to practise — written exam, oral simulation, listening, grammar, or vocabulary flashcards.",
+    hoverHint: "hover to preview",
     color: "bg-blue-500",
     ring: "ring-blue-500/40",
     iconBg: "bg-blue-500/10",
@@ -172,6 +174,7 @@ const steps: StepDef[] = [
     icon: Brain,
     title: "Practice with AI",
     description: "The AI generates unique content every session. Speak to the examiner, fill in your answers, flip vocab cards — fully interactive.",
+    hoverHint: "hover to preview",
     color: "bg-purple-500",
     ring: "ring-purple-500/40",
     iconBg: "bg-purple-500/10",
@@ -184,6 +187,7 @@ const steps: StepDef[] = [
     icon: Trophy,
     title: "Get instant feedback",
     description: "Receive detailed scores on grammar, vocabulary, task fulfillment, and more. Know exactly what to fix before exam day.",
+    hoverHint: "hover to preview",
     color: "bg-emerald-500",
     ring: "ring-emerald-500/40",
     iconBg: "bg-emerald-500/10",
@@ -239,7 +243,7 @@ function StepCard({ step, idx }: { step: StepDef; idx: number }) {
 
         {/* Hover hint */}
         <p className={`absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] text-zinc-500 transition-opacity duration-200 ${hovered ? "opacity-0" : "opacity-100"}`}>
-          hover to preview
+          {step.hoverHint}
         </p>
 
         {/* Animated popup */}
@@ -277,8 +281,29 @@ function StepCard({ step, idx }: { step: StepDef; idx: number }) {
 /* ── Main export ────────────────────────────────────────── */
 export function HowItWorksSection() {
   const t = useT();
-  return (
-    <section className="py-14 sm:py-20 lg:py-28 bg-zinc-50 dark:bg-zinc-900 overflow-hidden">
+
+  const translatedSteps: StepDef[] = [
+    {
+      ...steps[0],
+      title: t("landing.howItWorks.step1Title"),
+      description: t("landing.howItWorks.step1Desc"),
+      hoverHint: t("landing.howItWorks.hoverHint"),
+    },
+    {
+      ...steps[1],
+      title: t("landing.howItWorks.step2Title"),
+      description: t("landing.howItWorks.step2Desc"),
+      hoverHint: t("landing.howItWorks.hoverHint"),
+    },
+    {
+      ...steps[2],
+      title: t("landing.howItWorks.step3Title"),
+      description: t("landing.howItWorks.step3Desc"),
+      hoverHint: t("landing.howItWorks.hoverHint"),
+    },
+  ];
+
+  return (    <section className="py-14 sm:py-20 lg:py-28 bg-zinc-50 dark:bg-zinc-900 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <motion.div
@@ -311,7 +336,7 @@ export function HowItWorksSection() {
             </div>
           </div>
 
-          {steps.map((step, idx) => (
+          {translatedSteps.map((step, idx) => (
             <StepCard key={step.step} step={step} idx={idx} />
           ))}
         </div>

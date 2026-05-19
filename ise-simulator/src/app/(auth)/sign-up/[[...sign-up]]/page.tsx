@@ -70,6 +70,11 @@ export default function SignUpPage() {
                 borderColor: "#3f3f46",
                 color: "#f4f4f5",
               },
+              otpCodeFieldInput: {
+                backgroundColor: "#27272a",
+                borderColor: "#3f3f46",
+                color: "#f4f4f5",
+              },
               formButtonPrimary: {
                 background: "linear-gradient(to right, #38bdf8, #6366f1)",
                 border: "none",
