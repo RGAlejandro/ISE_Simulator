@@ -52,40 +52,42 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
   // ─────────────────────────────────────────────────────────────────────────
   ISE_FOUNDATION: {
     cefr: "A2",
-    examDuration: 60,
+    examDuration: 120,
     task1: {
-      totalWords: "200-300 words total",
-      wordsPerParagraph: "40-60 words",
+      totalWords: "EXACTLY 300 words total (Trinity ISE Foundation official spec)",
+      wordsPerParagraph: "approximately 60 words each (300 ÷ 5)",
       minSentences: 3,
-      contentDepth: "Simple factual descriptions using everyday language. Each paragraph covers one clear, concrete idea with short, direct sentences. No abstract concepts. Use familiar, real-world examples (daily routines, common places, simple descriptions of people or events).",
+      contentDepth: "Simple, factual text of the kind found in a textbook or article. Each paragraph covers one clear, concrete idea with short, direct sentences. No abstract concepts. Use familiar real-world examples (daily routines, common places, simple descriptions of people or events). Any topic-specific low-frequency words MUST be glossed inline (meaning explained through the text).",
     },
     task2: {
-      wordsPerText: "50-80 words",
+      wordsPerText: "approximately 75 words each text (300 ÷ 4 — official spec uses 3 texts; we use 4 to match our 30-question structure)",
       minSentences: 3,
-      graphMinWords: 30,
-      textRegister: "Very informal, conversational. Use simple everyday language as if written by a young person or casual blogger. Short sentences, simple connectors (and, but, because, so).",
+      graphMinWords: 40,
+      textRegister: "Simple factual texts familiar from educational context. Very informal/conversational style. Short sentences, simple connectors (and, but, because, so). All four texts MUST be on the same subject area and thematically linked.",
     },
+    // Official Trinity ISE Foundation subject areas (14)
     topics: [
-      "daily life and routines", "hobbies and free time", "family and friends",
-      "shopping and money", "travel and holidays", "food and eating out",
-      "school and learning", "my town or city", "sports and games",
-      "animals and pets", "celebrations and festivals", "clothes and fashion",
+      "Holidays", "Shopping", "School and work", "Hobbies and sports",
+      "Food", "Weekend and seasonal activities", "Jobs", "Places in the local area",
+      "Place of study", "Home life", "Weather", "Free time",
+      "Times and dates", "The natural world",
     ],
     subjectAreas: [
-      "food and drink", "transport and getting around", "weather and seasons",
-      "entertainment and TV", "home and neighbourhood", "parks and outdoor spaces",
-      "music and singing", "birthdays and parties", "weekend activities",
-      "favourite places", "pocket money and saving", "school subjects",
+      "Holidays", "Shopping", "School and work", "Hobbies and sports",
+      "Food", "Weekend and seasonal activities", "Jobs", "Places in the local area",
+      "Place of study", "Home life", "Weather", "Free time",
+      "Times and dates", "The natural world",
     ],
     complexity: "Simple sentences only. Present simple, past simple, 'going to' future. High-frequency vocabulary (most common 1,500 words). No idioms, no phrasal verbs, no complex connectors.",
     vocabularyBand: "A1-A2 core vocabulary. Words like: interesting, important, favourite, usually, sometimes, because, different, popular, enjoy, prefer.",
     grammarFocus: "Present simple, past simple, 'going to' for future, basic modals (can, must), comparatives/superlatives (bigger, the best), simple connectors (and, but, because, so, then).",
     textRegister: "Informal, friendly, personal tone. Written as if for a school project or a message to a friend.",
-    questionGuidance: "Questions should test basic comprehension. True statements should be clearly supported by the text. False statements should be obviously wrong (contradicted by the text). Gap fill answers should be single common words.",
-    writingWordLimit: { riw: { min: 80, max: 100 }, ew: { min: 80, max: 100 } },
+    questionGuidance: "Questions test basic comprehension. True statements clearly supported by the text. False statements obviously wrong (contradicted by the text). Gap fill answers should be single common words or short phrases (max 3 words).",
+    writingWordLimit: { riw: { min: 70, max: 100 }, ew: { min: 70, max: 100 } },
+    // Official Trinity ISE Foundation writing genres (4)
     writingTypes: {
-      riw: ["informal email", "informal letter", "short message"],
-      ew: ["informal email", "informal letter", "description", "short message"],
+      riw: ["descriptive essay", "article", "informal email", "informal letter", "neutral email", "neutral letter", "review"],
+      ew: ["descriptive essay", "article", "informal email", "informal letter", "neutral email", "neutral letter", "review"],
     },
   },
 
@@ -96,38 +98,38 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     cefr: "B1",
     examDuration: 120,
     task1: {
-      totalWords: "300-450 words total",
-      wordsPerParagraph: "60-90 words",
+      totalWords: "EXACTLY 400 words total (Trinity ISE I official spec)",
+      wordsPerParagraph: "approximately 80 words each (400 ÷ 5)",
       minSentences: 4,
-      contentDepth: "Clear factual text with some opinion or explanation. Each paragraph develops one main idea with supporting detail and at least one example. Mix simple and compound sentences. The text should be informative and accessible to an intermediate reader.",
+      contentDepth: "Factual, descriptive text of the kind found in a textbook, article or review. Each paragraph develops one main idea with supporting detail and at least one example. Mix simple and compound sentences. Any topic-specific low-frequency words MUST be glossed inline (meaning explained through the text).",
     },
     task2: {
-      wordsPerText: "80-120 words",
+      wordsPerText: "approximately 100 words each text (400 ÷ 4, Trinity ISE I official spec)",
       minSentences: 4,
-      graphMinWords: 40,
-      textRegister: "Mix of informal and semi-formal. Blogs and forum posts should sound natural and personal. The article should be slightly more formal. Use varied connectors (however, although, for example, in addition).",
+      graphMinWords: 50,
+      textRegister: "Factual, descriptive texts. Mix of informal and semi-formal. Blogs and forum posts should sound natural and personal. The article should be slightly more formal. Text D is an infographic (diagram/drawing/map/table with some writing). All four texts MUST be on the same subject area and thematically linked.",
     },
+    // Official Trinity ISE I subject areas (12)
     topics: [
-      "education and studying", "work and future careers", "health and fitness",
-      "the environment", "media and social media", "travel and tourism",
-      "technology in daily life", "music and entertainment", "money and budgets",
-      "friendship and relationships", "volunteering and community", "food and healthy eating",
+      "Travel", "Money", "Fashion", "Rules and regulations",
+      "Health and fitness", "Learning a foreign language", "Festivals", "Means of transport",
+      "Special occasions", "Entertainment", "Music", "Recent personal experiences",
     ],
     subjectAreas: [
-      "social media and online life", "sports and competition", "music and film",
-      "volunteering and charity", "traditions and customs", "studying abroad",
-      "recycling and waste", "online shopping", "keeping fit",
-      "pocket money and part-time jobs", "festivals around the world", "learning languages",
+      "Travel", "Money", "Fashion", "Rules and regulations",
+      "Health and fitness", "Learning a foreign language", "Festivals", "Means of transport",
+      "Special occasions", "Entertainment", "Music", "Recent personal experiences",
     ],
     complexity: "Mix of simple and compound sentences. Some complex sentences with 'although', 'while', 'if'. Intermediate vocabulary with common collocations. Occasional idiomatic expressions. Text should be clear but not oversimplified.",
     vocabularyBand: "B1 intermediate vocabulary. Words like: advantage, disadvantage, opportunity, experience, recommend, improve, contribute, participate, benefit, significant, effective, influence.",
     grammarFocus: "Present perfect, past continuous, first conditional (if + present, will), passive voice (simple), relative clauses (who, which, that), modals of advice/obligation (should, have to, need to), comparisons, linking words (however, although, therefore, for example).",
     textRegister: "Semi-formal to informal. Accessible and engaging. The text should feel like a well-written magazine article or educational blog post.",
-    questionGuidance: "Questions test understanding of main ideas and some detail. False statements should be plausible but subtly wrong (twisted facts, wrong attribution). Gap fill answers can be 1-2 words, testing specific vocabulary from the text.",
+    questionGuidance: "Questions test understanding of main ideas and some detail. False statements should be plausible but subtly wrong (twisted facts, wrong attribution). Gap fill answers can be 1-3 words, testing specific vocabulary from the text.",
     writingWordLimit: { riw: { min: 100, max: 130 }, ew: { min: 100, max: 130 } },
+    // Official Trinity ISE I writing genres (6)
     writingTypes: {
-      riw: ["informal email", "informal letter", "article", "description"],
-      ew: ["informal email", "informal letter", "article", "review", "description"],
+      riw: ["descriptive essay", "discursive essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review"],
+      ew: ["descriptive essay", "discursive essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review"],
     },
   },
 
@@ -138,38 +140,40 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     cefr: "B2",
     examDuration: 120,
     task1: {
-      totalWords: "400-550 words total",
-      wordsPerParagraph: "80-110 words",
+      totalWords: "EXACTLY 500 words total (Trinity ISE II official spec)",
+      wordsPerParagraph: "approximately 100 words each (500 ÷ 5)",
       minSentences: 5,
-      contentDepth: "Detailed, well-developed text that presents different perspectives on a topic. Each paragraph should have a clear topic sentence, supporting evidence or examples, and a concluding thought. Include some cause-and-effect reasoning, comparisons, or contrasting viewpoints. The text should challenge an upper-intermediate reader with some abstract ideas.",
+      contentDepth: "Complex text with factual ideas, opinions, argument and/or discussion (eg textbook, article or review). Each paragraph should have a clear topic sentence, supporting evidence or examples, and a concluding thought. Include cause-and-effect reasoning, comparisons, or contrasting viewpoints. Any topic-specific low-frequency words MUST be glossed inline (meaning explained in the text).",
     },
     task2: {
-      wordsPerText: "100-160 words",
+      wordsPerText: "approximately 125 words each text (500 ÷ 4, Trinity ISE II official spec)",
       minSentences: 5,
-      graphMinWords: 50,
-      textRegister: "Varied registers: Blog (semi-formal, opinionated), Forum post (personal experience, conversational), Article (formal, objective), Graph (data-driven, analytical). Each text should feel authentic to its format.",
+      graphMinWords: 60,
+      textRegister: "Complex texts with factual ideas, opinions, argument and/or discussion familiar from educational context (textbooks, encyclopedia or online discussion). Text D is an infographic (diagram/drawing/map/table with some writing). All four texts MUST be on the same subject area and thematically linked.",
     },
+    // Official Trinity ISE II subject areas (11)
     topics: [
-      "social issues and inequality", "technology and innovation", "culture and identity",
-      "globalisation and its effects", "environment and sustainability", "media influence and fake news",
-      "urbanisation and city life", "work-life balance", "education reform",
-      "immigration and multiculturalism", "consumer culture", "mental health and wellbeing",
+      "Society and living standards", "Personal values and ideals", "The world of work",
+      "Natural environmental concerns", "Public figures past and present", "Education",
+      "National customs", "Village and city life", "National and local produce and products",
+      "Early memories", "Pollution and recycling",
     ],
     subjectAreas: [
-      "ethical consumerism", "digital communication", "urban vs rural life",
-      "equality and diversity", "tourism impact on local communities", "renewable energy",
-      "fast fashion and sustainability", "online privacy", "youth unemployment",
-      "cultural heritage preservation", "food waste", "remote working",
+      "Society and living standards", "Personal values and ideals", "The world of work",
+      "Natural environmental concerns", "Public figures past and present", "Education",
+      "National customs", "Village and city life", "National and local produce and products",
+      "Early memories", "Pollution and recycling",
     ],
     complexity: "Complex sentence structures with subordination (although, despite, whereas, provided that). Abstract topics discussed with nuance. Some academic vocabulary. Arguments should present multiple sides. Include cause-effect, comparison, and conditional reasoning.",
     vocabularyBand: "B2 upper-intermediate vocabulary. Words like: controversy, perspective, consequence, sustainable, infrastructure, innovation, discriminate, predominantly, whereas, substantial, implement, advocate, furthermore, underlying.",
     grammarFocus: "Mixed conditionals, reported speech, passive constructions (complex), relative clauses (defining/non-defining), inversion for emphasis, wish/if only, modals of speculation (might have, could have), cleft sentences (It is X that...), discourse markers (nevertheless, on the other hand, in contrast).",
     textRegister: "Semi-formal to formal. Academic but accessible. The text should feel like a quality newspaper article, a university textbook excerpt, or a well-researched blog post.",
-    questionGuidance: "Questions require inference and careful reading. False statements should be cleverly constructed — plausible and related to the text but with subtle inaccuracies (wrong degree, overgeneralisations, reversed cause-effect). Gap fill answers should test specific vocabulary or phrases, including 2-word answers.",
+    questionGuidance: "Questions require inference and careful reading. False statements should be cleverly constructed — plausible and related to the text but with subtle inaccuracies (wrong degree, overgeneralisations, reversed cause-effect). Gap fill answers should test specific vocabulary or phrases (max 3 words).",
     writingWordLimit: { riw: { min: 150, max: 180 }, ew: { min: 150, max: 180 } },
+    // Official Trinity ISE II writing genres (8)
     writingTypes: {
-      riw: ["article", "review", "essay", "report", "formal email", "formal letter", "informal email", "informal letter"],
-      ew: ["article", "review", "essay", "report", "formal email", "formal letter", "informal email", "informal letter"],
+      riw: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
+      ew: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
     },
   },
 
@@ -180,30 +184,34 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     cefr: "C1",
     examDuration: 120,
     task1: {
-      totalWords: "500-700 words total",
-      wordsPerParagraph: "100-140 words",
+      totalWords: "EXACTLY 700 words total (Trinity ISE III official spec)",
+      wordsPerParagraph: "approximately 140 words each (700 ÷ 5)",
       minSentences: 5,
-      contentDepth: "Dense, academic-quality text that develops a sophisticated argument. Each paragraph must present a clear thesis point with evidence, analysis, and nuance. Include expert references ('researchers suggest...', 'studies indicate...'), counterarguments, cause-effect chains, and evaluative commentary. The text should challenge an advanced reader and require careful reading to distinguish between similar ideas. Avoid superficial treatment — each paragraph should say something substantive that cannot be summarised in a single sentence.",
+      contentDepth: "Dense, academic-quality text that develops a sophisticated argument. Each paragraph must present a clear thesis point with evidence, analysis, and nuance. Include expert references ('researchers suggest...', 'studies indicate...'), counterarguments, cause-effect chains, and evaluative commentary. The text should challenge an advanced reader and require careful reading to distinguish between similar ideas. Any topic-specific or low-frequency words should be GLOSSED in the text (e.g., 'paradigm shift (a fundamental change in thinking)'). Avoid superficial treatment — each paragraph should say something substantive that cannot be summarised in a single sentence.",
     },
     task2: {
-      wordsPerText: "120-200 words",
+      wordsPerText: "approximately 175 words each text (700 ÷ 4, Trinity ISE III official spec)",
       minSentences: 5,
       graphMinWords: 60,
-      textRegister: "Distinctly varied registers to test register awareness: Blog (informed opinion with personal stance and some informal markers), Forum post (personal experience with anecdotal evidence, slightly informal but thoughtful), Article (formal journalistic or academic tone, objective analysis), Graph/Chart (analytical description with data interpretation and trends). Each text should have enough depth to support multiple comprehension questions.",
+      textRegister: "Distinctly varied registers to test register awareness: Blog (informed opinion with personal stance and some informal markers), Forum post (personal experience with anecdotal evidence, slightly informal but thoughtful), Article (formal journalistic or academic tone, objective analysis), Infographic (Text D MUST be an infographic — a graphical/visual text with some written labels and short explanations, eg a labelled diagram, chart with annotations, or structured data visualisation). All four texts MUST be on the same subject area and thematically linked.",
     },
+    // Official Trinity ISE III subject areas (24 topics from the official spec)
     topics: [
-      "economics and global markets", "ethics and moral philosophy", "science and technological research",
-      "global politics and diplomacy", "arts, literature and cultural criticism", "law and justice systems",
-      "psychology and human behaviour", "media ethics and press freedom", "education policy and reform",
-      "public health and medical ethics", "urbanisation and smart cities", "energy policy and climate action",
-      "artificial intelligence and society", "international development", "linguistic diversity and language policy",
+      "Independence", "Ambitions", "Stereotypes", "Role models",
+      "Competitiveness", "Young people's rights", "The media", "Advertising",
+      "Lifestyles", "The arts", "The rights of the individual", "Economic issues",
+      "Roles in the family", "Communication", "The school curriculum", "Youth behaviour",
+      "Use of the internet", "Designer goods", "International events", "Equal opportunities",
+      "Social issues", "The future of the planet", "Scientific developments", "Stress management",
     ],
+    // Same official pool for Task 2 subject area (all 4 texts share one)
     subjectAreas: [
-      "artificial intelligence and automation", "mental health in modern society", "criminal justice reform",
-      "censorship and freedom of expression", "genetic engineering and bioethics", "sustainable development goals",
-      "wealth inequality and social mobility", "digital surveillance and privacy", "migration and refugee policy",
-      "space exploration and investment", "pharmaceutical industry ethics", "cultural appropriation vs appreciation",
-      "deforestation and biodiversity loss", "nuclear energy debate", "social media regulation",
+      "Independence", "Ambitions", "Stereotypes", "Role models",
+      "Competitiveness", "Young people's rights", "The media", "Advertising",
+      "Lifestyles", "The arts", "The rights of the individual", "Economic issues",
+      "Roles in the family", "Communication", "The school curriculum", "Youth behaviour",
+      "Use of the internet", "Designer goods", "International events", "Equal opportunities",
+      "Social issues", "The future of the planet", "Scientific developments", "Stress management",
     ],
     complexity: "Sophisticated, academic prose. Long complex sentences with multiple clauses. Hedging language (tends to, it could be argued that, arguably). Formal cohesive devices (notwithstanding, furthermore, in light of, consequently). Abstract concepts discussed with precision. The text must feel like it belongs in a quality broadsheet newspaper, an academic journal, or a university lecture.",
     vocabularyBand: "C1 advanced vocabulary. Words like: paradigm, unprecedented, intrinsic, exacerbate, proliferation, dichotomy, juxtaposition, ramification, contentious, pragmatic, epistemological, commodification, stratification, nuanced, multifaceted, concomitant, pervasive, mitigate, reconcile, underpin.",
@@ -211,9 +219,10 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     textRegister: "Formal academic register. Dense but clear prose. The writing style should resemble The Economist, The Guardian long-reads, or university-level textbooks.",
     questionGuidance: "Questions demand close reading, inference, and the ability to distinguish nuance. FALSE statements must be sophisticated distractors — paraphrasing the text but subtly distorting meaning (e.g., overstating a claim, confusing correlation with causation, attributing an idea to the wrong source). Gap fill answers should test precise vocabulary and collocations, including 2-3 word phrases.",
     writingWordLimit: { riw: { min: 200, max: 230 }, ew: { min: 200, max: 230 } },
+    // Official Trinity ISE III writing genres (8)
     writingTypes: {
-      riw: ["article", "essay", "report", "review", "formal letter", "formal email"],
-      ew: ["article", "essay", "report", "review", "formal letter", "formal email", "proposal"],
+      riw: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
+      ew: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
     },
   },
 
@@ -297,14 +306,17 @@ ${spec.task1.contentDepth}
 Structure: Para 1 = introduction/context; Para 2 = first argument with evidence; Para 3 = contrasting or complementary perspective; Para 4 = implications or in-depth case study; Para 5 = synthesis and forward look.
 
 TEXT 2 — Multi-text Reading — Topic: "${subjectArea}"
-Write 4 texts, each covering a different aspect of the topic:
+Write 4 thematically-linked texts, each covering a different aspect/angle of the SAME subject area:
 - Text A (Blog post): personal opinion with author name. ${spec.task2.wordsPerText} words. Opinions and personal examples.
 - Text B (Forum post): online discussion reply. ${spec.task2.wordsPerText} words. Personal experience, conversational.
 - Text C (Article): formal newspaper/website article. ${spec.task2.wordsPerText} words. Objective, with data or expert references.
-- Text D (Graph/Chart): analytical description ${spec.task2.graphMinWords}+ words explaining trends and specific numbers, PLUS a graphData array with at least 4 data points.
+- Text D — INFOGRAPHIC (MANDATORY \`isGraph: true\` + non-empty \`graphData\` array of at least 4 data points): analytical description ${spec.task2.graphMinWords}+ words explaining what the infographic shows, including specific numbers/labels from \`graphData\`. The text MUST resemble a labelled diagram, chart with annotations, or structured data visualisation.
+
+ALL 4 TEXTS MUST share subject area "${subjectArea}" and be thematically linked (different perspectives on the SAME issue).
+
 Register: ${spec.task2.textRegister}
 
-MANDATORY: Every paragraph must reach ${spec.task1.wordsPerParagraph} words. Every text (A/B/C) must reach ${spec.task2.wordsPerText} words. Do NOT truncate or shorten any text.
+MANDATORY: Total Reading 1 = ${spec.task1.totalWords}. Total Reading 2 = sum of texts A+B+C+D ≈ 700 words. Do NOT truncate any text — produce the full required length.
 
 Return exactly this JSON structure:
 {
@@ -563,7 +575,8 @@ TEXT FORMATS:
 - Text A — Blog post: A personal blog entry with the author's name. ${spec.task2.wordsPerText} words. Must contain opinions, examples, and personal experience.
 - Text B — Forum post: A reply in an online discussion. ${spec.task2.wordsPerText} words. Must feel like a real person sharing their thoughts or experience.
 - Text C — Article: A factual article from a newspaper or website. ${spec.task2.wordsPerText} words. More formal, objective, with data or expert references.
-- Text D — Graph/Chart: A graph with at least 4 data points showing a trend, PLUS a descriptive analysis paragraph (${spec.task2.graphMinWords}+ words) explaining what the data shows, including specific numbers.
+- Text D — INFOGRAPHIC (MANDATORY: \`"isGraph": true\` and a non-empty \`graphData\` array): A graphical/visual text such as a labelled diagram, chart with annotations, or structured data visualisation with at least 4 data points (label + numeric value pairs). MUST include a short descriptive analysis (${spec.task2.graphMinWords}+ words in the \`content\` field) explaining what the visualisation shows, including the specific data points.
+- ALL FOUR TEXTS MUST share the same subject area "${subjectArea}" and be thematically linked.
 
 Then generate 3 question sections:
 
@@ -735,6 +748,14 @@ CRITICAL RULES:
 
 export function getEvaluateWritingPrompt(level: ExamLevel, taskType: string, prompt: string, response: string): string {
   const desc = levelSpecs[level];
+  const isReadingIntoWriting = taskType === "READING_INTO_WRITING";
+
+  // Trinity ISE official rating scale: 0-4 per criterion
+  const readingWritingBlock = isReadingIntoWriting ? `
+  "readingAndWriting": {
+    "score": number (0-4),
+    "comments": "string (assess: understanding of source materials, selection of relevant content, ability to identify common themes and links across multiple texts, adaptation of content to suit writing purpose, paraphrasing/summarising skills)"
+  },` : "";
 
   return `You are a senior Trinity ISE examiner evaluating a ${desc.cefr} level writing response.
 
@@ -744,37 +765,39 @@ TASK PROMPT: ${prompt}
 CANDIDATE'S RESPONSE:
 ${response}
 
-Evaluate this response using the official ISE marking criteria. Be fair but rigorous.
+Evaluate using the OFFICIAL Trinity ISE marking criteria on a 0-4 scale per criterion:
+0 = Task not attempted / paper void / no performance to evaluate
+1 = Poor / inadequate / below the level
+2 = Acceptable for the level
+3 = Good — meets the level confidently
+4 = Excellent — fully meets all requirements with clarity and precision
 
-Score each area from 0-5 where:
-0 = No evidence
-1 = Very limited
-2 = Limited
-3 = Adequate
-4 = Good
-5 = Excellent
+Expected level: ${desc.cefr}. A score of 2 means acceptable at this level; 3 is the target.
 
-Consider the expected level is ${desc.cefr}. A score of 3 means meeting the standard for this level.
+${isReadingIntoWriting ? `Task 3 (Reading into Writing) is scored on FOUR criteria:
+- Reading and writing (use of source material, paraphrasing, integration of texts)
+- Task fulfilment (communicative aim, writer-reader relationship, topic coverage)
+- Organisation and structure (text organisation, paragraphing, signposting)
+- Language control (grammar, vocabulary, spelling, punctuation)` : `Task 4 (Extended Writing) is scored on THREE criteria:
+- Task fulfilment (communicative aim, writer-reader relationship, topic coverage)
+- Organisation and structure (text organisation, paragraphing, signposting)
+- Language control (grammar, vocabulary, spelling, punctuation)`}
 
 OUTPUT FORMAT (strict JSON):
 {
-  "score": number (overall 0-20),
-  "band": "Distinction" | "Merit" | "Pass" | "Fail",
-  "taskFulfillment": {
-    "score": number (0-5),
-    "comments": "string (specific feedback on how well the task was addressed)"
+  "score": number (overall 0-20 — derive from criteria, weighting all criteria equally and scaling to 20),
+  "band": "Distinction" | "Merit" | "Pass" | "Fail",${readingWritingBlock}
+  "taskFulfilment": {
+    "score": number (0-4),
+    "comments": "string (overall achievement of communicative aim, awareness of writer-reader relationship/register, adequacy of topic coverage)"
   },
-  "grammar": {
-    "score": number (0-5),
-    "comments": "string (specific grammar feedback with examples from the text)"
+  "organisationAndStructure": {
+    "score": number (0-4),
+    "comments": "string (text organisation including paragraphing, presentation and development of ideas, format suitability, signposting)"
   },
-  "vocabulary": {
-    "score": number (0-5),
-    "comments": "string (specific vocabulary feedback with suggestions)"
-  },
-  "organization": {
-    "score": number (0-5),
-    "comments": "string (feedback on structure, coherence, cohesion)"
+  "languageControl": {
+    "score": number (0-4),
+    "comments": "string (range and accuracy of grammar and lexis, effect of linguistic errors on understanding, control of punctuation and spelling)"
   },
   "suggestions": [
     "string (actionable improvement suggestion 1)",
@@ -785,3 +808,37 @@ OUTPUT FORMAT (strict JSON):
 
 Return ONLY the JSON object.`;
 }
+
+export function getReadingExplanationsPrompt(level: ExamLevel, wrongQuestions: {
+  num: number;
+  type: string;
+  context: string;
+  userAnswer: string;
+  correctAnswer: string;
+}[]): string {
+  const desc = levelSpecs[level];
+
+  return `You are a Trinity ISE examiner explaining wrong reading answers to a ${desc.cefr} student.
+
+For each wrong answer below, write a SHORT (1-2 sentence) explanation in clear English of:
+- Why the candidate's answer is WRONG, and
+- Why the correct answer is right.
+
+Be specific, kind and instructional. Do NOT just repeat the correct answer.
+
+WRONG ANSWERS:
+${wrongQuestions.map(q => `Q${q.num} [${q.type}]
+Context: ${q.context}
+Candidate wrote: ${q.userAnswer || "(blank)"}
+Correct answer: ${q.correctAnswer}`).join("\n---\n")}
+
+Return JSON with this exact shape:
+{
+  "explanations": [
+    { "num": <number>, "explanation": "<1-2 sentence explanation>" }
+  ]
+}
+
+Include one entry per wrong question above, in the same order. Return ONLY the JSON.`;
+}
+

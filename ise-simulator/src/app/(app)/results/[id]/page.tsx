@@ -42,7 +42,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           role: e.role,
           content: e.content,
         }))}
-        isPro={user.plan === "PRO"}
+        isPro={user.plan === "PRO" || user.plan === "ADMIN"}
       />
     );
   }

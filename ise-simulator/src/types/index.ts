@@ -113,14 +113,43 @@ export interface WrittenExamContent {
   extendedWriting: WritingTask;
 }
 
+/**
+ * Trinity ISE writing feedback — 0-4 rating per criterion (Trinity official scale).
+ *
+ * Task 3 (Reading into Writing) uses ALL four criteria including `readingAndWriting`.
+ * Task 4 (Extended Writing) uses three criteria — `readingAndWriting` is OMITTED.
+ *
+ * `score` is the OVERALL band on a 0-20 scale (sum or weighted of criteria).
+ */
 export interface WritingFeedback {
   score: number;
   band: string;
-  taskFulfillment: { score: number; comments: string };
-  grammar: { score: number; comments: string };
-  vocabulary: { score: number; comments: string };
-  organization: { score: number; comments: string };
+  /** Only present on Task 3 (Reading into Writing). */
+  readingAndWriting?: { score: number; comments: string };
+  taskFulfilment: { score: number; comments: string };
+  organisationAndStructure: { score: number; comments: string };
+  languageControl: { score: number; comments: string };
   suggestions: string[];
+}
+
+/** Per-question reading result, stored inside `aiFeedback` of READING_1/READING_2 records. */
+export interface ReadingQuestionResult {
+  num: number;                    // global question number (1-30)
+  type: "paragraph_matching" | "statement_selection" | "text_matching" | "gap_fill";
+  userAnswer: string;             // raw user input (could be empty)
+  correctAnswer: string;          // expected answer
+  isCorrect: boolean;
+  /** AI-generated explanation for WRONG answers (Pro/Admin only). Null on correct. */
+  explanation?: string | null;
+  /** Optional context: prompt text (statement/sentence) for display */
+  context?: string;
+}
+
+export interface ReadingFeedback {
+  score: number;
+  total: number;
+  percentage: number;
+  questions: ReadingQuestionResult[];
 }
 
 export interface OralFeedbackData {

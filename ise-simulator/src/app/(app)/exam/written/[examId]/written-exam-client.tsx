@@ -8,6 +8,7 @@ import { EXAM_DURATIONS } from "@/lib/constants";
 import { Clock, ChevronLeft, ChevronRight, Send, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
 import { DownloadPdfButton } from "@/components/exam/download-pdf-button";
+import { DownloadAnswersButton } from "@/components/exam/download-answers-button";
 import type { WrittenExamContent, ReadingTask1, ReadingTask2 } from "@/types";
 
 const TASK_META = [
@@ -135,6 +136,7 @@ export function WrittenExamClient({ examId, content, level }: Props) {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <DownloadPdfButton content={content} level={level} examId={examId} />
+            <DownloadAnswersButton content={content} level={level} examId={examId} />
             <Link href={`/exam/paper/${examId}/submit`}>
               <Button variant="outline" size="sm" className="gap-1.5">
                 <Upload className="h-3.5 w-3.5" />
