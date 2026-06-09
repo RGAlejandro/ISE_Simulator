@@ -70,9 +70,13 @@ export function PracticeClient({
       setError(t("practice.setup.errors.limitListening"));
       return;
     }
+    // Oral: redirect to dedicated setup page (level, tasks, topic + PDF)
+    if (kind === "oral") {
+      router.push("/exam/oral/setup");
+      return;
+    }
     setSetupError(null);
     setSetupLevel("");
-    if (kind !== "oral") setOralTopic("");
     setSetupKind(kind);
   };
 

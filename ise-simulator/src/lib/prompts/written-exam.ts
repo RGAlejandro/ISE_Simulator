@@ -86,8 +86,8 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     writingWordLimit: { riw: { min: 70, max: 100 }, ew: { min: 70, max: 100 } },
     // Official Trinity ISE Foundation writing genres (4)
     writingTypes: {
-      riw: ["descriptive essay", "article", "informal email", "informal letter", "neutral email", "neutral letter", "review"],
-      ew: ["descriptive essay", "article", "informal email", "informal letter", "neutral email", "neutral letter", "review"],
+      riw: ["descriptive essay", "article (magazine or online)", "informal or neutral email or letter", "review"],
+      ew: ["descriptive essay", "article (magazine or online)", "informal or neutral email or letter", "review"],
     },
   },
 
@@ -128,8 +128,8 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     writingWordLimit: { riw: { min: 100, max: 130 }, ew: { min: 100, max: 130 } },
     // Official Trinity ISE I writing genres (6)
     writingTypes: {
-      riw: ["descriptive essay", "discursive essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review"],
-      ew: ["descriptive essay", "discursive essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review"],
+      riw: ["descriptive essay", "discursive essay", "article (magazine or online)", "informal email or letter", "formal email or letter", "review"],
+      ew: ["descriptive essay", "discursive essay", "article (magazine or online)", "informal email or letter", "formal email or letter", "review"],
     },
   },
 
@@ -172,8 +172,8 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     writingWordLimit: { riw: { min: 150, max: 180 }, ew: { min: 150, max: 180 } },
     // Official Trinity ISE II writing genres (8)
     writingTypes: {
-      riw: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
-      ew: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
+      riw: ["descriptive essay", "discursive essay", "argumentative essay", "article (magazine or online)", "informal email or letter", "formal email or letter", "review", "report"],
+      ew: ["descriptive essay", "discursive essay", "argumentative essay", "article (magazine or online)", "informal email or letter", "formal email or letter", "review", "report"],
     },
   },
 
@@ -221,8 +221,8 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     writingWordLimit: { riw: { min: 200, max: 230 }, ew: { min: 200, max: 230 } },
     // Official Trinity ISE III writing genres (8)
     writingTypes: {
-      riw: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
-      ew: ["descriptive essay", "discursive essay", "argumentative essay", "article", "informal email", "informal letter", "formal email", "formal letter", "review", "report"],
+      riw: ["descriptive essay", "discursive essay", "argumentative essay", "article (magazine or online)", "informal email or letter", "formal email or letter", "review", "report"],
+      ew: ["descriptive essay", "discursive essay", "argumentative essay", "article (magazine or online)", "informal email or letter", "formal email or letter", "review", "report"],
     },
   },
 
