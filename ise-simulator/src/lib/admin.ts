@@ -9,6 +9,12 @@ export async function getAdminUser() {
 }
 
 export async function isAdminUser() {
-  const user = await getCurrentUser();
-  return user?.plan === "ADMIN";
+  try {
+    const user = await getCurrentUser();
+    return user?.plan === "ADMIN";
+  } catch {
+    // Public routes inside (app) layout (e.g. /pricing for unauth visitors) shouldn't 500
+    // just because Clerk couldn't resolve a session. Treat as "not admin".
+    return false;
+  }
 }
