@@ -48,7 +48,7 @@ function IconAction({
       aria-label={title}
       className={`h-9 w-9 rounded-full flex items-center justify-center transition-all border backdrop-blur ${
         active
-          ? "bg-blue-100 dark:bg-blue-900/70 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-300"
+          ? "bg-amber-100 dark:bg-amber-900/70 border-amber-300 dark:border-amber-700 text-amber-600 dark:text-amber-300"
           : "bg-white/80 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800"
       }`}
     >
@@ -128,21 +128,21 @@ export function Flashcard({
             position: "absolute",
             inset: 0,
           }}
-          className="flex flex-col h-full border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 shadow-sm"
+          className="flex flex-col h-full border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 shadow-sm"
         >
           <CardContent className="flex flex-col items-center justify-center gap-4 p-7 text-center h-full w-full">
             <div className="space-y-1">
-              <Badge variant="outline" className="text-xs capitalize text-blue-500 border-blue-300 dark:border-blue-700">
+              <Badge variant="outline" className="text-xs capitalize text-amber-500 border-amber-300 dark:border-amber-700">
                 {card.partOfSpeech}
               </Badge>
-              <p className="text-3xl font-bold text-blue-700 dark:text-blue-200 leading-tight">
+              <p className="text-3xl font-bold text-amber-700 dark:text-amber-200 leading-tight">
                 {card.translation}
               </p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">
                 {card.english}
               </p>
             </div>
-            <div className="rounded-lg bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 px-4 py-3 w-full text-left">
+            <div className="rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800 px-4 py-3 w-full text-left">
               <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1 font-medium">Example</p>
               <p className="text-sm text-zinc-700 dark:text-zinc-300 italic leading-relaxed">
                 &ldquo;{card.example}&rdquo;

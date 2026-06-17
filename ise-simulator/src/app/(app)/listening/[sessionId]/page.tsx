@@ -31,6 +31,7 @@ export default async function ListeningSessionPage({ params }: Props) {
       existingRound1Feedback={session.round1Feedback as object | null}
       existingRound2Feedback={session.round2Feedback as object | null}
       overallScore={session.overallScore}
+      isAdmin={user.plan === "ADMIN"}
     />
   );
 }

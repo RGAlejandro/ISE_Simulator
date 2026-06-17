@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, Users, FileText, Activity } from "lucide-react";
+import { LayoutGrid, Users, FileText, Activity, MessageSquare } from "lucide-react";
 
 const TABS = [
   { href: "/admin",          label: "Overview", Icon: LayoutGrid },
   { href: "/admin/users",    label: "Users",    Icon: Users },
   { href: "/admin/exams",    label: "Exams",    Icon: FileText },
   { href: "/admin/activity", label: "Activity", Icon: Activity },
+  { href: "/admin/feedback", label: "Feedback", Icon: MessageSquare },
 ];
 
 export function AdminNav() {

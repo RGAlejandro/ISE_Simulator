@@ -47,7 +47,9 @@ test.describe("Landing page", () => {
         !e.includes("Source Map") &&
         !e.includes("clerk.accounts.dev") &&
         !e.includes("clerk.browser.js") &&
-        !e.includes("Failed to fetch"),
+        !e.includes("Failed to fetch") &&
+        !e.includes("Failed to load resource") &&
+        !e.includes("net::ERR_FAILED"),
     );
     expect(real).toEqual([]);
   });

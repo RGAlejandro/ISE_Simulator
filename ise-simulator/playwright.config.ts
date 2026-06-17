@@ -21,9 +21,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   // Retries help mitigate Clerk dev-instance rate limiting (429 "too_many_requests") under load.
-  retries: process.env.CI ? 2 : 1,
+  retries: 2,
   // Cap concurrency to avoid hitting Clerk dev rate limits when running all 3 projects together.
-  workers: process.env.CI ? 2 : 3,
+  workers: process.env.CI ? 2 : 2,
   reporter: process.env.CI ? "github" : [["html", { open: "never" }], ["list"]],
 
   use: {

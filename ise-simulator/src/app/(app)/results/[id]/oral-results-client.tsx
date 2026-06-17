@@ -15,7 +15,21 @@ const TASK_LABELS: Record<OralTaskType, string> = {
   LISTENING: "Listening Task",
 };
 
-const SKILL_KEYS = ["pronunciation", "grammar", "vocabulary", "fluency", "taskFulfillment"] as const;
+// Trinity ISE Speaking & Listening 4-criterion rating scale (applies to spoken tasks).
+const SPOKEN_SKILL_KEYS = [
+  "communicativeEffectiveness",
+  "interactiveListening",
+  "languageControl",
+  "delivery",
+] as const;
+
+const SKILL_LABELS: Record<string, string> = {
+  communicativeEffectiveness: "Communicative Effectiveness",
+  interactiveListening: "Interactive Listening",
+  languageControl: "Language Control",
+  delivery: "Delivery",
+  listening: "Independent Listening",
+};
 
 interface OralResultsClientProps {
   exam: {
@@ -95,14 +109,23 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
           };
           const taskLabel = TASK_LABELS[f.taskType as OralTaskType] || f.taskType;
 
+          // Trinity: Listening task is scored 0-5 on a single criterion; spoken tasks 0-20 (sum of 4).
+          const isListening = f.taskType === "LISTENING";
+          const maxScore = isListening ? 5 : 20;
+          const passThreshold = isListening ? 3 : 10;
+          const distinctionThreshold = isListening ? 5 : 17;
+          const skillKeys: readonly string[] = isListening
+            ? ["listening"]
+            : SPOKEN_SKILL_KEYS;
+
           return (
             <Card key={f.taskType}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{taskLabel}</CardTitle>
                   {f.score != null && (
-                    <Badge variant={f.score >= 15 ? "success" : f.score >= 10 ? "default" : "warning"}>
-                      {f.score}/25
+                    <Badge variant={f.score >= distinctionThreshold ? "success" : f.score >= passThreshold ? "default" : "warning"}>
+                      {f.score}/{maxScore}
                     </Badge>
                   )}
                 </div>
@@ -110,17 +133,15 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
               <CardContent>
                 {isPro ? (
                   <div className="space-y-4">
-                    {/* Skill scores */}
+                    {/* Skill scores — Trinity 4-criterion rating scale */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {SKILL_KEYS.map((key) => {
+                      {skillKeys.map((key) => {
                         const area = fb[key];
                         if (!area || typeof area !== "object") return null;
                         return (
                           <div key={key}>
                             <div className="flex justify-between text-sm mb-1">
-                              <span className="capitalize">
-                                {key.replace(/([A-Z])/g, " $1").trim()}
-                              </span>
+                              <span>{SKILL_LABELS[key] ?? key}</span>
                               <span className="font-semibold">{area.score}/5</span>
                             </div>
                             <Progress value={(area.score / 5) * 100} />
@@ -188,7 +209,7 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
                   <div className="rounded-lg bg-zinc-100 dark:bg-zinc-900 p-6 text-center border-dashed border-2 border-zinc-300 dark:border-zinc-700">
                     <Lock className="h-8 w-8 mx-auto mb-2 text-zinc-400" />
                     <p className="text-sm text-zinc-500 mb-1">
-                      Score: {f.score != null ? `${f.score}/25` : "N/A"}
+                      Score: {f.score != null ? `${f.score}/${maxScore}` : "N/A"}
                     </p>
                     <p className="text-sm text-zinc-500 mb-3">
                       Detailed feedback and transcript available for Pro users

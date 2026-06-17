@@ -19,26 +19,11 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useListeningStore } from "@/store/listening-store";
+import { useSttRecorder } from "@/hooks/use-stt-recorder";
+import { MicWaveform } from "@/components/exam/mic-waveform";
+import { TranscriptPlayer } from "@/components/exam/transcript-player";
+import { ListeningAdminDownloads } from "@/components/exam/listening-admin-downloads";
 import type { ExamLevel, ListeningRound1Feedback, ListeningRound2Feedback } from "@/types";
-
-interface SpeechRecognitionResult {
-  readonly isFinal: boolean;
-  readonly [index: number]: { readonly transcript: string };
-}
-interface SpeechRecognitionResultList {
-  readonly length: number;
-  readonly [index: number]: SpeechRecognitionResult;
-}
-interface SpeechRecognitionInstance {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: { results: SpeechRecognitionResultList }) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-}
 
 const LEVEL_LABELS: Record<ExamLevel, string> = {
   ISE_FOUNDATION: "ISE Foundation (A2)",
@@ -70,6 +55,7 @@ interface ListeningClientProps {
   existingRound1Feedback: object | null;
   existingRound2Feedback: object | null;
   overallScore: number | null;
+  isAdmin: boolean;
 }
 
 export function ListeningClient({
@@ -83,10 +69,10 @@ export function ListeningClient({
   existingRound1Feedback,
   existingRound2Feedback,
   overallScore: existingOverallScore,
+  isAdmin,
 }: ListeningClientProps) {
   const router = useRouter();
   const store = useListeningStore();
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const passageAudioRef = useRef<HTMLAudioElement | null>(null);
   const [textInput, setTextInput] = useState("");
@@ -179,10 +165,11 @@ export function ListeningClient({
   useEffect(() => {
     if (store.timer === 0) {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (store.isRecording && recognitionRef.current) {
-        recognitionRef.current.stop();
+      if (store.isRecording) {
+        stt.stop();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.timer, store.isRecording]);
 
   const handlePlayRound1 = useCallback(() => {
@@ -199,64 +186,39 @@ export function ListeningClient({
     store.setHasPlayedRound2(true);
     playPassage(() => {
       store.setPhase("round2_respond");
+      startTimer();
     });
-  }, [store, playPassage]);
+  }, [store, playPassage, startTimer]);
+
+  // MediaRecorder + server-side Whisper STT (works in every browser, unlike Web Speech API).
+  // Transcript flows into whichever round's field is active.
+  const phaseRef = useRef(store.phase);
+  phaseRef.current = store.phase;
+  const stt = useSttRecorder({
+    onTranscript: (text) => {
+      store.setRecording(false);
+      const append = (prev: string) => (prev.trim() ? `${prev.trim()} ${text}` : text);
+      if (phaseRef.current === "round2_respond") setNotesInput(append);
+      else setTextInput(append);
+    },
+    onError: (message) => {
+      store.setRecording(false);
+      setShowTextFallback(true);
+      store.setError(message);
+    },
+  });
 
   const startRecording = useCallback(() => {
-    const SpeechRecognition =
-      (window as unknown as Record<string, unknown>).SpeechRecognition as
-        | (new () => SpeechRecognitionInstance)
-        | undefined ||
-      (window as unknown as Record<string, unknown>).webkitSpeechRecognition as
-        | (new () => SpeechRecognitionInstance)
-        | undefined;
-
-    if (!SpeechRecognition) {
-      setShowTextFallback(true);
-      store.setError("Speech recognition not supported. Use Chrome or Edge, or type below.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.continuous = true;
-    recognition.interimResults = false;
-
-    let transcript = "";
-
-    recognition.onresult = (event) => {
-      for (let i = 0; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          transcript += event.results[i][0].transcript + " ";
-        }
-      }
-    };
-
-    recognition.onerror = (event) => {
-      console.error("STT error:", event.error);
-      store.setRecording(false);
-      if (event.error === "not-allowed") {
-        setShowTextFallback(true);
-        store.setError("Microphone access denied. Please type your summary below.");
-      }
-    };
-
-    recognition.onend = () => {
-      store.setRecording(false);
-      if (transcript.trim()) {
-        setTextInput(transcript.trim());
-      }
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-    store.setRecording(true);
     store.setError(null);
-  }, [store]);
+    void stt.start();
+    store.setRecording(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stt.start, store]);
 
   const stopRecording = useCallback(() => {
-    recognitionRef.current?.stop();
-  }, []);
+    stt.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stt.stop]);
 
   const submitRound1 = useCallback(async () => {
     const response = textInput.trim();
@@ -290,6 +252,7 @@ export function ListeningClient({
       store.setError("Please write your notes before submitting.");
       return;
     }
+    if (timerRef.current) clearInterval(timerRef.current);
     setIsSubmitting(true);
     store.setError(null);
 
@@ -311,6 +274,35 @@ export function ListeningClient({
       setIsSubmitting(false);
     }
   }, [notesInput, sessionId, store]);
+
+  // Admin shortcut: skip both rounds (scores 0) and jump to the transcript,
+  // where the script PDF and MP3 can be generated.
+  const skipToTranscript = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (passageAudioRef.current) passageAudioRef.current.pause();
+    if (store.isRecording) stt.stop();
+    store.setPlaying(false);
+    store.setRecording(false);
+    store.setRound1Feedback({
+      score: 0,
+      mainIdeaCaptured: false,
+      informationTypeIdentified: false,
+      comments: "Skipped — not scored.",
+      missedPoints: [],
+    });
+    store.setRound2Feedback(
+      {
+        score: 0,
+        accuracyScore: 0,
+        completenessScore: 0,
+        comments: "Skipped — not scored.",
+        capturedDetails: [],
+        missedDetails: [],
+      },
+      0,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store, stt.stop]);
 
   const currentStepIndex = PHASE_STEPS.findIndex((s) => s.key === store.phase);
   const progressPct = ((currentStepIndex + 1) / PHASE_STEPS.length) * 100;
@@ -341,9 +333,9 @@ export function ListeningClient({
                 key={step.key}
                 className={`whitespace-nowrap ${
                   i <= currentStepIndex
-                    ? "text-blue-600 font-medium dark:text-blue-400"
+                    ? "text-purple-600 font-medium dark:text-purple-400"
                     : "text-zinc-400"
-                }
+                }`}
               >
                 {step.label}
               </span>
@@ -359,25 +351,39 @@ export function ListeningClient({
           </div>
         )}
 
+        {/* Admin: skip rounds straight to the transcript (scores 0).
+            On round1_listen the inline "Ir al final" button covers this. */}
+        {isAdmin && store.phase !== "done" && store.phase !== "round1_listen" && (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-4 py-2">
+            <span className="text-xs text-amber-700 dark:text-amber-400">
+              Admin: skip both tasks to reach the transcript, audio and PDF (scores 0).
+            </span>
+            <Button onClick={skipToTranscript} variant="outline" size="sm" className="gap-2 shrink-0">
+              <FileText className="h-4 w-4" />
+              Skip to transcript
+            </Button>
+          </div>
+        )}
+
         {/* PHASE: round1_listen */}
         {store.phase === "round1_listen" && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Volume2 className="h-5 w-5 text-blue-600" />
+                <Volume2 className="h-5 w-5 text-purple-600" />
                 First Listening
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-4 text-sm text-blue-800 dark:text-blue-200 space-y-2">
+              <div className="rounded-lg bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 p-4 text-sm text-purple-800 dark:text-purple-200 space-y-2">
                 <p className="font-semibold">Instructions — Round 1</p>
-                <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+                <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-300">
                   <li>Listen carefully to the passage. Do not take notes.</li>
                   <li>After it finishes, you will have <strong>60 seconds</strong> to give a general summary.</li>
                   <li>Focus on the main topic and type of information.</li>
                 </ul>
               </div>
-              <div className="text-center py-4">
+              <div className="flex flex-wrap items-center justify-center gap-3 py-4">
                 <Button
                   size="lg"
                   onClick={handlePlayRound1}
@@ -396,6 +402,12 @@ export function ListeningClient({
                     </>
                   )}
                 </Button>
+                {isAdmin && (
+                  <Button size="lg" variant="outline" onClick={skipToTranscript} className="gap-2">
+                    <FileText className="h-5 w-5" />
+                    Ir al final
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -425,8 +437,13 @@ export function ListeningClient({
 
               {/* Recording controls */}
               {!showTextFallback && (
-                <div className="flex gap-3">
-                  {!store.isRecording ? (
+                <div className="flex gap-3 items-center">
+                  {stt.isTranscribing ? (
+                    <span className="flex items-center gap-2 text-sm text-zinc-500">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Transcribing...
+                    </span>
+                  ) : !store.isRecording ? (
                     <Button
                       variant="default"
                       onClick={startRecording}
@@ -457,9 +474,16 @@ export function ListeningClient({
                 </div>
               )}
 
+              {store.isRecording && (
+                <div className="flex flex-col items-center gap-1">
+                  <MicWaveform stream={stt.stream} className="h-10" />
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">Listening...</p>
+                </div>
+              )}
+
               {/* Recorded transcript or text input */}
               <textarea
-                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Your summary will appear here after recording, or type directly..."
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
@@ -550,14 +574,14 @@ export function ListeningClient({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Volume2 className="h-5 w-5 text-blue-600" />
+                <Volume2 className="h-5 w-5 text-purple-600" />
                 Second Listening
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-4 text-sm text-blue-800 dark:text-blue-200 space-y-2">
+              <div className="rounded-lg bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 p-4 text-sm text-purple-800 dark:text-purple-200 space-y-2">
                 <p className="font-semibold">Instructions — Round 2</p>
-                <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+                <ul className="list-disc list-inside space-y-1 text-purple-700 dark:text-purple-300">
                   <li>Listen again carefully. This time you may take notes.</li>
                   <li>Try to capture specific facts, numbers, and key details.</li>
                   <li>Note the main information type: <strong>{informationType}</strong></li>
@@ -598,11 +622,57 @@ export function ListeningClient({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 p-3 text-sm text-purple-800 dark:text-purple-200">
-                Write all the details you captured from the listening. Include facts, numbers, advantages/disadvantages, comparisons — everything you noted.
+                Give all the specific details you captured from the listening — facts, numbers, advantages/disadvantages, comparisons. Speak your answer or type it.
               </div>
+
+              {/* Timer */}
+              {store.timer !== null && (
+                <div className={`flex items-center gap-2 text-sm font-medium ${store.timer <= 15 ? "text-red-600" : "text-zinc-600"}`}>
+                  <Clock className="h-4 w-4" />
+                  {store.timer}s remaining
+                </div>
+              )}
+
+              {/* Recording controls */}
+              {!showTextFallback && (
+                <div className="flex gap-3 items-center">
+                  {stt.isTranscribing ? (
+                    <span className="flex items-center gap-2 text-sm text-zinc-500">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Transcribing...
+                    </span>
+                  ) : !store.isRecording ? (
+                    <Button variant="default" onClick={startRecording} className="gap-2">
+                      <Mic className="h-4 w-4" />
+                      Start Recording
+                    </Button>
+                  ) : (
+                    <Button variant="destructive" onClick={stopRecording} className="gap-2 animate-pulse">
+                      <MicOff className="h-4 w-4" />
+                      Stop Recording
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTextFallback(true)}
+                    className="text-zinc-500"
+                  >
+                    Type instead
+                  </Button>
+                </div>
+              )}
+
+              {store.isRecording && (
+                <div className="flex flex-col items-center gap-1">
+                  <MicWaveform stream={stt.stream} className="h-10" />
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">Listening...</p>
+                </div>
+              )}
+
               <textarea
-                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 text-sm min-h-[180px] resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Write your detailed notes here..."
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3 text-sm min-h-[180px] resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Your notes will appear here after recording, or type directly..."
                 value={notesInput}
                 onChange={(e) => setNotesInput(e.target.value)}
               />
@@ -635,7 +705,7 @@ export function ListeningClient({
         {store.phase === "done" && store.round1Feedback && store.round2Feedback && (
           <div className="space-y-4">
             {/* Overall score */}
-            <Card className="border-2 border-blue-200 dark:border-blue-800">
+            <Card className="border-2 border-purple-200 dark:border-purple-800">
               <CardContent className="pt-6">
                 <div className="text-center space-y-2">
                   <p className="text-sm text-zinc-500 uppercase tracking-wide font-medium">Overall Score</p>
@@ -701,6 +771,31 @@ export function ListeningClient({
                       ))}
                     </ul>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Full transcript with synchronized playback */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  Listening transcript
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-xs text-zinc-500">
+                  Play the audio and follow along — each word is highlighted as the speaker says it.
+                </p>
+                <TranscriptPlayer text={passageText} />
+                {isAdmin && (
+                  <ListeningAdminDownloads
+                    passageText={passageText}
+                    passageTitle={passageTitle}
+                    passageTopic={passageTopic}
+                    level={level}
+                    informationType={informationType}
+                  />
                 )}
               </CardContent>
             </Card>

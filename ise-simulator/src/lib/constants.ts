@@ -20,11 +20,27 @@ export const ORAL_TASKS = [
   { type: "LISTENING", label: "Listening Task", description: "Listen to audio and answer questions" },
 ] as const;
 
+/**
+ * Official Trinity ISE Speaking & Listening per-task durations in minutes
+ * (Trinity "Guide for Students" per level). Tasks absent at a level are omitted.
+ * ISE IV uses the distinct Interview format (25 min total); values are adapted
+ * to the app's 4-task model.
+ */
+export const ORAL_TASK_MINUTES: Record<string, Partial<Record<string, number>>> = {
+  ISE_FOUNDATION: { TOPIC: 4, CONVERSATION: 2, LISTENING: 6 },
+  ISE_I:          { TOPIC: 4, CONVERSATION: 2, LISTENING: 7 },
+  ISE_II:         { TOPIC: 4, COLLABORATIVE: 4, CONVERSATION: 2, LISTENING: 8 },
+  ISE_III:        { TOPIC: 8, COLLABORATIVE: 4, CONVERSATION: 3, LISTENING: 8 },
+  ISE_IV:         { TOPIC: 10, COLLABORATIVE: 5, CONVERSATION: 4, LISTENING: 6 },
+};
+
 export const FREE_DAILY_LIMIT = {
   written: 1,
   oral: 1,
   listening: 3,
 };
+
+export const FREE_CHAT_DAILY_LIMIT = 20;
 
 export const EXAM_DURATIONS: Record<string, number> = {
   ISE_FOUNDATION: 60,

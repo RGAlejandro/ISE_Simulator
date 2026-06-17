@@ -349,7 +349,7 @@ export function VocabularyClient() {
   if (phase === "loading") {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center gap-4">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
         <p className="text-sm text-zinc-500">
           Generating {currentLevel.cefr} words...
         </p>
@@ -493,9 +493,9 @@ export function VocabularyClient() {
                   key={i}
                   className={`h-1.5 rounded-full transition-all ${
                     i < cardIndex
-                      ? "w-6 bg-blue-400"
+                      ? "w-6 bg-amber-400"
                       : i === cardIndex
-                      ? "w-6 bg-blue-600"
+                      ? "w-6 bg-amber-600"
                       : "w-3 bg-zinc-200 dark:bg-zinc-700"
                   }`}
                 />

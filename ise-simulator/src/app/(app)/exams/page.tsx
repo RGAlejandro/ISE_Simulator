@@ -27,8 +27,9 @@ export default async function ExamsPage({ searchParams }: { searchParams: Search
   const status = (VALID_STATUS.includes(params.status as typeof VALID_STATUS[number]) ? params.status : "all") as typeof VALID_STATUS[number];
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
-  const writtenWhere: Prisma.WrittenExamWhereInput = { userId: user.id };
-  const oralWhere:    Prisma.OralExamWhereInput    = { userId: user.id };
+  // hiddenAt: null = exclude soft-deleted exams from the user's view.
+  const writtenWhere: Prisma.WrittenExamWhereInput = { userId: user.id, hiddenAt: null };
+  const oralWhere:    Prisma.OralExamWhereInput    = { userId: user.id, hiddenAt: null };
   if (level !== "all") {
     writtenWhere.level = level as ExamLevel;
     oralWhere.level = level as ExamLevel;
@@ -50,8 +51,8 @@ export default async function ExamsPage({ searchParams }: { searchParams: Search
       orderBy: { createdAt: "desc" },
       select: { id: true, level: true, status: true, overallScore: true, createdAt: true },
     }),
-    prisma.writtenExam.count({ where: { userId: user.id } }),
-    prisma.oralExam.count({ where: { userId: user.id } }),
+    prisma.writtenExam.count({ where: { userId: user.id, hiddenAt: null } }),
+    prisma.oralExam.count({ where: { userId: user.id, hiddenAt: null } }),
   ]);
 
   const merged = [

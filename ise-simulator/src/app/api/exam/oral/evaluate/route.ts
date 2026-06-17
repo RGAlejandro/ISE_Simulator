@@ -40,7 +40,9 @@ export async function POST(req: NextRequest) {
     }
 
     const feedbackResults: Record<string, unknown> = {};
-    let totalScore = 0;
+    // Trinity scoring is split: spoken tasks 0-20 (sum of 4 criteria), Listening 0-5.
+    // Normalise each task to 0-100 then average for the overall score.
+    const taskScoresAsPercent: number[] = [];
 
     // Evaluate each task type
     for (const taskType of TASK_TYPES) {
@@ -81,7 +83,9 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      totalScore += feedback.score ?? 0;
+      const max = taskType === "LISTENING" ? 5 : 20;
+      const raw = Math.min(max, Math.max(0, feedback.score ?? 0));
+      taskScoresAsPercent.push((raw / max) * 100);
 
       // Only return detailed feedback for Pro users
       feedbackResults[taskType] =
@@ -90,11 +94,8 @@ export async function POST(req: NextRequest) {
           : { score: feedback.score };
     }
 
-    // Calculate overall score (average across tasks, normalized to 100)
-    const taskCount = Object.keys(feedbackResults).length;
-    const maxPerTask = 25;
-    const overallScore = taskCount > 0
-      ? Math.round((totalScore / (taskCount * maxPerTask)) * 100)
+    const overallScore = taskScoresAsPercent.length
+      ? Math.round(taskScoresAsPercent.reduce((a, b) => a + b, 0) / taskScoresAsPercent.length)
       : 0;
 
     // Update exam status

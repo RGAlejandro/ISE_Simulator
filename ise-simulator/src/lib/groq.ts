@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { parseAIJson } from "./parse-json";
 
 let _groq: Groq | null = null;
 
@@ -24,7 +25,8 @@ function isRetryableError(msg: string): boolean {
     msg.includes("quota") ||
     msg.includes("503") ||
     msg.includes("overloaded") ||
-    msg.includes("capacity")
+    msg.includes("capacity") ||
+    msg.includes("Failed to generate JSON")
   );
 }
 
@@ -45,6 +47,21 @@ async function tryGroqModels<T>(
     }
   }
   throw lastError;
+}
+
+/**
+ * Transcribe candidate audio with Groq Whisper. Works regardless of browser
+ * (replaces the Web Speech API, which is unavailable on Chromium/Brave/Firefox).
+ */
+export async function groqTranscribeAudio(file: File, language = "en"): Promise<string> {
+  const response = await getGroq().audio.transcriptions.create({
+    file,
+    model: "whisper-large-v3-turbo",
+    language,
+    response_format: "json",
+    temperature: 0,
+  });
+  return response.text ?? "";
 }
 
 export async function groqGenerateText(
@@ -81,7 +98,7 @@ export async function groqGenerateJSON(
       response_format: { type: "json_object" },
     });
     const text = response.choices[0]?.message?.content ?? "{}";
-    return JSON.parse(text);
+    return parseAIJson(text);
   });
 }
 
@@ -124,6 +141,6 @@ export async function groqGenerateChatJSON(
       response_format: { type: "json_object" },
     });
     const text = response.choices[0]?.message?.content ?? "{}";
-    return JSON.parse(text);
+    return parseAIJson(text);
   });
 }

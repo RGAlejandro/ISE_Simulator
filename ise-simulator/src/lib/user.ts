@@ -2,6 +2,26 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { FREE_DAILY_LIMIT } from "@/lib/constants";
 import type { UserUsage } from "@/types";
+import type { Plan, SubscriptionStatus } from "@prisma/client";
+
+/**
+ * Single source of truth for Pro entitlement.
+ * PAST_DUE keeps access until the already-paid period ends (Stripe dunning grace).
+ */
+export function isProUser(
+  user: {
+    plan: Plan;
+    subscription?: { status: SubscriptionStatus; currentPeriodEnd: Date | null } | null;
+  } | null
+): boolean {
+  if (!user) return false;
+  if (user.plan === "ADMIN") return true;
+  if (user.plan !== "PRO") return false;
+  const sub = user.subscription;
+  if (!sub) return false;
+  if (sub.status === "ACTIVE") return true;
+  return sub.status === "PAST_DUE" && !!sub.currentPeriodEnd && sub.currentPeriodEnd > new Date();
+}
 
 export async function getCurrentUser() {
   const { userId } = await auth();
@@ -48,7 +68,7 @@ export async function getDailyUsage(userId: string): Promise<UserUsage> {
     where: { userId_date: { userId, date: today } },
   });
 
-  const isPro = user?.plan === "ADMIN" || (user?.plan === "PRO" && user?.subscription?.status === "ACTIVE");
+  const isPro = isProUser(user);
   const writtenCount = usage?.writtenCount ?? 0;
   const oralCount = usage?.oralCount ?? 0;
   const listeningCount = usage?.listeningCount ?? 0;
@@ -63,11 +83,15 @@ export async function getDailyUsage(userId: string): Promise<UserUsage> {
   };
 }
 
-export async function incrementUsage(userId: string, type: "written" | "oral" | "listening") {
+export async function incrementUsage(userId: string, type: "written" | "oral" | "listening" | "chat") {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const field = type === "written" ? "writtenCount" : type === "oral" ? "oralCount" : "listeningCount";
+  const field =
+    type === "written" ? "writtenCount"
+    : type === "oral" ? "oralCount"
+    : type === "listening" ? "listeningCount"
+    : "chatCount";
 
   await prisma.dailyUsage.upsert({
     where: { userId_date: { userId, date: today } },

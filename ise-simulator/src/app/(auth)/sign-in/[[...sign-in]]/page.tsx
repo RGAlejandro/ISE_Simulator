@@ -1,5 +1,6 @@
 import { SignIn } from "@clerk/nextjs";
 import Link from "next/link";
+import { clerkDarkAppearance } from "@/lib/clerk-appearance";
 
 export default function SignInPage() {
   return (
@@ -33,62 +34,7 @@ export default function SignInPage() {
           <span className="text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors">← Back to home</span>
         </Link>
 
-        <SignIn
-          appearance={{
-            variables: {
-              colorBackground: "#18181b",
-              colorText: "#f4f4f5",
-              colorTextSecondary: "#a1a1aa",
-              colorInputBackground: "#27272a",
-              colorInputText: "#f4f4f5",
-              colorPrimary: "#38bdf8",
-              colorNeutral: "#f4f4f5",
-              colorDanger: "#f87171",
-              borderRadius: "0.75rem",
-            },
-            elements: {
-              rootBox: { width: "100%" },
-              card: {
-                backgroundColor: "#18181b",
-                border: "1px solid #3f3f46",
-                boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
-                width: "100%",
-              },
-              headerTitle: { color: "#f4f4f5" },
-              headerSubtitle: { color: "#a1a1aa" },
-              socialButtonsBlockButton: {
-                backgroundColor: "#27272a",
-                border: "1px solid #3f3f46",
-                color: "#e4e4e7",
-              },
-              socialButtonsBlockButtonText: { color: "#e4e4e7" },
-              dividerLine: { backgroundColor: "#3f3f46" },
-              dividerText: { color: "#71717a" },
-              formFieldLabel: { color: "#d4d4d8" },
-              formFieldInput: {
-                backgroundColor: "#27272a",
-                borderColor: "#3f3f46",
-                color: "#f4f4f5",
-              },
-              otpCodeFieldInput: {
-                backgroundColor: "#27272a",
-                borderColor: "#3f3f46",
-                color: "#f4f4f5",
-              },
-              formButtonPrimary: {
-                background: "linear-gradient(to right, #38bdf8, #6366f1)",
-                border: "none",
-                color: "white",
-              },
-              footerActionText: { color: "#71717a" },
-              footerActionLink: { color: "#38bdf8" },
-              footer: { display: "none" },
-              badge: { display: "none" },
-              identityPreviewText: { color: "#d4d4d8" },
-              identityPreviewEditButton: { color: "#38bdf8" },
-            },
-          }}
-        />
+        <SignIn appearance={clerkDarkAppearance} />
 
         <p className="text-sm text-zinc-500">
           Don&apos;t have an account?{" "}

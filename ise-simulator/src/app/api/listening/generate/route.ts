@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getDailyUsage, incrementUsage } from "@/lib/user";
 import { generateJSON } from "@/lib/ai-provider";
-import { generateListeningPrompt } from "@/lib/prompts/listening";
+import { generateListeningPrompt, getListeningMinWords } from "@/lib/prompts/listening";
 import type { ExamLevel } from "@/types";
 
 const VALID_LEVELS: ExamLevel[] = ["ISE_FOUNDATION", "ISE_I", "ISE_II", "ISE_III", "ISE_IV"];
@@ -36,7 +36,18 @@ export async function POST(req: Request) {
     }
 
     const prompt = generateListeningPrompt(level);
-    const passageData = await generateJSON(prompt, { temperature: 0.75 });
+    // Accept the first passage meeting ~80% of the level's minimum length;
+    // regenerate once if the model returns something too short.
+    const minWords = getListeningMinWords(level);
+    const wordCount = (t: string) => t.trim().split(/\s+/).filter(Boolean).length;
+
+    let passageData = await generateJSON(prompt, { temperature: 0.75 });
+    if (passageData?.passageText && wordCount(passageData.passageText) < minWords * 0.8) {
+      const retry = await generateJSON(prompt, { temperature: 0.8 });
+      if (retry?.passageText && wordCount(retry.passageText) > wordCount(passageData.passageText)) {
+        passageData = retry;
+      }
+    }
 
     if (!passageData.passageText || !passageData.title) {
       return NextResponse.json({ error: "Failed to generate passage" }, { status: 503 });

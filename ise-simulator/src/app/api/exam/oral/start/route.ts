@@ -6,6 +6,8 @@ import { getCurrentUser, getDailyUsage, incrementUsage } from "@/lib/user";
 import {
   getOralExaminerSystemPrompt,
   getTopicTaskPrompt,
+  getCollaborativeTaskPrompt,
+  getConversationTaskPrompt,
 } from "@/lib/prompts/oral-exam";
 import type { ExamLevel, OralTaskType } from "@prisma/client";
 
@@ -63,6 +65,15 @@ export async function POST(req: NextRequest) {
     const topicGeneral = (body.topicGeneral ?? "").trim() || null;
     const topicDetailed = (body.topicDetailed ?? body.topic ?? "").trim() || null;
 
+    // Server-side length limits — oversized payloads never reach the DB or prompts
+    const MAX_TOPIC_TEXT = 5000;
+    if ((topicGeneral?.length ?? 0) > MAX_TOPIC_TEXT || (topicDetailed?.length ?? 0) > MAX_TOPIC_TEXT) {
+      return NextResponse.json(
+        { error: `Topic preparation text is too long (max ${MAX_TOPIC_TEXT} characters)` },
+        { status: 400 },
+      );
+    }
+
     // If TOPIC selected, require some content (general or detailed)
     if (selectedTasks.includes("TOPIC") && !topicGeneral && !topicDetailed) {
       return NextResponse.json({ error: "Please provide topic content (general or detailed)" }, { status: 400 });
@@ -94,27 +105,29 @@ export async function POST(req: NextRequest) {
     let examinerOpening = "";
 
     if (firstTask === "TOPIC") {
-      const topicForPrompt = topicDetailed || topicGeneral || "general topic";
+      // Use the first non-empty piece of prep as the displayed topic seed for the opening line
+      const topicForPrompt = topicGeneral?.split("\n").find(l => l.trim())?.trim() || "your prepared topic";
       const systemPrompt = getOralExaminerSystemPrompt(lvl);
-      const topicPrompt = getTopicTaskPrompt(lvl, topicForPrompt);
+      const topicPrompt = getTopicTaskPrompt(lvl, topicForPrompt, {
+        general: topicGeneral,
+        detailed: topicDetailed,
+      });
       examinerOpening = await generateChat(systemPrompt, topicPrompt, {
         temperature: 0.7,
         maxTokens: 200,
       });
     } else if (firstTask === "CONVERSATION") {
       const systemPrompt = getOralExaminerSystemPrompt(lvl);
-      examinerOpening = await generateChat(
-        systemPrompt,
-        `The candidate has chosen to skip the Topic task. Begin the Conversation task. Choose one of the official ISE conversation subject areas for ${lvl} and open the discussion with one focused question. Keep it natural and friendly.`,
-        { temperature: 0.7, maxTokens: 180 },
-      );
+      examinerOpening = await generateChat(systemPrompt, getConversationTaskPrompt(lvl), {
+        temperature: 0.7,
+        maxTokens: 180,
+      });
     } else if (firstTask === "COLLABORATIVE") {
       const systemPrompt = getOralExaminerSystemPrompt(lvl);
-      examinerOpening = await generateChat(
-        systemPrompt,
-        `Begin the Collaborative task. Present a short prompt (an opinion or situation) that the candidate should respond to by asking questions, weighing pros/cons, and concluding. Stop talking after presenting the prompt so the candidate can begin.`,
-        { temperature: 0.7, maxTokens: 200 },
-      );
+      examinerOpening = await generateChat(systemPrompt, getCollaborativeTaskPrompt(lvl), {
+        temperature: 0.7,
+        maxTokens: 200,
+      });
     } else {
       // LISTENING — placeholder, full handling in phase 4
       examinerOpening = "We will now do the Independent Listening task. (Audio playback coming soon.)";

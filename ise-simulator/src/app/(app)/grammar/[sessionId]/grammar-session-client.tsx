@@ -88,7 +88,7 @@ function GapFillQuestion({
           value={answer}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Type your answer..."
-          className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
       ) : (
         <div className="flex items-center gap-2 flex-wrap">
@@ -136,7 +136,7 @@ function McqQuestion({
           let cls = "w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-colors ";
           if (!submitted) {
             cls += selected
-              ? "border-indigo-400 bg-indigo-50 dark:bg-indigo-950 dark:border-indigo-500"
+              ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-950 dark:border-emerald-500"
               : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-500";
           } else {
             if (isCorrectOpt) cls += "border-green-400 bg-green-50 dark:bg-green-950 dark:border-green-600 text-green-800 dark:text-green-200";
@@ -186,7 +186,7 @@ function ErrorCorrectionQuestion({
             value={answer}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Type the correct word..."
-            className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
       ) : (

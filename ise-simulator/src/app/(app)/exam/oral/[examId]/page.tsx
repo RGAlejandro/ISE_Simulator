@@ -33,12 +33,22 @@ export default async function OralExamPage({ params }: PageProps) {
   // Get the first examiner message
   const firstExchange = exam.exchanges[0];
 
+  // Tasks the candidate opted into during setup. Empty array = legacy exam → run full canonical order.
+  const selectedTasks = exam.selectedTasks?.length
+    ? exam.selectedTasks
+    : ["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"];
+  const initialTask = (firstExchange?.taskType as string) ?? selectedTasks[0];
+
   return (
     <OralExamClient
       examId={exam.id}
       level={exam.level}
       initialMessage={firstExchange?.content || ""}
-      isPro={user.plan === "PRO"}
+      isPro={user.plan === "PRO" || user.plan === "ADMIN"}
+      selectedTasks={selectedTasks}
+      initialTask={initialTask}
+      topicGeneral={exam.topicGeneral}
+      topicDetailed={exam.topicDetailed}
     />
   );
 }

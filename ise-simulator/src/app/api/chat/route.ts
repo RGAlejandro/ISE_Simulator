@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateChat } from "@/lib/ai-provider";
+import { isProUser, incrementUsage } from "@/lib/user";
+import { FREE_CHAT_DAILY_LIMIT } from "@/lib/constants";
 
-const FREE_CHAT_DAILY_LIMIT = 20;
+// Defensive caps on the prompt we build from client-provided history
+const MAX_HISTORY_MESSAGES = 20;
+const MAX_MESSAGE_CHARS = 2000;
 
 const SYSTEM_PROMPT = `You are "ISE Assistant", a helpful AI tutor embedded in ISE Simulator — a web app that helps students prepare for the Trinity College London ISE (Integrated Skills in English) exams.
 
@@ -53,26 +57,29 @@ export async function POST(req: NextRequest) {
 
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const isPro =
-    user.plan === "ADMIN" ||
-    (user.plan === "PRO" && user.subscription?.status === "ACTIVE");
+  const isPro = isProUser(user);
 
-  // Rate-limit free users: count user messages sent in this session (client sends full history each request)
+  // Rate-limit free users server-side: persistent daily counter, not client-sent history
   if (!isPro) {
-    const userMsgCount = messages.filter((m) => m.role === "user").length;
-    if (userMsgCount > FREE_CHAT_DAILY_LIMIT) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const usage = await prisma.dailyUsage.findUnique({
+      where: { userId_date: { userId: user.id, date: today } },
+    });
+    if ((usage?.chatCount ?? 0) >= FREE_CHAT_DAILY_LIMIT) {
       return NextResponse.json({
-        message: `Has alcanzado el límite de ${FREE_CHAT_DAILY_LIMIT} mensajes por sesión para usuarios gratuitos. Actualiza a Pro en /pricing para conversaciones ilimitadas.`,
+        message: `Has alcanzado el límite de ${FREE_CHAT_DAILY_LIMIT} mensajes al día para usuarios gratuitos. Actualiza a Pro en /pricing para conversaciones ilimitadas.`,
       });
     }
   }
 
-  const userContextBlock = `\n\nUSER CONTEXT:\n- Name: ${user.name ?? "unknown"}\n- Plan: ${isPro ? "Pro (full access)" : `Free (limited daily exams; chat limited to ${FREE_CHAT_DAILY_LIMIT} messages per session)`}\n- Exam level preference: not stored (ask them if relevant)`;
+  const userContextBlock = `\n\nUSER CONTEXT:\n- Name: ${user.name ?? "unknown"}\n- Plan: ${isPro ? "Pro (full access)" : `Free (limited daily exams; chat limited to ${FREE_CHAT_DAILY_LIMIT} messages per day)`}\n- Exam level preference: not stored (ask them if relevant)`;
 
   const fullPrompt = `${SYSTEM_PROMPT}${userContextBlock}`;
 
   const conversationText = messages
-    .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+    .slice(-MAX_HISTORY_MESSAGES)
+    .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${String(m.content).slice(0, MAX_MESSAGE_CHARS)}`)
     .join("\n\n");
 
   try {
@@ -80,6 +87,10 @@ export async function POST(req: NextRequest) {
       temperature: 0.7,
       maxTokens: isPro ? 1024 : 512,
     });
+
+    if (!isPro) {
+      await incrementUsage(user.id, "chat");
+    }
 
     return NextResponse.json({ message: text });
   } catch (err) {

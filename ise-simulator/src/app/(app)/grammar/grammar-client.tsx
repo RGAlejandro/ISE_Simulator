@@ -104,7 +104,7 @@ export function GrammarClient() {
                 className={`
                   flex flex-col items-start gap-1 rounded-xl border-2 p-4 text-left transition-all cursor-pointer
                   ${selectedType === type
-                    ? "bg-indigo-50 dark:bg-indigo-950 border-indigo-400 dark:border-indigo-500 shadow-md"
+                    ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-400 dark:border-emerald-500 shadow-md"
                     : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500"
                   }
                 `}

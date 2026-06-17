@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useT } from "@/components/i18n/language-provider";
 import {
   PenTool, Mic, BarChart2, Trophy, ChevronRight, Upload, FileText, Lock,
-  Flame, TrendingUp, Sparkles, Crown, Target, Calendar, ArrowUpRight, Rocket,
+  Flame, TrendingUp, Sparkles, Crown, Target, Calendar, ArrowUpRight, Rocket, Trash2,
 } from "lucide-react";
 import { Sparkline } from "@/components/admin/sparkline";
 import { cn } from "@/lib/utils";
@@ -54,9 +54,11 @@ function greetingKey() {
   return "dashboard.greeting.evening";
 }
 
-export function ExamListRow({ exam, isPro }: {
+export function ExamListRow({ exam, isPro, onDelete }: {
   exam: { id: string; type: "written" | "oral"; level: string; status: string; score: number | null; createdAt: string };
   isPro: boolean;
+  /** When provided, shows a delete (soft-hide) button that calls this with the exam. */
+  onDelete?: (exam: { id: string; type: "written" | "oral" }) => void;
 }) {
   const t = useT();
   const isWritten = exam.type === "written";
@@ -156,6 +158,17 @@ export function ExamListRow({ exam, isPro }: {
               {t("dashboard.exam.view")} <ChevronRight className="h-3 w-3" />
             </Button>
           </Link>
+        )}
+        {onDelete && (
+          <button
+            type="button"
+            onClick={() => onDelete({ id: exam.id, type: exam.type })}
+            title={t("dashboard.exam.delete")}
+            aria-label={t("dashboard.exam.delete")}
+            className="h-8 w-8 flex items-center justify-center rounded-md text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         )}
       </div>
     </div>

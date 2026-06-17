@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ExamListRow } from "../dashboard/dashboard-client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ChevronLeft, ChevronRight, Filter, FileText, Mic, Inbox } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type ExamItem = {
@@ -44,6 +48,27 @@ interface Props {
 export function ExamsClient({ exams, isPro, filters, pagination, totals }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [items, setItems] = useState(exams);
+  const [pendingHide, setPendingHide] = useState<{ id: string; type: "written" | "oral" } | null>(null);
+
+  const confirmHide = async () => {
+    if (!pendingHide) return;
+    const target = pendingHide;
+    setPendingHide(null);
+    // Optimistic removal; revert on failure.
+    setItems((prev) => prev.filter((e) => !(e.id === target.id && e.type === target.type)));
+    try {
+      const res = await fetch("/api/exams/hide", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(target),
+      });
+      if (!res.ok) throw new Error("hide failed");
+      router.refresh();
+    } catch {
+      setItems(exams); // revert
+    }
+  };
 
   const buildHref = (patch: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams?.toString());
@@ -65,6 +90,22 @@ export function ExamsClient({ exams, isPro, filters, pagination, totals }: Props
 
   return (
     <>
+      {/* Delete confirmation */}
+      <Dialog open={pendingHide !== null} onOpenChange={(open) => { if (!open) setPendingHide(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove this exam?</DialogTitle>
+            <DialogDescription>
+              It will be removed from your list. This cannot be undone from here.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setPendingHide(null)}>Cancel</Button>
+            <Button className="bg-red-600 hover:bg-red-700" onClick={confirmHide}>Remove</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-purple-950/30 pointer-events-none" />
@@ -138,7 +179,7 @@ export function ExamsClient({ exams, isPro, filters, pagination, totals }: Props
         </div>
 
         {/* Results */}
-        {exams.length === 0 ? (
+        {items.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-10 text-center">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
               <Inbox className="h-6 w-6" />
@@ -156,8 +197,13 @@ export function ExamsClient({ exams, isPro, filters, pagination, totals }: Props
         ) : (
           <>
             <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800/70">
-              {exams.map((exam) => (
-                <ExamListRow key={`${exam.type}-${exam.id}`} exam={exam} isPro={isPro} />
+              {items.map((exam) => (
+                <ExamListRow
+                  key={`${exam.type}-${exam.id}`}
+                  exam={exam}
+                  isPro={isPro}
+                  onDelete={setPendingHide}
+                />
               ))}
             </div>
 

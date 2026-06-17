@@ -10,20 +10,29 @@ export function useEnglishTTS(onError?: ErrorListener) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const errorListenerRef = useRef<ErrorListener | undefined>(onError);
+  // Incremented on every speak() call; an in-flight request whose token is stale
+  // discards its result instead of playing — prevents overlapping/duplicate voices.
+  const playTokenRef = useRef(0);
 
   useEffect(() => {
     errorListenerRef.current = onError;
   }, [onError]);
 
-  const speak = useCallback(async (text: string) => {
-    if (!text) return;
+  const speak = useCallback(async (text: string, opts?: { onEnd?: () => void; voice?: string }) => {
+    if (!text) {
+      opts?.onEnd?.();
+      return;
+    }
 
+    // Mark this as the latest request and stop whatever is currently playing.
+    const token = ++playTokenRef.current;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
 
-    const key = text.trim().slice(0, 1000);
+    const trimmed = text.trim().slice(0, 5000);
+    const key = `${opts?.voice ?? "default"}:${trimmed}`;
 
     try {
       setIsPlaying(true);
@@ -34,7 +43,7 @@ export function useEnglishTTS(onError?: ErrorListener) {
         const res = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: key }),
+          body: JSON.stringify({ text: trimmed, voice: opts?.voice }),
         });
 
         if (!res.ok) {
@@ -48,13 +57,25 @@ export function useEnglishTTS(onError?: ErrorListener) {
         audioCache.set(key, url);
       }
 
+      // A newer speak() superseded this one while we were fetching — abort.
+      if (token !== playTokenRef.current) {
+        opts?.onEnd?.();
+        return;
+      }
+
       const audio = new Audio(url);
       audioRef.current = audio;
 
-      audio.onended = () => setIsPlaying(false);
+      audio.onended = () => {
+        if (token !== playTokenRef.current) return;
+        setIsPlaying(false);
+        opts?.onEnd?.();
+      };
       audio.onerror = () => {
+        if (token !== playTokenRef.current) return;
         setIsPlaying(false);
         errorListenerRef.current?.("playback-failed");
+        opts?.onEnd?.();
       };
 
       await audio.play();
@@ -63,10 +84,13 @@ export function useEnglishTTS(onError?: ErrorListener) {
       const msg = err instanceof Error ? err.message : "tts-failed";
       console.warn("[tts]", msg);
       errorListenerRef.current?.(msg);
+      opts?.onEnd?.();
     }
   }, []);
 
   const stop = useCallback(() => {
+    // Invalidate any in-flight request so it won't start playing after stop.
+    playTokenRef.current++;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -76,6 +100,7 @@ export function useEnglishTTS(onError?: ErrorListener) {
 
   useEffect(() => {
     return () => {
+      playTokenRef.current++;
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;

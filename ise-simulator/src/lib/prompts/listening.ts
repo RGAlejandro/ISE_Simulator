@@ -1,48 +1,72 @@
 import type { ExamLevel } from "@/types";
 
+// Word counts target the real Trinity spoken durations at a natural ~140 wpm
+// reading pace (verified against official ISE sample listenings).
 const levelConfig: Record<ExamLevel, {
   cefr: string;
   wordCount: string;
+  minWords: number;
+  spokenDuration: string;
   complexity: string;
   topics: string[];
   informationTypes: string[];
 }> = {
   ISE_FOUNDATION: {
     cefr: "A2",
-    wordCount: "80-120 words",
+    wordCount: "150-200 words",
+    minWords: 150,
+    spokenDuration: "about 1 to 1.5 minutes",
     complexity: "Simple sentences, common vocabulary, present/past simple, clear structure",
     topics: ["daily routines", "hobbies", "family life", "food and shopping", "local transport"],
     informationTypes: ["likes and dislikes", "two different options", "simple advantages and disadvantages"],
   },
   ISE_I: {
     cefr: "B1",
-    wordCount: "120-160 words",
+    wordCount: "210-260 words",
+    minWords: 210,
+    spokenDuration: "about 1.5 to 2 minutes",
     complexity: "Moderate sentences, varied vocabulary, some opinions and comparisons",
     topics: ["school life", "technology use", "sports and fitness", "travel", "part-time jobs"],
     informationTypes: ["advantages and disadvantages", "two contrasting views", "factual comparison with numbers"],
   },
   ISE_II: {
     cefr: "B2",
-    wordCount: "150-200 words",
+    wordCount: "320-380 words",
+    minWords: 320,
+    spokenDuration: "about 2.5 minutes",
     complexity: "Complex structures, abstract ideas, statistics, cause and effect",
     topics: ["social media impact", "environmental issues", "urban vs rural life", "health and wellbeing", "education systems"],
     informationTypes: ["statistics and data comparison", "pros and cons with evidence", "contrasting research findings", "cause and effect relationships"],
   },
   ISE_III: {
     cefr: "C1",
-    wordCount: "180-240 words",
+    wordCount: "400-500 words",
+    minWords: 400,
+    spokenDuration: "about 2 minutes 45 seconds to 3 minutes",
     complexity: "Sophisticated vocabulary, nuanced arguments, academic register, implicit contrasts",
-    topics: ["AI and ethics", "global economics", "mental health policy", "climate solutions", "criminal justice reform"],
-    informationTypes: ["contrasting expert opinions", "statistical trends with interpretation", "policy advantages vs drawbacks", "competing theoretical frameworks"],
+    // Official Trinity ISE III conversation/subject areas (Guide for Students).
+    topics: [
+      "independence", "ambitions", "stereotypes", "role models",
+      "competitiveness", "young people's rights", "the media", "advertising",
+      "lifestyles", "the arts", "the rights of the individual", "economic issues",
+    ],
+    informationTypes: ["contrasting expert opinions", "statistical trends with interpretation", "advantages vs drawbacks", "competing viewpoints"],
   },
   ISE_IV: {
     cefr: "C2",
-    wordCount: "200-260 words",
+    wordCount: "480-580 words",
+    minWords: 480,
+    spokenDuration: "about 3.5 to 4 minutes",
     complexity: "Near-native complexity, specialised terminology, subtle distinctions, rhetorical sophistication",
     topics: ["bioethics", "geopolitics", "philosophy of mind", "post-humanism", "epistemological debates"],
     informationTypes: ["nuanced opposing arguments", "complex statistical interplay", "academic debate with caveats", "philosophical distinctions with examples"],
   },
 };
+
+/** Minimum acceptable word count for a generated passage at this level. */
+export function getListeningMinWords(level: ExamLevel): number {
+  return levelConfig[level].minWords;
+}
 
 export function generateListeningPrompt(level: ExamLevel): string {
   const config = levelConfig[level];
@@ -54,12 +78,14 @@ export function generateListeningPrompt(level: ExamLevel): string {
 Generate a factual listening passage with these exact specifications:
 - Topic area: ${topic}
 - Information type: ${infoType} (this must be CLEAR and PROMINENT in the text)
-- Length: ${config.wordCount}
+- Length: ${config.wordCount} — this is a STRICT MINIMUM of ${config.minWords} words. Passages shorter than this are unusable.
+- Target spoken duration: ${config.spokenDuration} when read aloud at a natural pace. Write enough content to fill that whole time.
 - Language complexity: ${config.complexity}
 - Style: informative, factual, suitable for academic listening comprehension
+- Develop the topic fully: multiple paragraphs, several supporting points, examples and elaboration — do NOT stop early or summarise briefly.
 - The passage should be clearly spoken (no complex abbreviations, numbers spelled out)
 
-CRITICAL: The passage MUST contain clearly distinguishable information that a student can note down, such as:
+CRITICAL: The passage MUST be at least ${config.minWords} words AND contain clearly distinguishable information that a student can note down, such as:
 - Specific facts, numbers, or statistics
 - Named advantages AND disadvantages (at least 2 of each if that is the information type)
 - Clear contrasts between two positions, approaches, or options
@@ -71,6 +97,35 @@ Return ONLY valid JSON with this exact structure:
   "topic": "${topic}",
   "informationType": "${infoType}",
   "passageText": "the full listening passage text here"
+}
+
+Do NOT include any text outside the JSON object.`;
+}
+
+/**
+ * Model answers for both listening tasks, derived from the passage. Used in the
+ * admin PDF so a teacher can see the "solution" to each task.
+ */
+export function modelAnswersPrompt(
+  passageText: string,
+  passageTitle: string,
+  informationType: string
+): string {
+  return `You are a Trinity ISE listening examiner writing the MODEL ANSWERS (the solution) for a listening exercise, based on the passage below.
+
+PASSAGE (title: "${passageTitle}"):
+${passageText}
+
+INFORMATION TYPE: ${informationType}
+
+Produce the ideal answers a top candidate would give:
+- Task 1 (General Summary, after first listening): a 2-3 sentence summary stating what the talk is about AND the type of information it contains (${informationType}).
+- Task 2 (Detailed Notes, after second listening): the key specific points a candidate should capture — facts, numbers, named advantages/disadvantages, contrasts, cause/effect. Be concrete and faithful to the passage.
+
+Return ONLY valid JSON:
+{
+  "task1ModelAnswer": "the model general summary (2-3 sentences)",
+  "task2KeyPoints": ["specific point 1", "specific point 2", "... up to 10 points"]
 }
 
 Do NOT include any text outside the JSON object.`;

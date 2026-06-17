@@ -5,6 +5,8 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
+  // Feedback POST is anonymous (landing page); GET/PATCH/DELETE are still admin-guarded inside the route.
+  "/api/feedback",
   "/pricing",
   "/tips",
 ]);

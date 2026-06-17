@@ -105,13 +105,13 @@ export function SaveToListDialog({
                 onClick={() => handleSelect(null)}
                 className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors border ${
                   isSaved && currentListId === null
-                    ? "border-blue-300 bg-blue-50 dark:bg-blue-950 dark:border-blue-700"
+                    ? "border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-700"
                     : "border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 }`}
               >
                 <span className="text-xl">🔖</span>
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 flex-1">Unfiled (just save)</span>
-                {isSaved && currentListId === null && <BookmarkCheck className="h-4 w-4 text-blue-500" />}
+                {isSaved && currentListId === null && <BookmarkCheck className="h-4 w-4 text-amber-500" />}
               </button>
               {lists.map((l) => {
                 const active = isSaved && currentListId === l.id;
@@ -122,7 +122,7 @@ export function SaveToListDialog({
                     onClick={() => handleSelect(l.id)}
                     className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors border ${
                       active
-                        ? "border-blue-300 bg-blue-50 dark:bg-blue-950 dark:border-blue-700"
+                        ? "border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-700"
                         : "border-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800"
                     }`}
                   >
@@ -131,7 +131,7 @@ export function SaveToListDialog({
                       <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 truncate">{l.name}</p>
                       <p className="text-xs text-zinc-400">{l.wordCount} {l.wordCount === 1 ? "word" : "words"}</p>
                     </div>
-                    {active && <BookmarkCheck className="h-4 w-4 text-blue-500 flex-shrink-0" />}
+                    {active && <BookmarkCheck className="h-4 w-4 text-amber-500 flex-shrink-0" />}
                   </button>
                 );
               })}
@@ -170,7 +170,7 @@ export function SaveToListDialog({
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Travel words"
                   maxLength={60}
-                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
               <div className="flex items-center gap-4">
@@ -181,7 +181,7 @@ export function SaveToListDialog({
                     value={newEmoji}
                     onChange={(e) => setNewEmoji(e.target.value.slice(0, 4))}
                     placeholder="📚"
-                    className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
                 <div className="flex-[2]">

@@ -51,6 +51,8 @@ model WrittenExam {
   content          Json
   status           ExamStatus        @default(IN_PROGRESS)
   score            Float?
+  /** Soft-delete: hidden from the user's lists but kept in the database. */
+  hiddenAt         DateTime?
   startedAt        DateTime          @default(now())
   completedAt      DateTime?
   createdAt        DateTime          @default(now())
@@ -59,7 +61,7 @@ model WrittenExam {
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   responses        WrittenResponse[]
 
-  @@index([userId])
+  @@index([userId, createdAt])
 }
 
 model WrittenResponse {
@@ -89,6 +91,8 @@ model OralExam {
   topicGeneral  String?       @db.Text
   /** Full detailed essay candidate prepared for the Topic task. */
   topicDetailed String?       @db.Text
+  /** Soft-delete: hidden from the user's lists but kept in the database. */
+  hiddenAt     DateTime?
   startedAt    DateTime       @default(now())
   completedAt  DateTime?
   createdAt    DateTime       @default(now())
@@ -97,7 +101,7 @@ model OralExam {
   exchanges    OralExchange[]
   feedback     OralFeedback[]
 
-  @@index([userId])
+  @@index([userId, createdAt])
 }
 
 model OralExchange {
@@ -225,10 +229,37 @@ model DailyUsage {
   writtenCount   Int      @default(0)
   oralCount      Int      @default(0)
   listeningCount Int      @default(0)
+  chatCount      Int      @default(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
   @@index([userId, date])
+}
+
+model Feedback {
+  id         String           @id @default(cuid())
+  category   FeedbackCategory
+  message    String           @db.Text
+  isRead     Boolean          @default(false)
+  userAgent  String?
+  ipHash     String?
+  createdAt  DateTime         @default(now())
+
+  @@index([createdAt])
+  @@index([isRead])
+  @@index([ipHash, createdAt])
+}
+
+/// Stripe webhook events already processed, for idempotent delivery handling.
+model ProcessedWebhookEvent {
+  id        String   @id
+  createdAt DateTime @default(now())
+}
+
+enum FeedbackCategory {
+  SUGGESTION
+  BUG
+  OTHER
 }
 
 enum Plan {

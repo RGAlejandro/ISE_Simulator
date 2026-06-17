@@ -27,8 +27,11 @@ export function WordDetailsDialog({ open, onOpenChange, word, level, onSpeak }: 
 
     const cached = detailsCache.get(word.toLowerCase());
     if (cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDetails(cached);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(null);
       return;
     }
@@ -73,7 +76,7 @@ export function WordDetailsDialog({ open, onOpenChange, word, level, onSpeak }: 
             <DialogTitle className="text-2xl">{word}</DialogTitle>
             <button
               onClick={() => speak(word)}
-              className="h-7 w-7 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+              className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300 flex items-center justify-center hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors"
               title="Pronounce"
             >
               <Volume2 className="h-3.5 w-3.5" />
@@ -85,7 +88,7 @@ export function WordDetailsDialog({ open, onOpenChange, word, level, onSpeak }: 
 
         {loading && (
           <div className="flex flex-col items-center gap-2 py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+            <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
             <p className="text-sm text-zinc-500">Loading details...</p>
           </div>
         )}
@@ -115,7 +118,7 @@ export function WordDetailsDialog({ open, onOpenChange, word, level, onSpeak }: 
                     <button
                       key={s}
                       onClick={() => speak(s)}
-                      className="text-xs px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900"
+                      className="text-xs px-2 py-1 rounded-md bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900"
                     >
                       {s}
                     </button>
@@ -153,7 +156,7 @@ export function WordDetailsDialog({ open, onOpenChange, word, level, onSpeak }: 
                   >
                     <button
                       onClick={() => speak(ex)}
-                      className="text-blue-500 hover:text-blue-700 flex-shrink-0 mt-0.5"
+                      className="text-amber-500 hover:text-amber-700 flex-shrink-0 mt-0.5"
                       title="Read aloud"
                     >
                       <Volume2 className="h-3.5 w-3.5" />

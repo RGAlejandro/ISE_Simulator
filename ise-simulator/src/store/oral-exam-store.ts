@@ -22,7 +22,7 @@ interface OralExamState {
   topicInput: string;
 
   // Actions
-  setExam: (examId: string, level: ExamLevel) => void;
+  setExam: (examId: string, level: ExamLevel, firstTask?: OralTaskType, firstIndex?: number) => void;
   setCurrentTask: (task: OralTaskType, index: number) => void;
   addMessage: (msg: OralMessage) => void;
   setExaminerSpeaking: (speaking: boolean) => void;
@@ -47,8 +47,8 @@ export const useOralExamStore = create<OralExamState>((set) => ({
   isExamFinished: false,
   topicInput: "",
 
-  setExam: (examId, level) =>
-    set({ examId, level, currentTask: "TOPIC", taskIndex: 0, messages: [], isExamFinished: false }),
+  setExam: (examId, level, firstTask = "TOPIC", firstIndex = 0) =>
+    set({ examId, level, currentTask: firstTask, taskIndex: firstIndex, messages: [], isExamFinished: false }),
   setCurrentTask: (task, index) => set({ currentTask: task, taskIndex: index }),
   addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
   setExaminerSpeaking: (speaking) => set({ isExaminerSpeaking: speaking }),

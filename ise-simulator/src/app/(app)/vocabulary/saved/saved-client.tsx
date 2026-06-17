@@ -278,7 +278,7 @@ export function SavedClient({ initialLists, initialWords }: Props) {
                       </div>
                       <Badge className={`${LEVEL_COLORS[level]} text-[10px] font-bold flex-shrink-0`}>{level}</Badge>
                     </div>
-                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{w.spanish}</p>
+                    <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">{w.spanish}</p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 italic line-clamp-2">&ldquo;{w.example}&rdquo;</p>
 
                     <div className="flex items-center justify-between pt-1">
@@ -286,14 +286,14 @@ export function SavedClient({ initialLists, initialWords }: Props) {
                         <button
                           onClick={() => supported && speak(w.english)}
                           disabled={!supported}
-                          className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-40"
+                          className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900 hover:text-amber-600 dark:hover:text-amber-400 transition-colors disabled:opacity-40"
                           title="Pronounce"
                         >
                           <Volume2 className={`h-4 w-4 ${isPlaying ? "animate-pulse" : ""}`} />
                         </button>
                         <button
                           onClick={() => setDetailsWord({ english: w.english, level })}
-                          className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 flex items-center justify-center hover:bg-amber-100 dark:hover:bg-amber-900 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                           title="Details"
                         >
                           <Info className="h-4 w-4" />
@@ -353,7 +353,7 @@ export function SavedClient({ initialLists, initialWords }: Props) {
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="e.g. Travel words"
                 maxLength={60}
-                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
             <div className="flex items-center gap-4">
@@ -363,7 +363,7 @@ export function SavedClient({ initialLists, initialWords }: Props) {
                   type="text"
                   value={newEmoji}
                   onChange={(e) => setNewEmoji(e.target.value.slice(0, 4))}
-                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
               </div>
               <div className="flex-[2]">

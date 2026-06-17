@@ -1,3 +1,5 @@
+import { parseAIJson } from "./parse-json";
+
 const OPENROUTER_BASE = "https://openrouter.ai/api/v1/chat/completions";
 
 function getApiKey(): string {
@@ -26,7 +28,8 @@ function isRetryableError(msg: string): boolean {
     msg.includes("capacity") ||
     msg.includes("RESOURCE_EXHAUSTED") ||
     msg.includes("404") ||
-    msg.includes("No endpoints found")
+    msg.includes("No endpoints found") ||
+    msg.includes("Failed to generate JSON")
   );
 }
 
@@ -131,7 +134,7 @@ export async function openrouterGenerateJSON(
       modelName,
       { temperature: options?.temperature, jsonMode: true }
     );
-    return JSON.parse(text || "{}");
+    return parseAIJson(text || "{}");
   });
 }
 
@@ -169,6 +172,6 @@ export async function openrouterGenerateChatJSON(
       modelName,
       { temperature: options?.temperature, jsonMode: true }
     );
-    return JSON.parse(text || "{}");
+    return parseAIJson(text || "{}");
   });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useCallback, useSyncExternalStore } from "react";
 
 export type Theme = "system" | "light" | "dark";
 
@@ -14,21 +14,40 @@ const ThemeContext = createContext<ThemeContextValue>({
   setTheme: () => {},
 });
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system");
+const STORAGE_KEY = "theme";
 
-  // Read stored preference on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("theme") as Theme | null;
-    if (stored && ["system", "light", "dark"].includes(stored)) {
-      setThemeState(stored);
-    }
-  }, []);
+function readTheme(): Theme {
+  if (typeof window === "undefined") return "system";
+  const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
+  if (stored && (stored === "system" || stored === "light" || stored === "dark")) return stored;
+  return "system";
+}
+
+// External store: notifies listeners when theme changes (cross-tab via storage event + same-tab via custom dispatch)
+const themeListeners = new Set<() => void>();
+function subscribeTheme(cb: () => void) {
+  themeListeners.add(cb);
+  const onStorage = (e: StorageEvent) => { if (e.key === STORAGE_KEY) cb(); };
+  if (typeof window !== "undefined") window.addEventListener("storage", onStorage);
+  return () => {
+    themeListeners.delete(cb);
+    if (typeof window !== "undefined") window.removeEventListener("storage", onStorage);
+  };
+}
+function notifyTheme() {
+  themeListeners.forEach(l => l());
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const theme = useSyncExternalStore<Theme>(
+    subscribeTheme,
+    readTheme,
+    () => "system",
+  );
 
   // Apply dark class + listen to system changes when in "system" mode
   useEffect(() => {
     const root = document.documentElement;
-
     const apply = (dark: boolean) => root.classList.toggle("dark", dark);
 
     if (theme === "dark") {
@@ -44,10 +63,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme]);
 
-  const setTheme = (t: Theme) => {
-    setThemeState(t);
-    localStorage.setItem("theme", t);
-  };
+  const setTheme = useCallback((t: Theme) => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, t);
+    notifyTheme();
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

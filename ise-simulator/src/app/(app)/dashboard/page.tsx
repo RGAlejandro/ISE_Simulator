@@ -22,31 +22,31 @@ export default async function DashboardPage() {
 
   const [recentWritten, recentOral, totalWritten, totalOral, scoredWritten, scoredOral, activity14] = await Promise.all([
     prisma.writtenExam.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, hiddenAt: null },
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
     prisma.oralExam.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, hiddenAt: null },
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
-    prisma.writtenExam.count({ where: { userId: user.id } }),
-    prisma.oralExam.count({ where: { userId: user.id } }),
+    prisma.writtenExam.count({ where: { userId: user.id, hiddenAt: null } }),
+    prisma.oralExam.count({ where: { userId: user.id, hiddenAt: null } }),
     prisma.writtenExam.findMany({
-      where: { userId: user.id, score: { not: null } },
+      where: { userId: user.id, hiddenAt: null, score: { not: null } },
       select: { score: true },
     }),
     prisma.oralExam.findMany({
-      where: { userId: user.id, overallScore: { not: null } },
+      where: { userId: user.id, hiddenAt: null, overallScore: { not: null } },
       select: { overallScore: true },
     }),
     prisma.writtenExam.findMany({
-      where: { userId: user.id, createdAt: { gte: since14 } },
+      where: { userId: user.id, hiddenAt: null, createdAt: { gte: since14 } },
       select: { createdAt: true },
     }).then(async writtens => {
       const orals = await prisma.oralExam.findMany({
-        where: { userId: user.id, createdAt: { gte: since14 } },
+        where: { userId: user.id, hiddenAt: null, createdAt: { gte: since14 } },
         select: { createdAt: true },
       });
       return [...writtens, ...orals];

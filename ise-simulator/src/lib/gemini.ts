@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { parseAIJson } from "./parse-json";
 
 function getGenAI() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -26,8 +27,8 @@ async function tryWithFallback<T>(
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[Gemini] Model ${modelName} failed: ${msg.slice(0, 120)}`);
       lastError = err;
-      // Only retry on 503/overloaded/quota errors
-      if (!msg.includes("503") && !msg.includes("overloaded") && !msg.includes("high demand") && !msg.includes("RESOURCE_EXHAUSTED")) {
+      // Only retry on 503/overloaded/quota/malformed-JSON errors
+      if (!msg.includes("503") && !msg.includes("overloaded") && !msg.includes("high demand") && !msg.includes("RESOURCE_EXHAUSTED") && !msg.includes("Failed to generate JSON")) {
         throw err; // Non-retryable error, don't try other models
       }
     }
@@ -65,7 +66,7 @@ export async function geminiGenerateJSON(
       },
     });
     const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text());
+    return parseAIJson(result.response.text());
   });
 }
 
@@ -105,7 +106,7 @@ export async function generateWithFileData(
       { inlineData: { data: fileData.data, mimeType: fileData.mimeType } },
       prompt,
     ]);
-    return JSON.parse(result.response.text());
+    return parseAIJson(result.response.text());
   });
 }
 
@@ -124,6 +125,6 @@ export async function geminiGenerateChatJSON(
       systemInstruction: systemPrompt,
     });
     const result = await model.generateContent(userPrompt);
-    return JSON.parse(result.response.text());
+    return parseAIJson(result.response.text());
   });
 }

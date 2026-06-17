@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
   let feedback: Record<string, unknown>;
   try {
-    feedback = await generateWithFileData(prompt, { data: base64, mimeType: file.type });
+    feedback = (await generateWithFileData(prompt, { data: base64, mimeType: file.type })) as Record<string, unknown>;
   } catch (err) {
     console.error("[paper-grade] Gemini error:", err);
     return NextResponse.json({ error: "AI grading failed. Try again." }, { status: 502 });

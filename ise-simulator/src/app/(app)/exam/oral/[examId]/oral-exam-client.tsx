@@ -2,28 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
-interface SpeechRecognitionResult {
-  readonly isFinal: boolean;
-  readonly [index: number]: { readonly transcript: string };
-}
-
-interface SpeechRecognitionResultList {
-  readonly length: number;
-  readonly [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionInstance {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: { results: SpeechRecognitionResultList }) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-}
-
+import { useSttRecorder } from "@/hooks/use-stt-recorder";
+import { useEnglishTTS } from "@/hooks/use-english-tts";
+import { MicWaveform } from "@/components/exam/mic-waveform";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,10 +17,26 @@ import {
   MessageSquare,
   ArrowRight,
   CheckCircle,
+  Clock,
 } from "lucide-react";
-import { useOralExamStore, TASK_ORDER } from "@/store/oral-exam-store";
+import { useOralExamStore } from "@/store/oral-exam-store";
 import type { OralMessage } from "@/store/oral-exam-store";
 import type { OralTaskType } from "@/types";
+
+/**
+ * Trinity ISE III/IV: Topic task = timed formal presentation + timed discussion.
+ * Official: ISE III 4 min + up to 4 min; ISE IV up to 5 min + discussion.
+ */
+const FORMAL_TOPIC_TIMING: Partial<Record<string, { presentation: number; discussion: number }>> = {
+  ISE_III: { presentation: 4 * 60, discussion: 4 * 60 },
+  ISE_IV: { presentation: 5 * 60, discussion: 5 * 60 },
+};
+
+function formatTime(totalSeconds: number): string {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 const TASK_LABELS: Record<OralTaskType, { label: string; description: string; icon: string }> = {
   TOPIC: {
@@ -49,7 +46,7 @@ const TASK_LABELS: Record<OralTaskType, { label: string; description: string; ic
   },
   COLLABORATIVE: {
     label: "Collaborative Task",
-    description: "Discuss a topic with the examiner. Share opinions and ideas.",
+    description: "The examiner gives a situation, then stops. YOU lead: ask questions, weigh pros and cons, and reach a conclusion.",
     icon: "🤝",
   },
   CONVERSATION: {
@@ -69,12 +66,27 @@ interface OralExamClientProps {
   level: string;
   initialMessage: string;
   isPro: boolean;
+  /** Tasks the candidate opted into at setup (canonical order). Drives progress bar + transitions. */
+  selectedTasks: string[];
+  /** First task examiner opens with. Already reflected in initialMessage. */
+  initialTask: string;
+  /** Candidate's prepared topic bullet outline (Topic task). */
+  topicGeneral: string | null;
+  /** Candidate's prepared full essay (Topic task). */
+  topicDetailed: string | null;
 }
 
-export function OralExamClient({ examId, level, initialMessage, isPro }: OralExamClientProps) {
+export function OralExamClient({
+  examId, level, initialMessage, isPro,
+  selectedTasks, initialTask, topicGeneral, topicDetailed,
+}: OralExamClientProps) {
+  // Dynamic task order = canonical filter on candidate's selectedTasks
+  const taskOrder = (["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"] as const)
+    .filter(t => selectedTasks.includes(t));
+  // Suppress unused-var lints for fields wired through props for future phases (Topic-aware prompts).
+  void topicGeneral; void topicDetailed;
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const mediaRecorderRef = useRef<unknown>(null);
 
   const store = useOralExamStore();
   const [exchangeCount, setExchangeCount] = useState(1);
@@ -84,15 +96,49 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
     questions?: string[];
   } | null>(null);
   const [currentListeningQuestion, setCurrentListeningQuestion] = useState(0);
-  const [hasPlayedListening, setHasPlayedListening] = useState(false);
+  /** Trinity spec: candidate hears the Listening passage TWICE. 0 = not started, 1 = first play done, 2 = both done. */
+  const [listeningPlayCount, setListeningPlayCount] = useState(0);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [examError, setExamError] = useState<string | null>(null);
   const [textInput, setTextInput] = useState("");
   const [showTextFallback, setShowTextFallback] = useState(false);
 
+  // ISE III/IV Topic task phases: timed formal presentation → timed discussion.
+  // Only applies when the exam actually STARTS on the Topic task (it's always
+  // first when selected). Initialized from props so it never fires when Topic
+  // was skipped — avoids reading the store's transient default task.
+  const formalTiming = FORMAL_TOPIC_TIMING[level];
+  const startsWithFormalTopic = !!formalTiming && initialTask === "TOPIC";
+  const [topicPhase, setTopicPhase] = useState<"presentation" | "discussion" | null>(
+    startsWithFormalTopic ? "presentation" : null,
+  );
+  const [phaseTimeLeft, setPhaseTimeLeft] = useState<number | null>(
+    startsWithFormalTopic ? formalTiming!.presentation : null,
+  );
+  const topicPhaseRef = useRef(topicPhase);
+  topicPhaseRef.current = topicPhase;
+
+  // Until the init effect sets up the store for THIS exam (it runs after first
+  // paint), fall back to the server-provided first task. The oral store is a
+  // global singleton, so on client navigation it can still hold a previous
+  // exam's task — this stops the wrong task (e.g. Topic) flashing until reload.
+  const storeReady = store.examId === examId;
+  const currentTask: OralTaskType = storeReady ? store.currentTask : ((initialTask as OralTaskType) ?? taskOrder[0]);
+  const taskIndex = storeReady ? store.taskIndex : Math.max(0, taskOrder.indexOf(currentTask));
+  /** Set when a phase timer expires — the next respond call closes the task server-side. */
+  const endTaskRef = useRef(false);
+  /** Guards the init effect so the opening audio plays once (React StrictMode double-invokes effects in dev). */
+  const didInitRef = useRef(false);
+
   // Initialize exam
   useEffect(() => {
-    store.setExam(examId, level as import("@/types").ExamLevel);
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+
+    // Start the store on the actual first task (the candidate may have skipped Topic).
+    const firstTask = (initialTask as OralTaskType) ?? taskOrder[0];
+    const firstIndex = Math.max(0, taskOrder.indexOf(firstTask));
+    store.setExam(examId, level as import("@/types").ExamLevel, firstTask, firstIndex);
     if (initialMessage) {
       store.addMessage({
         id: "initial",
@@ -114,143 +160,149 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [store.messages]);
 
-  // Play examiner text as speech using Web Speech API (free)
+  // Neural TTS via /api/tts (msedge-tts) — same engine in every browser.
+  // The examiner voice is fixed so the whole exam sounds like one person.
+  const { speak: ttsSpeak } = useEnglishTTS();
+  const EXAMINER_VOICE = "en-GB-SoniaNeural";
+
+  // Play examiner text with the neural voice. Returns once playback starts;
+  // `isExaminerSpeaking` clears when the audio actually ends.
   const playExaminerAudio = useCallback(async (text: string) => {
+    if (!text) return;
     store.setExaminerSpeaking(true);
-    try {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "en-GB";
-      utterance.rate = 0.95;
-      utterance.pitch = 1;
-      // Try to find a natural English voice
-      const voices = window.speechSynthesis.getVoices();
-      const englishVoice = voices.find(
-        (v) => v.lang.startsWith("en") && v.name.toLowerCase().includes("female")
-      ) || voices.find((v) => v.lang.startsWith("en-GB")) || voices.find((v) => v.lang.startsWith("en"));
-      if (englishVoice) utterance.voice = englishVoice;
-
-      utterance.onend = () => store.setExaminerSpeaking(false);
-      utterance.onerror = () => store.setExaminerSpeaking(false);
-
-      window.speechSynthesis.cancel(); // Cancel any ongoing speech
-      window.speechSynthesis.speak(utterance);
-    } catch {
-      store.setExaminerSpeaking(false);
-    }
+    void ttsSpeak(text, {
+      voice: EXAMINER_VOICE,
+      onEnd: () => store.setExaminerSpeaking(false),
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ttsSpeak]);
 
-  // Play listening passage audio using Web Speech API (free)
+  /**
+   * Play the Listening passage. Trinity spec: candidate hears the recording TWICE.
+   * After each play we update `listeningPlayCount`. When count reaches 2, fire the first comprehension question.
+   */
   const playListeningPassage = useCallback(async () => {
     if (!listeningData?.listeningText) return;
     store.setExaminerSpeaking(true);
-    try {
-      const utterance = new SpeechSynthesisUtterance(listeningData.listeningText);
-      utterance.lang = "en-GB";
-      utterance.rate = 0.9;
-      const voices = window.speechSynthesis.getVoices();
-      const englishVoice = voices.find(
-        (v) => v.lang.startsWith("en-GB")
-      ) || voices.find((v) => v.lang.startsWith("en"));
-      if (englishVoice) utterance.voice = englishVoice;
-
-      utterance.onend = () => {
+    void ttsSpeak(listeningData.listeningText, {
+      voice: EXAMINER_VOICE,
+      onEnd: () => {
         store.setExaminerSpeaking(false);
-        setHasPlayedListening(true);
-        // After listening ends, ask the first question
-        if (listeningData.questions && listeningData.questions.length > 0) {
-          const firstQ = listeningData.questions[0];
-          store.addMessage({
-            id: `examiner-listening-q-0`,
-            role: "examiner",
-            content: firstQ,
-            timestamp: Date.now(),
-          });
-          playExaminerAudio(firstQ);
-        }
-      };
-      utterance.onerror = () => {
-        store.setExaminerSpeaking(false);
-      };
-
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    } catch {
-      store.setExaminerSpeaking(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listeningData, playExaminerAudio]);
-
-  // Start recording using Web Speech Recognition API (free)
-  const startRecording = useCallback(async () => {
-    try {
-      const SpeechRecognition = (window as unknown as Record<string, unknown>).SpeechRecognition as (new () => SpeechRecognitionInstance) | undefined
-        || (window as unknown as Record<string, unknown>).webkitSpeechRecognition as (new () => SpeechRecognitionInstance) | undefined;
-      if (!SpeechRecognition) {
-        setExamError("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
-        return;
-      }
-
-      const recognition = new SpeechRecognition();
-      recognition.lang = "en-US";
-      recognition.continuous = true;
-      recognition.interimResults = false;
-
-      let finalTranscript = "";
-
-      recognition.onresult = (event: { results: SpeechRecognitionResultList }) => {
-        for (let i = 0; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + " ";
+        setListeningPlayCount((prev) => {
+          const next = prev + 1;
+          if (next >= 2 && listeningData.questions && listeningData.questions.length > 0) {
+            // Two plays complete — fire first comprehension question
+            const firstQ = listeningData.questions[0];
+            store.addMessage({
+              id: `examiner-listening-q-0`,
+              role: "examiner",
+              content: firstQ,
+              timestamp: Date.now(),
+            });
+            // Slight pause then speak the question
+            setTimeout(() => playExaminerAudio(firstQ), 400);
           }
-        }
-      };
+          return next;
+        });
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listeningData, playExaminerAudio, ttsSpeak]);
 
-      recognition.onerror = (event: { error: string }) => {
-        console.error("Speech recognition error:", event.error);
-        store.setRecording(false);
-      };
+  // Recording: MediaRecorder + server-side Whisper STT (works in every browser,
+  // unlike the Web Speech API which Chromium/Brave/Firefox cannot use).
+  const stt = useSttRecorder({
+    onTranscript: (text) => {
+      store.setRecording(false);
+      void processTranscript(text);
+    },
+    onError: (message) => {
+      store.setRecording(false);
+      store.setProcessing(false);
+      setExamError(message);
+      setShowTextFallback(true);
+    },
+  });
 
-      recognition.onend = async () => {
-        store.setRecording(false);
-        if (finalTranscript.trim().length > 0) {
-          await processTranscript(finalTranscript.trim());
-        } else {
-          setExamError("Could not understand. Please try again and speak clearly.");
-        }
-      };
+  const startRecording = useCallback(() => {
+    setExamError(null);
+    void stt.start();
+    store.setRecording(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stt.start]);
 
-      mediaRecorderRef.current = recognition as unknown as MediaRecorder;
-      recognition.start();
-      store.setRecording(true);
-    } catch (err) {
-      console.error("Error starting speech recognition:", err);
-      alert("Please allow microphone access to take the oral exam.");
+  const stopRecording = useCallback(() => {
+    stt.stop();
+    // Show the processing indicator while the audio uploads + transcribes
+    store.setProcessing(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stt.stop]);
+
+  // ── Formal Topic phases (ISE III/IV) ──────────────────────────────────────
+  // Clear the phase once the exam moves off the Topic task. (Entry is handled by
+  // the initial state above — Topic is always the first task when selected.)
+  useEffect(() => {
+    if (currentTask !== "TOPIC" && topicPhase !== null) {
+      setTopicPhase(null);
+      setPhaseTimeLeft(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.currentTask, exchangeCount]);
+  }, [currentTask, topicPhase]);
 
-  // Stop recording
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current) {
-      (mediaRecorderRef.current as unknown as { stop: () => void }).stop();
+  // Tick the phase timer. Presentation counts down only while the candidate is
+  // actually speaking; discussion runs continuously like the real exam clock.
+  const phaseTimerActive =
+    topicPhase !== null &&
+    phaseTimeLeft !== null &&
+    phaseTimeLeft > 0 &&
+    !store.isExamFinished &&
+    (topicPhase === "presentation" ? stt.isRecording : true);
+
+  useEffect(() => {
+    if (!phaseTimerActive) return;
+    const id = setInterval(() => {
+      setPhaseTimeLeft((s) => (s === null || s <= 0 ? s : s - 1));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phaseTimerActive]);
+
+  // Phase timer expiry
+  useEffect(() => {
+    if (phaseTimeLeft !== 0 || topicPhase === null) return;
+    if (topicPhase === "presentation") {
+      // Presentation time over — stop the recording; the transcript flows into
+      // processTranscript, which flips the phase to discussion.
+      if (stt.isRecording) stopRecording();
+    } else {
+      // Discussion time over — close the Topic task after the current turn.
+      endTaskRef.current = true;
+      if (stt.isRecording) {
+        stopRecording();
+      } else if (!store.isProcessing && !store.isExaminerSpeaking) {
+        void processTranscript("");
+      }
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phaseTimeLeft, topicPhase]);
 
   // Process transcript: send to examiner → get response → speak
   const processTranscript = useCallback(
     async (candidateText: string) => {
       store.setProcessing(true);
+      const endTask = endTaskRef.current;
+      endTaskRef.current = false;
 
       try {
-        // Add candidate message
-        const candidateMsg: OralMessage = {
-          id: `candidate-${Date.now()}`,
-          role: "candidate",
-          content: candidateText,
-          timestamp: Date.now(),
-        };
-        store.addMessage(candidateMsg);
+        // Add candidate message (skipped when a timer expired with no final answer)
+        if (candidateText) {
+          const candidateMsg: OralMessage = {
+            id: `candidate-${Date.now()}`,
+            role: "candidate",
+            content: candidateText,
+            timestamp: Date.now(),
+          };
+          store.addMessage(candidateMsg);
+        }
 
         // Send to examiner AI
         const respondRes = await fetch("/api/exam/oral/respond", {
@@ -261,16 +313,24 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
             taskType: store.currentTask,
             candidateText,
             exchangeCount: exchangeCount + 1,
+            ...(endTask ? { endTask: true } : {}),
           }),
         });
 
         if (!respondRes.ok) throw new Error("Respond failed");
         const data = await respondRes.json();
 
+        // Formal Topic levels: the first processed turn IS the presentation —
+        // switch to the timed discussion phase.
+        if (topicPhaseRef.current === "presentation" && !data.isTaskTransition && formalTiming) {
+          setTopicPhase("discussion");
+          setPhaseTimeLeft(formalTiming.discussion);
+        }
+
         // Handle task transitions
         if (data.isTaskTransition) {
           const newTask = data.taskType as OralTaskType;
-          const newIndex = TASK_ORDER.indexOf(newTask);
+          const newIndex = taskOrder.indexOf(newTask);
           store.setCurrentTask(newTask, newIndex);
           setExchangeCount(1);
 
@@ -336,8 +396,8 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
     }
   }, [examId, router]);
 
-  const currentTaskInfo = TASK_LABELS[store.currentTask];
-  const taskProgress = ((store.taskIndex + 1) / TASK_ORDER.length) * 100;
+  const currentTaskInfo = TASK_LABELS[currentTask];
+  const taskProgress = ((taskIndex + 1) / taskOrder.length) * 100;
 
   const canRecord =
     !store.isExaminerSpeaking &&
@@ -345,9 +405,9 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
     !store.isProcessing &&
     !store.isExamFinished;
 
-  // For listening: check if we need to show the "Play Listening" button
+  // For listening: button visible until two plays complete (Trinity spec: hears twice)
   const showPlayListening =
-    store.currentTask === "LISTENING" && listeningData && !hasPlayedListening;
+    currentTask === "LISTENING" && listeningData && listeningPlayCount < 2;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
@@ -371,21 +431,21 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
         <div className="flex items-center justify-between text-sm text-zinc-500 mb-2">
           <span>Progress</span>
           <span>
-            Task {store.taskIndex + 1} of {TASK_ORDER.length}
+            Task {taskIndex + 1} of {taskOrder.length}
           </span>
         </div>
         <Progress value={taskProgress} className="h-2" />
         <div className="mt-2 flex justify-between overflow-x-auto gap-2">
-          {TASK_ORDER.map((task, i) => (
+          {taskOrder.map((task, i) => (
             <div
               key={task}
               className={`flex items-center gap-1 text-xs ${
-                i <= store.taskIndex
+                i <= taskIndex
                   ? "text-blue-600 dark:text-blue-400 font-medium"
                   : "text-zinc-400"
               }`}
             >
-              {i < store.taskIndex ? (
+              {i < taskIndex ? (
                 <CheckCircle className="h-3 w-3" />
               ) : (
                 <MessageSquare className="h-3 w-3" />
@@ -404,6 +464,38 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
           </p>
         </CardContent>
       </Card>
+
+      {/* Formal Topic phase banner (ISE III/IV): timed presentation → timed discussion */}
+      {topicPhase && phaseTimeLeft !== null && formalTiming && (
+        <Card className={`mb-4 ${phaseTimeLeft <= 30 ? "border-red-300 dark:border-red-800" : "border-zinc-200 dark:border-zinc-700"}`}>
+          <CardContent className="py-3 px-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
+                  {topicPhase === "presentation" ? "Phase 1 — Formal presentation" : "Phase 2 — Topic discussion"}
+                </p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {topicPhase === "presentation"
+                    ? "Deliver your prepared presentation. The clock runs while you speak; the examiner listens without interrupting."
+                    : "The examiner now asks questions about your presentation. Defend your ideas — the clock keeps running."}
+                </p>
+              </div>
+              <div className={`flex items-center gap-2 font-mono text-2xl font-bold tabular-nums ${phaseTimeLeft <= 30 ? "text-red-600 dark:text-red-400" : "text-zinc-900 dark:text-zinc-50"}`}>
+                <Clock className="h-5 w-5" />
+                {formatTime(phaseTimeLeft)}
+              </div>
+            </div>
+            <div className="mt-2 h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-1000 ${phaseTimeLeft <= 30 ? "bg-red-500" : "bg-blue-500"}`}
+                style={{
+                  width: `${(phaseTimeLeft / (topicPhase === "presentation" ? formalTiming.presentation : formalTiming.discussion)) * 100}%`,
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Conversation Area */}
       <Card className="mb-4">
@@ -428,6 +520,18 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
                     <span className="text-xs font-semibold opacity-70">
                       {msg.role === "candidate" ? "You" : "Examiner"}
                     </span>
+                    {msg.role === "examiner" && (
+                      <button
+                        type="button"
+                        onClick={() => playExaminerAudio(msg.content)}
+                        disabled={store.isExaminerSpeaking}
+                        title="Play again"
+                        aria-label="Play again"
+                        className="ml-auto inline-flex items-center justify-center rounded-full p-1 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors disabled:opacity-40"
+                      >
+                        <Volume2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                   <p className="text-sm leading-relaxed">{msg.content}</p>
                 </div>
@@ -469,6 +573,11 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
 
       {/* Controls */}
       <div className="flex flex-col items-center gap-4">
+        {examError && (
+          <div className="w-full rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+            {examError}
+          </div>
+        )}
         {store.isExamFinished ? (
           // Exam finished — show evaluate button
           <div className="text-center space-y-4">
@@ -501,10 +610,15 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
             )}
           </div>
         ) : showPlayListening ? (
-          // Listening task — play audio button
+          // Listening task — play audio button. Trinity spec: candidate hears recording TWICE.
           <div className="text-center space-y-3">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Listen carefully to the passage. You will be asked questions afterwards.
+              {listeningPlayCount === 0
+                ? "Listen carefully — you will hear this passage TWICE before the questions."
+                : "Listen again. After the second play the examiner will ask the comprehension questions."}
+            </p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500 tabular-nums">
+              Play {listeningPlayCount + 1} of 2
             </p>
             <Button
               size="lg"
@@ -521,7 +635,7 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
               ) : (
                 <>
                   <Volume2 className="h-5 w-5" />
-                  Play Listening Passage
+                  {listeningPlayCount === 0 ? "Play Listening Passage (1st time)" : "Play Listening Passage (2nd time)"}
                 </>
               )}
             </Button>
@@ -568,6 +682,14 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
         ) : (
           // Normal recording controls
           <div className="flex flex-col items-center gap-3">
+            {store.isRecording && (
+              <div className="flex flex-col items-center gap-1">
+                <MicWaveform stream={stt.stream} className="h-12" />
+                <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                  The examiner is listening...
+                </p>
+              </div>
+            )}
             <Button
               size="lg"
               variant={store.isRecording ? "destructive" : "default"}
@@ -583,12 +705,16 @@ export function OralExamClient({ examId, level, initialMessage, isPro }: OralExa
             </Button>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               {store.isRecording
-                ? "Click to stop recording"
+                ? topicPhase === "presentation"
+                  ? "Presenting — click to finish your presentation early"
+                  : "Click to stop recording"
                 : store.isProcessing
                   ? "Processing..."
                   : store.isExaminerSpeaking
                     ? "Wait for the examiner to finish"
-                    : "Click to start speaking"}
+                    : topicPhase === "presentation"
+                      ? "Click to START your formal presentation — the clock begins when you speak"
+                      : "Click to start speaking"}
             </p>
             <button
               className="text-xs text-zinc-400 hover:text-zinc-600 underline"

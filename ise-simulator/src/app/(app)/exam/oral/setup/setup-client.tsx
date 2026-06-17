@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Mic, GraduationCap, MessagesSquare, Users, Volume2, FileText,
+  Mic, MessagesSquare, Users, Volume2, FileText,
   ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, Sparkles,
 } from "lucide-react";
-import { EXAM_LEVELS } from "@/lib/constants";
+import { EXAM_LEVELS, ORAL_TASK_MINUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 type ExamLevel = "ISE_FOUNDATION" | "ISE_I" | "ISE_II" | "ISE_III" | "ISE_IV";
@@ -23,12 +23,24 @@ const ALLOWED_TASKS_BY_LEVEL: Record<ExamLevel, OralTaskType[]> = {
   ISE_IV:         ["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"],
 };
 
-const TASK_META: Record<OralTaskType, { icon: typeof Mic; label: string; minutes: number; description: string }> = {
-  TOPIC:         { icon: Mic,            label: "Topic task",          minutes: 4, description: "Discuss your prepared topic with the examiner. You bring the agenda." },
-  COLLABORATIVE: { icon: Users,          label: "Collaborative task",  minutes: 4, description: "Examiner presents a situation. You ask questions, debate pros/cons, conclude. B2+ only." },
-  CONVERSATION:  { icon: MessagesSquare, label: "Conversation task",   minutes: 2, description: "Free conversation on level-specific subject areas." },
-  LISTENING:     { icon: Volume2,        label: "Independent listening", minutes: 8, description: "Listen to a recording, summarise + answer follow-ups." },
+const TASK_META: Record<OralTaskType, { icon: typeof Mic; label: string; description: string }> = {
+  TOPIC:         { icon: Mic,            label: "Topic task",          description: "Discuss your prepared topic with the examiner. You bring the agenda." },
+  COLLABORATIVE: { icon: Users,          label: "Collaborative task",  description: "Examiner presents a situation. You ask questions, debate pros/cons, conclude. B2+ only." },
+  CONVERSATION:  { icon: MessagesSquare, label: "Conversation task",   description: "Free conversation on level-specific subject areas." },
+  LISTENING:     { icon: Volume2,        label: "Independent listening", description: "Listen to a recording, summarise + answer follow-ups." },
 };
+
+// ISE III/IV: Topic = formal presentation + discussion (official Trinity spec)
+const TOPIC_FORMAL_DESC: Partial<Record<ExamLevel, string>> = {
+  ISE_III: "4-minute formal presentation of your prepared topic, then up to 4 minutes defending it in discussion with the examiner.",
+  ISE_IV:  "Formal presentation of up to 5 minutes, then an extended discussion where you defend your ideas.",
+};
+
+/** Official per-task minutes for the selected level (Trinity Guide for Students). */
+function taskMinutes(level: ExamLevel | "", task: OralTaskType): number | null {
+  if (!level) return null;
+  return ORAL_TASK_MINUTES[level]?.[task] ?? null;
+}
 
 interface Props {
   initialLevel: string | null;
@@ -50,6 +62,15 @@ export function OralSetupClient({ initialLevel }: Props) {
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // null = not yet checked (SSR-safe), false = browser lacks Web Speech API
+  const [speechSupported, setSpeechSupported] = useState<boolean | null>(null);
+
+  // Detect speech recognition support up front, BEFORE the exam starts —
+  // starting consumes the free user's daily oral exam, so they must know now.
+  useEffect(() => {
+    const w = window as unknown as Record<string, unknown>;
+    setSpeechSupported(Boolean(w.SpeechRecognition || w.webkitSpeechRecognition));
+  }, []);
 
   const allowedTasks: OralTaskType[] = level ? ALLOWED_TASKS_BY_LEVEL[level as ExamLevel] : [];
 
@@ -166,6 +187,16 @@ export function OralSetupClient({ initialLevel }: Props) {
 
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
+        {speechSupported === false && (
+          <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>
+              Your browser does not support speech recognition, which the oral exam needs for voice answers.
+              Please use <strong>Chrome</strong> or <strong>Edge</strong> to take the oral exam.
+            </span>
+          </div>
+        )}
+
         {error && (
           <div className="flex items-start gap-2 rounded-lg bg-red-50 border border-red-200 dark:bg-red-950/40 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
             <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -215,6 +246,10 @@ export function OralSetupClient({ initialLevel }: Props) {
                 const checked = tasks.has(t);
                 const meta = TASK_META[t];
                 const Icon = meta.icon;
+                const minutes = taskMinutes(level, t);
+                const description = t === "TOPIC"
+                  ? (TOPIC_FORMAL_DESC[level as ExamLevel] ?? meta.description)
+                  : meta.description;
                 return (
                   <button
                     key={t}
@@ -236,10 +271,10 @@ export function OralSetupClient({ initialLevel }: Props) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
                         <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{meta.label}</span>
-                        <Badge variant="outline" className="text-[10px]">~{meta.minutes} min</Badge>
+                        {minutes !== null && <Badge variant="outline" className="text-[10px]">~{minutes} min</Badge>}
                         {!enabled && <Badge variant="outline" className="text-[10px]">Not available at this level</Badge>}
                       </div>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">{meta.description}</p>
+                      <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">{description}</p>
                     </div>
                   </button>
                 );
@@ -389,7 +424,7 @@ export function OralSetupClient({ initialLevel }: Props) {
               <Button variant="outline" onClick={() => setStep(tasks.has("TOPIC") ? "topic" : "tasks")} className="gap-1.5">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </Button>
-              <Button onClick={startExam} disabled={submitting} className="gap-2 bg-rose-600 hover:bg-rose-700">
+              <Button onClick={startExam} disabled={submitting || speechSupported === false} className="gap-2 bg-rose-600 hover:bg-rose-700">
                 {submitting ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Starting...</>
                 ) : (

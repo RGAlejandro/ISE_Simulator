@@ -22,6 +22,8 @@ interface LevelSpec {
 
   // ── Task 2: Multi-text Reading (4 texts) ──
   task2: {
+    /** Trinity-official total words for all texts A+B+C+D combined. */
+    totalWords: number;
     wordsPerText: string;
     minSentences: number; // minimum sentences per text (A, B, C)
     graphMinWords: number; // minimum words for text D description
@@ -60,6 +62,7 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
       contentDepth: "Simple, factual text of the kind found in a textbook or article. Each paragraph covers one clear, concrete idea with short, direct sentences. No abstract concepts. Use familiar real-world examples (daily routines, common places, simple descriptions of people or events). Any topic-specific low-frequency words MUST be glossed inline (meaning explained through the text).",
     },
     task2: {
+      totalWords: 300,
       wordsPerText: "approximately 75 words each text (300 ÷ 4 — official spec uses 3 texts; we use 4 to match our 30-question structure)",
       minSentences: 3,
       graphMinWords: 40,
@@ -104,6 +107,7 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
       contentDepth: "Factual, descriptive text of the kind found in a textbook, article or review. Each paragraph develops one main idea with supporting detail and at least one example. Mix simple and compound sentences. Any topic-specific low-frequency words MUST be glossed inline (meaning explained through the text).",
     },
     task2: {
+      totalWords: 400,
       wordsPerText: "approximately 100 words each text (400 ÷ 4, Trinity ISE I official spec)",
       minSentences: 4,
       graphMinWords: 50,
@@ -146,6 +150,7 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
       contentDepth: "Complex text with factual ideas, opinions, argument and/or discussion (eg textbook, article or review). Each paragraph should have a clear topic sentence, supporting evidence or examples, and a concluding thought. Include cause-and-effect reasoning, comparisons, or contrasting viewpoints. Any topic-specific low-frequency words MUST be glossed inline (meaning explained in the text).",
     },
     task2: {
+      totalWords: 500,
       wordsPerText: "approximately 125 words each text (500 ÷ 4, Trinity ISE II official spec)",
       minSentences: 5,
       graphMinWords: 60,
@@ -190,6 +195,7 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
       contentDepth: "Dense, academic-quality text that develops a sophisticated argument. Each paragraph must present a clear thesis point with evidence, analysis, and nuance. Include expert references ('researchers suggest...', 'studies indicate...'), counterarguments, cause-effect chains, and evaluative commentary. The text should challenge an advanced reader and require careful reading to distinguish between similar ideas. Any topic-specific or low-frequency words should be GLOSSED in the text (e.g., 'paradigm shift (a fundamental change in thinking)'). Avoid superficial treatment — each paragraph should say something substantive that cannot be summarised in a single sentence.",
     },
     task2: {
+      totalWords: 700,
       wordsPerText: "approximately 175 words each text (700 ÷ 4, Trinity ISE III official spec)",
       minSentences: 5,
       graphMinWords: 60,
@@ -239,6 +245,7 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
       contentDepth: "Highly dense, scholarly-quality text suitable for a near-native reader. Each paragraph must develop a complex argument with multiple layers of reasoning, evidence, and critical evaluation. Include references to theoretical frameworks, scholarly debate, historical context, and forward-looking analysis. Use rhetorical devices (irony, understatement, rhetorical questions). The text should require multiple readings to fully appreciate the nuances and implicit arguments.",
     },
     task2: {
+      totalWords: 800,
       wordsPerText: "150-250 words",
       minSentences: 6,
       graphMinWords: 80,
@@ -316,7 +323,7 @@ ALL 4 TEXTS MUST share subject area "${subjectArea}" and be thematically linked 
 
 Register: ${spec.task2.textRegister}
 
-MANDATORY: Total Reading 1 = ${spec.task1.totalWords}. Total Reading 2 = sum of texts A+B+C+D ≈ 700 words. Do NOT truncate any text — produce the full required length.
+MANDATORY: Total Reading 1 = ${spec.task1.totalWords}. Total Reading 2 = sum of texts A+B+C+D ≈ ${spec.task2.totalWords} words. Do NOT truncate any text — produce the full required length.
 
 Return exactly this JSON structure:
 {

@@ -152,13 +152,29 @@ export interface ReadingFeedback {
   questions: ReadingQuestionResult[];
 }
 
+/**
+ * Trinity ISE Speaking & Listening rating scale (official spec).
+ *
+ * Per the Trinity ISE Speaking & Listening Exam Information Booklet:
+ * - Topic / Collaborative / Conversation tasks are scored on 4 criteria, each 0-5.
+ * - Independent Listening task is scored separately on its own scale (`listening` field).
+ *
+ * `score` is the overall band on a 0-20 scale (sum of the 4 spoken criteria) for
+ * spoken tasks; for Listening, `score` is on its own 0-5 scale.
+ */
 export interface OralFeedbackData {
   score: number;
-  pronunciation: { score: number; comments: string };
-  grammar: { score: number; comments: string };
-  vocabulary: { score: number; comments: string };
-  fluency: { score: number; comments: string };
-  taskFulfillment: { score: number; comments: string };
+  band: string;
+  /** Fulfilment of task, appropriacy of contributions, turn-taking, repairing breakdowns. */
+  communicativeEffectiveness: { score: number; comments: string };
+  /** Relevance of response, level of understanding, speed and accuracy of responses. */
+  interactiveListening: { score: number; comments: string };
+  /** Range and accuracy of language functions used, effect on listener. */
+  languageControl: { score: number; comments: string };
+  /** Fluency, intelligibility, effect on listener. */
+  delivery: { score: number; comments: string };
+  /** Only present on Independent Listening task evaluations (own Trinity scale). */
+  listening?: { score: number; comments: string };
   suggestions: string[];
 }
 
