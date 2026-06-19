@@ -12,7 +12,7 @@ import { WordDetailsDialog } from "@/components/vocabulary/word-details-dialog";
 import { useEnglishTTS } from "@/hooks/use-english-tts";
 import { useToast } from "@/components/ui/toaster";
 import { useI18n } from "@/components/i18n/language-provider";
-import { scoreToLevel, levelToStartScore, SCORE_TO_LEVEL, type CefrBand } from "@/lib/prompts/vocabulary";
+import { scoreToLevel, levelToStartScore, SCORE_TO_LEVEL, type CefrBand, type VocabCategory } from "@/lib/prompts/vocabulary";
 import type { VocabCard, VocabularyListData } from "@/types";
 import {
   Loader2,
@@ -35,6 +35,9 @@ type Phase = "setup" | "loading" | "studying" | "done";
 export function VocabularyClient() {
   const [phase, setPhase] = useState<Phase>("setup");
   const [selectedStart, setSelectedStart] = useState<CefrBand | "">("");
+  const [category, setCategory] = useState<VocabCategory>("words");
+  const categoryRef = useRef<VocabCategory>("words");
+  categoryRef.current = category;
 
   const [score, setScore] = useState(42);
   const [cards, setCards] = useState<VocabCard[]>([]);
@@ -112,7 +115,7 @@ export function VocabularyClient() {
       const res = await fetch("/api/vocabulary/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ score: nextScore, alreadySeen: seen, locale }),
+        body: JSON.stringify({ score: nextScore, alreadySeen: seen, locale, category: categoryRef.current }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
@@ -293,6 +296,32 @@ export function VocabularyClient() {
               {error}
             </div>
           )}
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center">
+              What do you want to practise?
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { id: "words", emoji: "🔤", label: "Words" },
+                { id: "phrasal_verbs", emoji: "🔗", label: "Phrasal verbs" },
+                { id: "idioms", emoji: "💬", label: "Idioms" },
+              ] as { id: VocabCategory; emoji: string; label: string }[]).map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setCategory(c.id)}
+                  className={`rounded-xl py-3 flex flex-col items-center gap-1 border-2 transition-all ${
+                    category === c.id
+                      ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300"
+                      : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600"
+                  }`}
+                >
+                  <span className="text-lg">{c.emoji}</span>
+                  <span className="text-xs font-semibold leading-tight text-center">{c.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="space-y-3">
             <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center">

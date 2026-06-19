@@ -53,13 +53,40 @@ const TRANSLATION_LANG: Record<string, { name: string; hint: string; noWordNote:
 };
 const DEFAULT_TRANSLATION_LANG = TRANSLATION_LANG.es;
 
+export type VocabCategory = "words" | "phrasal_verbs" | "idioms";
+
+const CATEGORY_SPEC: Record<VocabCategory, { noun: string; itemRule: string; extraHint: string; partOfSpeech: string }> = {
+  words: {
+    noun: "vocabulary items",
+    itemRule: "A single word or very short phrase (1-3 words), useful and natural in real English",
+    extraHint: "",
+    partOfSpeech: "noun|verb|adjective|adverb|phrase|idiom",
+  },
+  phrasal_verbs: {
+    noun: "phrasal verbs",
+    itemRule:
+      "A genuine English PHRASAL VERB (verb + particle, e.g. 'put off', 'come across', 'look into', 'run out of'). It MUST be a real phrasal verb — NOT a plain verb and NOT an idiom",
+    extraHint: "Vary the verbs, particles and meanings. Mix separable and inseparable ones.",
+    partOfSpeech: "phrasal verb",
+  },
+  idioms: {
+    noun: "idioms",
+    itemRule:
+      "A common English IDIOM or fixed expression whose meaning is NOT literal (e.g. 'hit the nail on the head', 'once in a blue moon', 'the ball is in your court')",
+    extraHint: "Pick idioms a learner would realistically hear; avoid obscure or regional ones.",
+    partOfSpeech: "idiom",
+  },
+};
+
 export function generateAdaptiveVocabularyPrompt(
   score: number,
   alreadySeen: string[],
-  locale = "es"
+  locale = "es",
+  category: VocabCategory = "words"
 ): string {
   const { cefr } = scoreToLevel(score);
   const desc = SCORE_DESCRIPTORS[cefr];
+  const cat = CATEGORY_SPEC[category] ?? CATEGORY_SPEC.words;
 
   // Within the band, position affects word selection: lower = simpler end, higher = harder end
   const band = SCORE_TO_LEVEL.find((b) => b.cefr === cefr)!;
@@ -73,39 +100,39 @@ export function generateAdaptiveVocabularyPrompt(
 
   const exclusionNote =
     alreadySeen.length > 0
-      ? `\n\nDo NOT use any of these words (already shown this session): ${alreadySeen.slice(-60).join(", ")}`
+      ? `\n\nDo NOT use any of these (already shown this session): ${alreadySeen.slice(-60).join(", ")}`
       : "";
 
   const lang = TRANSLATION_LANG[locale] ?? DEFAULT_TRANSLATION_LANG;
 
-  return `You are generating vocabulary flashcards for an adaptive English learning app for ${lang.name} speakers.
+  return `You are generating ${cat.noun} flashcards for an adaptive English learning app for ${lang.name} speakers.
 
 Current difficulty level: ${cefr} (${desc.complexity})
 ${positionHint}
 
-Word complexity reference for ${cefr}: ${desc.examples}${exclusionNote}
+Complexity reference for ${cefr}: ${desc.examples}${exclusionNote}
 
-Generate exactly 5 vocabulary items appropriate for ${cefr} level. Each must be:
-- A single word or very short phrase (1-3 words)
-- Useful and natural in real English
+Generate exactly 5 ${cat.noun} appropriate for ${cefr} level. Each item must be:
+- ${cat.itemRule}
 - At the difficulty level described above
 - NOT a proper noun, abbreviation, or ultra-technical jargon
+${cat.extraHint ? `- ${cat.extraHint}` : ""}
 
 Return ONLY valid JSON:
 {
   "cards": [
     {
-      "english": "the word or phrase",
-      "partOfSpeech": "noun|verb|adjective|adverb|phrase|idiom",
+      "english": "the ${category === "words" ? "word or phrase" : cat.noun.replace(/s$/, "")}",
+      "partOfSpeech": "${cat.partOfSpeech}",
       "translation": "${lang.hint}",
-      "example": "Natural English sentence showing how to use this word correctly"
+      "example": "Natural English sentence showing how to use it correctly"
     }
   ]
 }
 
 Rules:
-- "english": base form (infinitive for verbs, singular for nouns)
-- "translation": most common ${lang.name} translation, concise
+- "english": ${category === "words" ? "base form (infinitive for verbs, singular for nouns)" : "the full expression in its standard form"}
+- "translation": most common ${lang.name} ${category === "idioms" ? "equivalent or meaning" : "translation"}, concise
 - "example": clear real usage — NOT a definition, NOT a translation
 - ${lang.noWordNote}
 - Exactly 5 items in the array

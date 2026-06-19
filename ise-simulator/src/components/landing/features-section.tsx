@@ -17,20 +17,20 @@ const TAB_STATIC = [
   {
     id: "oral" as TabId,
     icon: Mic,
-    color: "text-purple-600 dark:text-purple-400",
-    bg: "bg-purple-100 dark:bg-purple-900",
+    color: "text-rose-600 dark:text-rose-400",
+    bg: "bg-rose-100 dark:bg-rose-900",
   },
   {
     id: "listening" as TabId,
     icon: Volume2,
-    color: "text-cyan-600 dark:text-cyan-400",
-    bg: "bg-cyan-100 dark:bg-cyan-900",
+    color: "text-purple-600 dark:text-purple-400",
+    bg: "bg-purple-100 dark:bg-purple-900",
   },
   {
     id: "vocabulary" as TabId,
     icon: BookMarked,
-    color: "text-pink-600 dark:text-pink-400",
-    bg: "bg-pink-100 dark:bg-pink-900",
+    color: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-100 dark:bg-amber-900",
   },
   {
     id: "grammar" as TabId,
@@ -101,13 +101,13 @@ function OralPreview() {
       className="h-full space-y-3"
     >
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[10px] font-bold bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">ISE I</span>
+        <span className="text-[10px] font-bold bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300 px-2 py-0.5 rounded-full">ISE I</span>
         <span className="text-xs text-zinc-400">Topic Task · Conversation</span>
       </div>
       <div className="space-y-3">
         {/* AI message */}
         <div className="flex items-start gap-2">
-          <div className="h-7 w-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center flex-shrink-0 text-xs">🤖</div>
+          <div className="h-7 w-7 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center flex-shrink-0 text-xs">🤖</div>
           <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-xs">
             <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">
               &ldquo;That&apos;s very interesting. Can you tell me more about why you chose this topic?&rdquo;
@@ -141,7 +141,7 @@ function OralPreview() {
         </div>
         {/* AI next */}
         <div className="flex items-start gap-2">
-          <div className="h-7 w-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center flex-shrink-0 text-xs">🤖</div>
+          <div className="h-7 w-7 rounded-full bg-rose-100 dark:bg-rose-900 flex items-center justify-center flex-shrink-0 text-xs">🤖</div>
           <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-tl-none px-3.5 py-2.5">
             <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.2, repeat: Infinity }} className="flex gap-1 items-center">
               <div className="h-2 w-2 rounded-full bg-zinc-400" />
@@ -172,7 +172,7 @@ function ListeningPreview() {
       className="h-full space-y-4"
     >
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-bold bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300 px-2 py-0.5 rounded-full">ISE II</span>
+        <span className="text-[10px] font-bold bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">ISE II</span>
         <span className="text-xs text-zinc-400">Round 2 — Detailed Notes</span>
       </div>
       {/* Audio player */}
@@ -185,7 +185,7 @@ function ListeningPreview() {
           <motion.div
             animate={{ width: ["0%", "73%"] }}
             transition={{ duration: 3, ease: "linear" }}
-            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600"
+            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-purple-500 to-purple-600"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -195,7 +195,7 @@ function ListeningPreview() {
                 key={i}
                 animate={{ height: [`${h * 2}px`, `${h * 3}px`, `${h * 2}px`] }}
                 transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.07 }}
-                className="w-0.5 bg-cyan-400 rounded-full"
+                className="w-0.5 bg-purple-400 rounded-full"
                 style={{ height: `${h * 2}px` }}
               />
             ))}
@@ -210,7 +210,7 @@ function ListeningPreview() {
           {["Social media use up 30% since 2020", "73% of teens use platforms daily", "Mental health concerns — anxiety link"].map((line, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.4 + 0.5 }}
               className="flex items-start gap-1.5">
-              <span className="text-cyan-500 flex-shrink-0 text-xs">–</span>
+              <span className="text-purple-500 flex-shrink-0 text-xs">–</span>
               <span className="text-[11px] text-zinc-600 dark:text-zinc-400">{line}</span>
             </motion.div>
           ))}
@@ -235,7 +235,7 @@ function VocabularyPreview() {
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 px-2 py-0.5 rounded-full">C1 Level</span>
+          <span className="text-[10px] font-bold bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full">C1 Level</span>
           <span className="text-xs text-zinc-400">Card 7 of ∞</span>
         </div>
         <div className="text-xs text-zinc-400">Score: <span className="text-green-500 font-semibold">72</span>/100</div>
@@ -255,19 +255,19 @@ function VocabularyPreview() {
         >
           {/* Front */}
           <div
-            className="absolute inset-0 rounded-2xl border-2 border-pink-200 dark:border-pink-800 bg-gradient-to-br from-pink-50 to-white dark:from-pink-950 dark:to-zinc-900 flex flex-col items-center justify-center p-4"
+            className="absolute inset-0 rounded-2xl border-2 border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-white dark:from-amber-950 dark:to-zinc-900 flex flex-col items-center justify-center p-4"
             style={{ backfaceVisibility: "hidden" }}
           >
             <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">substantiate</p>
             <p className="text-xs text-zinc-400 mt-1">verb</p>
-            <p className="text-[10px] text-pink-400 mt-4">tap to reveal →</p>
+            <p className="text-[10px] text-amber-400 mt-4">tap to reveal →</p>
           </div>
           {/* Back */}
           <div
-            className="absolute inset-0 rounded-2xl border-2 border-pink-400 dark:border-pink-600 bg-gradient-to-br from-pink-100 to-pink-50 dark:from-pink-900 dark:to-pink-950 flex flex-col items-center justify-center p-4"
+            className="absolute inset-0 rounded-2xl border-2 border-amber-400 dark:border-amber-600 bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900 dark:to-amber-950 flex flex-col items-center justify-center p-4"
             style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           >
-            <p className="text-lg font-bold text-pink-700 dark:text-pink-300">corroborar</p>
+            <p className="text-lg font-bold text-amber-700 dark:text-amber-300">corroborar</p>
             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-2 text-center italic">&ldquo;The evidence substantiates her claim.&rdquo;</p>
           </div>
         </motion.div>
@@ -436,17 +436,17 @@ export function FeaturesSection() {
           <div className="lg:col-span-3">
             <div className={`rounded-2xl border-2 overflow-hidden ${
               active === "written" ? "border-blue-200 dark:border-blue-900" :
-              active === "oral" ? "border-purple-200 dark:border-purple-900" :
-              active === "listening" ? "border-cyan-200 dark:border-cyan-900" :
-              active === "vocabulary" ? "border-pink-200 dark:border-pink-900" :
+              active === "oral" ? "border-rose-200 dark:border-rose-900" :
+              active === "listening" ? "border-purple-200 dark:border-purple-900" :
+              active === "vocabulary" ? "border-amber-200 dark:border-amber-900" :
               "border-green-200 dark:border-green-900"
             }`}>
               {/* Header bar */}
               <div className={`flex items-center gap-2 px-4 py-3 border-b ${
                 active === "written" ? "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-900" :
-                active === "oral" ? "bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-900" :
-                active === "listening" ? "bg-cyan-50 dark:bg-cyan-950 border-cyan-200 dark:border-cyan-900" :
-                active === "vocabulary" ? "bg-pink-50 dark:bg-pink-950 border-pink-200 dark:border-pink-900" :
+                active === "oral" ? "bg-rose-50 dark:bg-rose-950 border-rose-200 dark:border-rose-900" :
+                active === "listening" ? "bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-900" :
+                active === "vocabulary" ? "bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-900" :
                 "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-900"
               }`}>
                 <div className={`h-8 w-8 rounded-lg ${activeTab.bg} flex items-center justify-center`}>

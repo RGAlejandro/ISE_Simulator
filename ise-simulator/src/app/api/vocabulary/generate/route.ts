@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { generateJSON } from "@/lib/ai-provider";
-import { generateAdaptiveVocabularyPrompt } from "@/lib/prompts/vocabulary";
+import { generateAdaptiveVocabularyPrompt, type VocabCategory } from "@/lib/prompts/vocabulary";
+
+const VALID_CATEGORIES: VocabCategory[] = ["words", "phrasal_verbs", "idioms"];
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +13,9 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { score, alreadySeen = [], locale = "es" } = body as { score: number; alreadySeen?: string[]; locale?: string };
+    const { score, alreadySeen = [], locale = "es", category = "words" } = body as {
+      score: number; alreadySeen?: string[]; locale?: string; category?: string;
+    };
 
     if (typeof score !== "number" || score < 0 || score > 100) {
       return NextResponse.json({ error: "Invalid score" }, { status: 400 });
@@ -21,7 +25,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid alreadySeen" }, { status: 400 });
     }
 
-    const prompt = generateAdaptiveVocabularyPrompt(score, alreadySeen, locale);
+    const cat: VocabCategory = VALID_CATEGORIES.includes(category as VocabCategory)
+      ? (category as VocabCategory)
+      : "words";
+
+    const prompt = generateAdaptiveVocabularyPrompt(score, alreadySeen, locale, cat);
     const data = await generateJSON(prompt, { temperature: 0.85 });
 
     if (!Array.isArray(data?.cards) || data.cards.length === 0) {
