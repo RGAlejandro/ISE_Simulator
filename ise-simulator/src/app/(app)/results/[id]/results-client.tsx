@@ -94,8 +94,8 @@ export function ResultsClient({ exam, responses, isPro }: ResultsClientProps) {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-purple-950/30 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 paper-bg pointer-events-none" />
+        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
 
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 mb-4">
@@ -111,7 +111,7 @@ export function ResultsClient({ exam, responses, isPro }: ResultsClientProps) {
               <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-300">
                 {exam.level.replace("_", " ")} · {new Date(exam.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}
               </p>
-              <h1 className="mt-1 text-3xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              <h1 className="mt-1 text-3xl sm:text-5xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
                 {exam.score != null ? `${exam.score}%` : "Pending"}
               </h1>
               <div className="mt-2 flex items-center gap-2">

@@ -282,7 +282,7 @@ export function VocabularyClient() {
         <div className="mx-auto max-w-md space-y-10">
           <div className="text-center space-y-2">
             <div className="text-5xl mb-3">🃏</div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-2xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Adaptive Vocabulary
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
@@ -356,6 +356,25 @@ export function VocabularyClient() {
           >
             Start Session
           </Button>
+
+          {lists.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center">
+                Or practise with your saved lists
+              </p>
+              <div className="space-y-2">
+                {lists.map((l) => (
+                  <Link key={l.id} href={`/vocabulary/study/${l.id}`} className="block">
+                    <div className="flex items-center gap-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-3 transition-all hover:border-amber-400 dark:hover:border-amber-400">
+                      <span className="text-xl">{l.emoji}</span>
+                      <span className="flex-1 min-w-0 truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{l.name}</span>
+                      <span className="text-xs text-zinc-400">{l.wordCount} {l.wordCount === 1 ? "word" : "words"}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
 
           <Link href="/vocabulary/saved" className="block">
             <Button variant="outline" size="lg" className="w-full gap-2">
@@ -476,7 +495,7 @@ export function VocabularyClient() {
               <Flashcard
                 key={cardIndex}
                 card={currentCard}
-                isFlipped={isFlipped}
+                isFlipped={isFlipped && !isExiting}
                 onFlip={() => { if (!isExiting) setIsFlipped((f) => !f); }}
                 onSpeak={speak}
                 isPlaying={isPlaying}

@@ -212,23 +212,23 @@ function DemoWindow() {
 export function HeroSection() {
   const t = useT();
   return (
-    <section className="relative overflow-hidden min-h-[calc(100dvh-4rem)] sm:min-h-screen flex items-center bg-gradient-to-br from-slate-50 via-blue-50/40 to-purple-50/20 dark:from-zinc-950 dark:via-blue-950/20 dark:to-purple-950/10">
+    <section className="relative overflow-hidden min-h-[calc(100dvh-4rem)] sm:min-h-screen flex items-center">
 
       {/* Animated background orbs — scaled down on mobile */}
       <motion.div
         animate={{ y: [0, -40, 0], x: [0, 20, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-16 right-[5%] h-[250px] w-[250px] sm:h-[500px] sm:w-[500px] rounded-full bg-blue-200/30 dark:bg-blue-800/15 blur-3xl pointer-events-none"
+        className="absolute top-16 right-[5%] h-[250px] w-[250px] sm:h-[500px] sm:w-[500px] rounded-full bg-brand/10 blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ y: [0, 30, 0], x: [0, -15, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute bottom-0 left-[5%] h-[200px] w-[200px] sm:h-[400px] sm:w-[400px] rounded-full bg-purple-200/30 dark:bg-purple-800/15 blur-3xl pointer-events-none"
+        className="absolute bottom-0 left-[5%] h-[200px] w-[200px] sm:h-[400px] sm:w-[400px] rounded-full bg-marker/20 blur-3xl pointer-events-none"
       />
       <motion.div
         animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.35, 0.2] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] sm:h-[600px] sm:w-[600px] rounded-full bg-indigo-100/20 dark:bg-indigo-900/10 blur-3xl pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] sm:h-[600px] sm:w-[600px] rounded-full bg-brand/5 blur-3xl pointer-events-none"
       />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 w-full">
@@ -243,11 +243,11 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-4 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-4 py-1.5 text-sm font-medium text-brand dark:text-brand shadow-sm">
                 <motion.span
                   animate={{ scale: [1, 1.4, 1] }}
                   transition={{ duration: 2.5, repeat: Infinity }}
-                  className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0"
+                  className="h-2 w-2 rounded-full bg-brand flex-shrink-0"
                 />
                 {t("landing.hero.badge")}
               </div>
@@ -258,10 +258,10 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl xl:text-6xl leading-[1.1]"
+              className="font-display text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl xl:text-6xl leading-[1.08]"
             >
               {t("landing.hero.title")}{" "}
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="marker-underline italic text-brand dark:text-brand">
                 {t("landing.hero.titleAccent")}
               </span>
             </motion.h1>
@@ -284,7 +284,7 @@ export function HeroSection() {
               className="flex flex-col sm:flex-row gap-3"
             >
               <Link href="/sign-up">
-                <Button size="lg" className="text-base px-8 gap-2 w-full sm:w-auto shadow-lg shadow-blue-200 dark:shadow-blue-900/50">
+                <Button size="lg" className="text-base px-8 gap-2 w-full sm:w-auto bg-brand text-brand-foreground hover:opacity-90 shadow-lg shadow-brand/20">
                   {t("landing.hero.ctaPrimary")}
                   <ArrowRight className="h-4 w-4" />
                 </Button>

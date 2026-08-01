@@ -366,7 +366,7 @@ export function FeaturesSection() {
   const activeTab = TABS.find((t) => t.id === active)!;
 
   return (
-    <section id="features" className="py-14 sm:py-20 lg:py-28 bg-white dark:bg-zinc-950">
+    <section id="features" className="py-14 sm:py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -376,7 +376,7 @@ export function FeaturesSection() {
           viewport={{ once: true }}
           className="text-center mb-10 sm:mb-14 lg:mb-16"
         >
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
             {t("landing.features.title")}
           </h2>
           <p className="mt-4 text-lg text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
+import { PERSONA_VOICES } from "@/lib/examiner-personas";
 
 const ttsCache = new Map<string, ArrayBuffer>();
 
@@ -8,11 +9,16 @@ const ttsCache = new Map<string, ArrayBuffer>();
 // old 1000-char cap — ISE III/IV passages run ~2500+ chars.
 const MAX_TEXT_LENGTH = 5000;
 
-const ALLOWED_VOICES = [
+const ALLOWED_VOICES: string[] = [
   "en-GB-RyanNeural",
   "en-GB-SoniaNeural",
   "en-GB-LibbyNeural",
-] as const;
+  // American voices for pronunciation practice
+  "en-US-GuyNeural",
+  "en-US-AriaNeural",
+  // Examiner-persona voices (accents)
+  ...PERSONA_VOICES,
+];
 const DEFAULT_VOICE = "en-GB-RyanNeural";
 
 const audioHeaders = {

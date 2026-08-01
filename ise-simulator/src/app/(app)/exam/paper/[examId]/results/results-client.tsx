@@ -158,7 +158,7 @@ export function PaperResultsClient({ examId, level, feedback, score }: Props) {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <p className="text-blue-200 text-sm">Paper Exam Results</p>
-              <h1 className="text-2xl font-bold mt-0.5">{LEVEL_LABELS[level] ?? level}</h1>
+              <h1 className="text-2xl font-display font-semibold tracking-tight mt-0.5">{LEVEL_LABELS[level] ?? level}</h1>
               {f.overallBand && <p className="text-blue-100 text-sm mt-1">Band: {f.overallBand}</p>}
             </div>
             {score !== null && (

@@ -314,7 +314,7 @@ export function ListeningClient({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-2xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Listening Practice
             </h1>
             <p className="text-sm text-zinc-500 mt-1">{LEVEL_LABELS[level]}</p>

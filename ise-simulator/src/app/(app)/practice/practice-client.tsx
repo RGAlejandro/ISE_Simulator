@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Volume2, BookOpen, Loader2, PenTool, Mic,
-  Sparkles, AlertCircle, GraduationCap,
+  Sparkles, AlertCircle, GraduationCap, Layers,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -264,16 +264,16 @@ export function PracticeClient({
 
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-purple-950/30 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 paper-bg pointer-events-none" />
+        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
 
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-14 text-center">
           <Badge variant="outline" className="mb-3 sm:mb-4 backdrop-blur bg-white/60 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-700">
             <Sparkles className="h-3 w-3 mr-1" />
             {t("practice.badge")}
           </Badge>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             {t("practice.title")}
           </h1>
           <p className="mt-3 text-base sm:text-lg text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto px-2">
@@ -401,9 +401,26 @@ export function PracticeClient({
               }
             />
 
+            {/* PRONUNCIATION */}
+            <ModuleCard
+              icon={<Mic className="h-5 w-5" />}
+              tone="sky"
+              title={t("practice.cards.pronunciation.title")}
+              description={t("practice.cards.pronunciation.description")}
+              badge={t("practice.badges.unlimited")}
+              bulletsKey="pronunciation"
+              cta={
+                <Link href="/pronunciation" className="block">
+                  <Button className="w-full gap-2 bg-sky-600 hover:bg-sky-700">
+                    <Mic className="h-4 w-4" /> {t("practice.cards.pronunciation.cta")}
+                  </Button>
+                </Link>
+              }
+            />
+
             {/* VOCAB */}
             <ModuleCard
-              icon={<span className="text-lg">🃏</span>}
+              icon={<Layers className="h-5 w-5" />}
               tone="amber"
               title={t("practice.cards.vocab.title")}
               description={t("practice.cards.vocab.description")}
@@ -412,7 +429,7 @@ export function PracticeClient({
               cta={
                 <Link href="/vocabulary" className="block">
                   <Button className="w-full gap-2 bg-amber-600 hover:bg-amber-700">
-                    <span>🃏</span> {t("practice.cards.vocab.cta")}
+                    <Layers className="h-4 w-4" /> {t("practice.cards.vocab.cta")}
                   </Button>
                 </Link>
               }
@@ -424,7 +441,7 @@ export function PracticeClient({
   );
 }
 
-type Tone = "blue" | "rose" | "purple" | "green" | "amber";
+type Tone = "blue" | "rose" | "purple" | "green" | "amber" | "sky";
 
 const TONE_STYLES: Record<Tone, { iconBg: string; iconColor: string; bg: string; ring: string; topBorder: string }> = {
   blue:   { iconBg: "bg-blue-100 dark:bg-blue-900/50",     iconColor: "text-blue-600 dark:text-blue-300",     bg: "from-blue-50/70 to-transparent dark:from-blue-950/30",     ring: "ring-blue-200/60 dark:ring-blue-900/40",     topBorder: "from-blue-500 to-indigo-500" },
@@ -432,9 +449,10 @@ const TONE_STYLES: Record<Tone, { iconBg: string; iconColor: string; bg: string;
   purple: { iconBg: "bg-purple-100 dark:bg-purple-900/50", iconColor: "text-purple-600 dark:text-purple-300", bg: "from-purple-50/70 to-transparent dark:from-purple-950/30", ring: "ring-purple-200/60 dark:ring-purple-900/40", topBorder: "from-purple-500 to-fuchsia-500" },
   green:  { iconBg: "bg-emerald-100 dark:bg-emerald-900/50", iconColor: "text-emerald-600 dark:text-emerald-300", bg: "from-emerald-50/70 to-transparent dark:from-emerald-950/30", ring: "ring-emerald-200/60 dark:ring-emerald-900/40", topBorder: "from-emerald-500 to-teal-500" },
   amber:  { iconBg: "bg-amber-100 dark:bg-amber-900/50",   iconColor: "text-amber-600 dark:text-amber-300",   bg: "from-amber-50/70 to-transparent dark:from-amber-950/30",   ring: "ring-amber-200/60 dark:ring-amber-900/40",   topBorder: "from-amber-500 to-orange-500" },
+  sky:    { iconBg: "bg-sky-100 dark:bg-sky-900/50",       iconColor: "text-sky-600 dark:text-sky-300",       bg: "from-sky-50/70 to-transparent dark:from-sky-950/30",       ring: "ring-sky-200/60 dark:ring-sky-900/40",       topBorder: "from-sky-500 to-cyan-500" },
 };
 
-type BulletsKey = "written" | "oral" | "listening" | "grammar" | "vocab";
+type BulletsKey = "written" | "oral" | "listening" | "grammar" | "vocab" | "pronunciation";
 
 function ModuleCard({
   icon, tone, title, description, badge, bulletsKey, cta,

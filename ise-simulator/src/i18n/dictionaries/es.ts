@@ -5,6 +5,7 @@ export const es: Dictionary = {
     dashboard: "Panel",
     practice: "Práctica",
     tips: "Consejos y guías",
+    chat: "Chat",
     pricing: "Precios",
     admin: "Admin",
     signIn: "Iniciar sesión",
@@ -279,6 +280,17 @@ export const es: Dictionary = {
           "Práctica ilimitada",
         ],
         cta: "Abrir Gramática",
+      },
+      pronunciation: {
+        title: "Pronunciación",
+        description: "Lee en voz alta y recibe feedback al instante — elige acento RP o americano.",
+        bullets: [
+          "Acentos RP y americano",
+          "Tu propio texto o generado por IA",
+          "Fácil / Normal / Avanzado",
+          "Escucha el modelo y luego graba",
+        ],
+        cta: "Practicar pronunciación",
       },
       vocab: {
         title: "Vocabulario",

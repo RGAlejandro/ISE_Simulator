@@ -3,6 +3,7 @@ export const en = {
     dashboard: "Dashboard",
     practice: "Practice",
     tips: "Tips & Guides",
+    chat: "Chat",
     pricing: "Pricing",
     admin: "Admin",
     signIn: "Sign In",
@@ -277,6 +278,17 @@ export const en = {
           "Unlimited practice",
         ],
         cta: "Open Grammar",
+      },
+      pronunciation: {
+        title: "Pronunciation",
+        description: "Read aloud and get instant feedback — choose RP or American accent.",
+        bullets: [
+          "RP & American accents",
+          "Your own text or AI-generated",
+          "Easy / Normal / Advanced",
+          "Hear the model, then record",
+        ],
+        cta: "Start Pronunciation",
       },
       vocab: {
         title: "Vocabulary",

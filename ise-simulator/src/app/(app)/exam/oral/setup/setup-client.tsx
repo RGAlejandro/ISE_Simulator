@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Mic, MessagesSquare, Users, Volume2, FileText,
-  ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, Sparkles,
+  ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, Sparkles, Dices,
 } from "lucide-react";
 import { EXAM_LEVELS, ORAL_TASK_MINUTES } from "@/lib/constants";
+import { EXAMINER_PERSONAS, type ExaminerPersona } from "@/lib/examiner-personas";
 import { cn } from "@/lib/utils";
 
 type ExamLevel = "ISE_FOUNDATION" | "ISE_I" | "ISE_II" | "ISE_III" | "ISE_IV";
@@ -46,7 +47,7 @@ interface Props {
   initialLevel: string | null;
 }
 
-type Step = "level" | "tasks" | "topic" | "review";
+type Step = "level" | "tasks" | "topic" | "examiner" | "review";
 
 export function OralSetupClient({ initialLevel }: Props) {
   const router = useRouter();
@@ -62,6 +63,11 @@ export function OralSetupClient({ initialLevel }: Props) {
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Examiner persona selection
+  const [examinerPersona, setExaminerPersona] = useState<string>("");
+  const [spinning, setSpinning] = useState(false);
+  const [spinIndex, setSpinIndex] = useState(0);
+  const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // null = not yet checked (SSR-safe), false = browser lacks Web Speech API
   const [speechSupported, setSpeechSupported] = useState<boolean | null>(null);
 
@@ -95,17 +101,54 @@ export function OralSetupClient({ initialLevel }: Props) {
       return;
     }
     if (tasks.has("TOPIC")) setStep("topic");
-    else setStep("review");
+    else setStep("examiner");
   };
 
-  const goToReview = () => {
+  const goToExaminer = () => {
     if (tasks.has("TOPIC") && !topicGeneral.trim() && !topicDetailed.trim()) {
       setError("Please add some topic content (general or detailed) before continuing.");
       return;
     }
     setError(null);
+    setStep("examiner");
+  };
+
+  const goToReview = () => {
+    if (!examinerPersona) {
+      setError("Pick an examiner (or spin for a random one) to continue.");
+      return;
+    }
+    setError(null);
     setStep("review");
   };
+
+  // Roulette: cycle the highlight through the personas, decelerating, then land
+  // on a random one and select it.
+  const spinRoulette = () => {
+    if (spinning) return;
+    setError(null);
+    setExaminerPersona("");
+    setSpinning(true);
+    const finalIndex = Math.floor(Math.random() * EXAMINER_PERSONAS.length);
+    const totalSteps = EXAMINER_PERSONAS.length * 3 + finalIndex + 1;
+    let step = 0;
+    const tick = () => {
+      setSpinIndex((i) => (i + 1) % EXAMINER_PERSONAS.length);
+      step++;
+      if (step >= totalSteps) {
+        setSpinIndex(finalIndex);
+        setExaminerPersona(EXAMINER_PERSONAS[finalIndex].id);
+        setSpinning(false);
+        return;
+      }
+      // Ease-out: start fast (70ms), slow to ~300ms at the end.
+      const delay = 70 + Math.round(230 * (step / totalSteps) ** 2);
+      spinTimer.current = setTimeout(tick, delay);
+    };
+    spinTimer.current = setTimeout(tick, 70);
+  };
+
+  useEffect(() => () => { if (spinTimer.current) clearTimeout(spinTimer.current); }, []);
 
   const onPdfChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,6 +185,7 @@ export function OralSetupClient({ initialLevel }: Props) {
           selectedTasks: Array.from(tasks),
           topicGeneral: topicGeneral.trim() || null,
           topicDetailed: topicDetailed.trim() || null,
+          examinerPersona: examinerPersona || null,
         }),
       });
       const data = await res.json();
@@ -156,8 +200,8 @@ export function OralSetupClient({ initialLevel }: Props) {
   return (
     <>
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50 dark:from-rose-950/30 dark:via-pink-950/20 dark:to-purple-950/30 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-rose-400/20 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 paper-bg pointer-events-none" />
+        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-rose-400/15 blur-3xl pointer-events-none" />
 
         <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
           <Link href="/practice" className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 mb-4">
@@ -168,7 +212,7 @@ export function OralSetupClient({ initialLevel }: Props) {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-300">
               <Mic className="h-5 w-5" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-50">Oral exam setup</h1>
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Oral exam setup</h1>
           </div>
           <p className="text-sm text-zinc-600 dark:text-zinc-300">Configure your exam — choose level, tasks, and prepare your topic.</p>
 
@@ -178,7 +222,9 @@ export function OralSetupClient({ initialLevel }: Props) {
             <StepConn done={step !== "level"} />
             <StepDot active={step === "tasks"} done={step === "topic" || step === "review"} label="Tasks" />
             <StepConn done={step === "topic" || step === "review"} />
-            <StepDot active={step === "topic"} done={step === "review"} label="Topic" disabled={!tasks.has("TOPIC")} />
+            <StepDot active={step === "topic"} done={step === "examiner" || step === "review"} label="Topic" disabled={!tasks.has("TOPIC")} />
+            <StepConn done={step === "examiner" || step === "review"} />
+            <StepDot active={step === "examiner"} done={step === "review"} label="Examiner" />
             <StepConn done={step === "review"} />
             <StepDot active={step === "review"} done={false} label="Review" />
           </div>
@@ -372,7 +418,52 @@ export function OralSetupClient({ initialLevel }: Props) {
               <Button variant="outline" onClick={() => setStep("tasks")} className="gap-1.5">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </Button>
-              <Button onClick={goToReview} className="gap-1.5 bg-rose-600 hover:bg-rose-700">
+              <Button onClick={goToExaminer} className="gap-1.5 bg-rose-600 hover:bg-rose-700">
+                Choose examiner <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {/* STEP — Examiner */}
+        {step === "examiner" && (
+          <section className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-3 mb-1 flex-wrap">
+              <div>
+                <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-50">Choose your examiner</h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Accent, tone and pace differ — scoring stays the same official Trinity standard.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={spinRoulette}
+                disabled={spinning}
+                className="gap-1.5 shrink-0"
+              >
+                <Dices className={cn("h-4 w-4", spinning && "animate-spin")} />
+                {spinning ? "Spinning..." : "Surprise me"}
+              </Button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {EXAMINER_PERSONAS.map((p, i) => (
+                <PersonaCard
+                  key={p.id}
+                  persona={p}
+                  selected={!spinning && examinerPersona === p.id}
+                  highlighted={spinning && spinIndex === i}
+                  disabled={spinning}
+                  onClick={() => { setExaminerPersona(p.id); setError(null); }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <Button variant="outline" onClick={() => setStep(tasks.has("TOPIC") ? "topic" : "tasks")} className="gap-1.5">
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
+              </Button>
+              <Button onClick={goToReview} disabled={spinning || !examinerPersona} className="gap-1.5 bg-rose-600 hover:bg-rose-700">
                 Review <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </div>
@@ -404,6 +495,23 @@ export function OralSetupClient({ initialLevel }: Props) {
               </div>
             </div>
 
+            {examinerPersona && (() => {
+              const p = EXAMINER_PERSONAS.find(x => x.id === examinerPersona);
+              if (!p) return null;
+              return (
+                <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
+                  <p className="text-[10px] uppercase tracking-wide font-semibold text-zinc-500 dark:text-zinc-400 mb-2">Examiner</p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{p.flag}</span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{p.name}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{p.accent} · {p.difficulty}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {tasks.has("TOPIC") && (
               <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
                 <p className="text-[10px] uppercase tracking-wide font-semibold text-zinc-500 dark:text-zinc-400 mb-2">Topic content</p>
@@ -421,7 +529,7 @@ export function OralSetupClient({ initialLevel }: Props) {
             )}
 
             <div className="flex items-center justify-between gap-3 pt-2">
-              <Button variant="outline" onClick={() => setStep(tasks.has("TOPIC") ? "topic" : "tasks")} className="gap-1.5">
+              <Button variant="outline" onClick={() => setStep("examiner")} className="gap-1.5">
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </Button>
               <Button onClick={startExam} disabled={submitting || speechSupported === false} className="gap-2 bg-rose-600 hover:bg-rose-700">
@@ -461,4 +569,63 @@ function StepDot({ active, done, label, disabled }: { active: boolean; done: boo
 
 function StepConn({ done }: { done: boolean }) {
   return <span className={cn("h-px w-4 sm:w-8", done ? "bg-emerald-400" : "bg-zinc-200 dark:bg-zinc-700")} />;
+}
+
+function DifficultyMeter({ level }: { level: 1 | 2 | 3 }) {
+  const color = level === 1 ? "bg-emerald-500" : level === 2 ? "bg-amber-500" : "bg-rose-500";
+  return (
+    <span className="inline-flex items-center gap-0.5" title={`Difficulty ${level}/3`}>
+      {[1, 2, 3].map(i => (
+        <span key={i} className={cn("h-1.5 w-3 rounded-full", i <= level ? color : "bg-zinc-200 dark:bg-zinc-700")} />
+      ))}
+    </span>
+  );
+}
+
+function PersonaCard({
+  persona, selected, highlighted, disabled, onClick,
+}: {
+  persona: ExaminerPersona;
+  selected: boolean;
+  highlighted: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "text-left rounded-xl border-2 p-4 transition-all",
+        selected && "border-rose-500 bg-rose-50/60 dark:border-rose-500 dark:bg-rose-950/30 ring-2 ring-rose-500/20",
+        highlighted && "border-rose-400 bg-rose-50/40 dark:border-rose-600 dark:bg-rose-950/20 scale-[1.02] shadow-md",
+        !selected && !highlighted && "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600",
+        disabled && "cursor-default",
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="text-2xl leading-none">{persona.flag}</span>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate">{persona.name}</p>
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">{persona.accent}</p>
+          </div>
+        </div>
+        {selected && <Check className="h-4 w-4 shrink-0 text-rose-600" />}
+      </div>
+
+      <div className="mt-2.5 flex items-center gap-2">
+        <DifficultyMeter level={persona.difficultyLevel} />
+        <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">{persona.difficulty}</span>
+      </div>
+
+      <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">{persona.blurb}</p>
+
+      <div className="mt-2.5 flex flex-wrap gap-1">
+        {persona.tags.map(t => (
+          <Badge key={t} variant="outline" className="text-[10px] font-normal">{t}</Badge>
+        ))}
+      </div>
+    </button>
+  );
 }

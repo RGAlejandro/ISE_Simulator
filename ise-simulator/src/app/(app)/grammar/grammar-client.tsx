@@ -66,7 +66,7 @@ export function GrammarClient() {
 
         <div className="text-center space-y-2">
           <div className="text-4xl">📝</div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Grammar Exercises</h1>
+          <h1 className="text-3xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Grammar Exercises</h1>
           <p className="text-zinc-500 dark:text-zinc-400">10 AI-generated questions tailored to your CEFR level</p>
         </div>
 

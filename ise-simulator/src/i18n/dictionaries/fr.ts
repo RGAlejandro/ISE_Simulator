@@ -5,6 +5,7 @@ export const fr: Dictionary = {
     dashboard: "Tableau de bord",
     practice: "Pratique",
     tips: "Conseils et guides",
+    chat: "Chat",
     pricing: "Tarifs",
     admin: "Admin",
     signIn: "Se connecter",
@@ -279,6 +280,17 @@ export const fr: Dictionary = {
           "Pratique illimitée",
         ],
         cta: "Ouvrir Grammaire",
+      },
+      pronunciation: {
+        title: "Prononciation",
+        description: "Lis à voix haute et reçois un retour instantané — accent RP ou américain.",
+        bullets: [
+          "Accents RP et américain",
+          "Ton propre texte ou généré par IA",
+          "Facile / Normal / Avancé",
+          "Écoute le modèle puis enregistre",
+        ],
+        cta: "Démarrer la prononciation",
       },
       vocab: {
         title: "Vocabulaire",

@@ -220,15 +220,15 @@ export function DashboardClient({ user, isPro, recentExams, totalExams, stats, u
     <>
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/30 dark:via-indigo-950/20 dark:to-purple-950/30 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-purple-400/20 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 paper-bg pointer-events-none" />
+        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-300">{t(greetingKey())}</p>
-              <h1 className="mt-1 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 break-words">
+              <h1 className="mt-1 text-2xl sm:text-3xl lg:text-4xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 break-words">
                 {user.name || user.email.split("@")[0]}
               </h1>
               <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
@@ -442,13 +442,13 @@ function NextStepCard({ icon, title, body, ctaHref, ctaLabel }: {
   icon: React.ReactNode; title: string; body: string; ctaHref: string; ctaLabel: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:border-zinc-800 dark:from-indigo-950/30 dark:via-zinc-900 dark:to-purple-950/30 p-6">
+    <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-brand/5 dark:border-zinc-800 dark:bg-brand/10 p-6">
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand text-brand-foreground">
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50">{title}</h3>
+          <h3 className="text-base font-display font-semibold text-zinc-900 dark:text-zinc-50">{title}</h3>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{body}</p>
           <Link href={ctaHref}>
             <Button size="sm" variant="outline" className="mt-3 gap-1.5">

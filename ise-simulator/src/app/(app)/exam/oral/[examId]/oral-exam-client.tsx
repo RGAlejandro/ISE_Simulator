@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSttRecorder } from "@/hooks/use-stt-recorder";
 import { useEnglishTTS } from "@/hooks/use-english-tts";
+import { getPersona } from "@/lib/examiner-personas";
 import { MicWaveform } from "@/components/exam/mic-waveform";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,11 +75,13 @@ interface OralExamClientProps {
   topicGeneral: string | null;
   /** Candidate's prepared full essay (Topic task). */
   topicDetailed: string | null;
+  /** Chosen examiner persona id (drives the examiner voice/accent). */
+  examinerPersona: string | null;
 }
 
 export function OralExamClient({
   examId, level, initialMessage, isPro,
-  selectedTasks, initialTask, topicGeneral, topicDetailed,
+  selectedTasks, initialTask, topicGeneral, topicDetailed, examinerPersona,
 }: OralExamClientProps) {
   // Dynamic task order = canonical filter on candidate's selectedTasks
   const taskOrder = (["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"] as const)
@@ -161,9 +164,10 @@ export function OralExamClient({
   }, [store.messages]);
 
   // Neural TTS via /api/tts (msedge-tts) — same engine in every browser.
-  // The examiner voice is fixed so the whole exam sounds like one person.
+  // The examiner voice follows the chosen persona's accent so the whole exam
+  // sounds like one consistent examiner.
   const { speak: ttsSpeak } = useEnglishTTS();
-  const EXAMINER_VOICE = "en-GB-SoniaNeural";
+  const EXAMINER_VOICE = getPersona(examinerPersona).voice;
 
   // Play examiner text with the neural voice. Returns once playback starts;
   // `isExaminerSpeaking` clears when the audio actually ends.
@@ -414,7 +418,7 @@ export function OralExamClient({
       {/* Header */}
       <div className="mb-6 flex items-start sm:items-center justify-between flex-wrap gap-2">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-xl sm:text-2xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             Oral Exam — {level.replace("_", " ")}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">

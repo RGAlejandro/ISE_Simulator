@@ -9,6 +9,7 @@ import {
   getCollaborativeTaskPrompt,
   getConversationTaskPrompt,
 } from "@/lib/prompts/oral-exam";
+import { getPersona } from "@/lib/examiner-personas";
 import type { ExamLevel, OralTaskType } from "@prisma/client";
 
 const VALID_LEVELS: ExamLevel[] = ["ISE_FOUNDATION", "ISE_I", "ISE_II", "ISE_III", "ISE_IV"];
@@ -30,6 +31,8 @@ interface Body {
   topicDetailed?: string;
   /** Legacy: single topic string (kept for backward compat) */
   topic?: string;
+  /** Chosen examiner persona id (accent/tone only). */
+  examinerPersona?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -47,6 +50,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid exam level" }, { status: 400 });
     }
     const lvl = level as ExamLevel;
+
+    // Resolve persona (falls back to default if missing/unknown)
+    const personaId = getPersona(body.examinerPersona).id;
 
     // Validate selectedTasks against allowed for this level (fallback: all allowed)
     const requested = (body.selectedTasks ?? ALLOWED_TASKS_BY_LEVEL[lvl])
@@ -97,6 +103,7 @@ export async function POST(req: NextRequest) {
         selectedTasks,
         topicGeneral,
         topicDetailed,
+        examinerPersona: personaId,
       },
     });
 
@@ -107,7 +114,7 @@ export async function POST(req: NextRequest) {
     if (firstTask === "TOPIC") {
       // Use the first non-empty piece of prep as the displayed topic seed for the opening line
       const topicForPrompt = topicGeneral?.split("\n").find(l => l.trim())?.trim() || "your prepared topic";
-      const systemPrompt = getOralExaminerSystemPrompt(lvl);
+      const systemPrompt = getOralExaminerSystemPrompt(lvl, personaId);
       const topicPrompt = getTopicTaskPrompt(lvl, topicForPrompt, {
         general: topicGeneral,
         detailed: topicDetailed,
@@ -117,13 +124,13 @@ export async function POST(req: NextRequest) {
         maxTokens: 200,
       });
     } else if (firstTask === "CONVERSATION") {
-      const systemPrompt = getOralExaminerSystemPrompt(lvl);
+      const systemPrompt = getOralExaminerSystemPrompt(lvl, personaId);
       examinerOpening = await generateChat(systemPrompt, getConversationTaskPrompt(lvl), {
         temperature: 0.7,
         maxTokens: 180,
       });
     } else if (firstTask === "COLLABORATIVE") {
-      const systemPrompt = getOralExaminerSystemPrompt(lvl);
+      const systemPrompt = getOralExaminerSystemPrompt(lvl, personaId);
       examinerOpening = await generateChat(systemPrompt, getCollaborativeTaskPrompt(lvl), {
         temperature: 0.7,
         maxTokens: 200,

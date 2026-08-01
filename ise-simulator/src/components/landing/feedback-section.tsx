@@ -63,7 +63,7 @@ export function FeedbackSection() {
   return (
     <section
       id="feedback"
-      className="py-14 sm:py-20 lg:py-24 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800"
+      className="py-14 sm:py-20 lg:py-24 border-t border-zinc-200 dark:border-zinc-800"
     >
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <motion.div

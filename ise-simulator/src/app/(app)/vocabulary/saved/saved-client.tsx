@@ -24,7 +24,8 @@ import { WordDetailsDialog } from "@/components/vocabulary/word-details-dialog";
 import { LEVEL_COLORS } from "@/components/vocabulary/flashcard";
 import { useEnglishTTS } from "@/hooks/use-english-tts";
 import { useToast } from "@/components/ui/toaster";
-import { ArrowLeft, Plus, Volume2, Info, Trash2, MoreVertical, BookOpen, Loader2 } from "lucide-react";
+import { useI18n } from "@/components/i18n/language-provider";
+import { ArrowLeft, Plus, Volume2, Info, Trash2, MoreVertical, BookOpen, Loader2, Sparkles } from "lucide-react";
 import type { CefrBand } from "@/lib/prompts/vocabulary";
 import type { SavedWordData, VocabularyListData } from "@/types";
 
@@ -52,9 +53,12 @@ export function SavedClient({ initialLists, initialWords }: Props) {
   const [newColor, setNewColor] = useState("blue");
   const [busy, setBusy] = useState(false);
   const [detailsWord, setDetailsWord] = useState<{ english: string; level: CefrBand } | null>(null);
+  const [addInput, setAddInput] = useState("");
+  const [adding, setAdding] = useState(false);
 
   const { speak, isPlaying, supported } = useEnglishTTS();
   const { show } = useToast();
+  const { locale } = useI18n();
 
   const filteredWords = useMemo(() => {
     if (activeListId === "all") return words;
@@ -85,6 +89,44 @@ export function SavedClient({ initialLists, initialWords }: Props) {
       show(err instanceof Error ? err.message : "Create failed", "error");
     } finally {
       setBusy(false);
+    }
+  };
+
+  // Target list for newly added words: the active list, or unfiled for All/Unfiled views.
+  const targetListId = activeListId === "all" || activeListId === "_unfiled" ? null : activeListId;
+
+  const addWord = async () => {
+    const term = addInput.trim();
+    if (!term || adding) return;
+    setAdding(true);
+    try {
+      const res = await fetch("/api/vocabulary/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ english: term, listId: targetListId, locale }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to add word");
+      const w = data.word as SavedWordData;
+      const oldListId = words.find((x) => x.id === w.id)?.listId ?? undefined;
+      setWords((prev) => [w, ...prev.filter((x) => x.id !== w.id)]);
+      setLists((prev) =>
+        prev.map((l) => {
+          let c = l.wordCount;
+          if (oldListId && l.id === oldListId) c -= 1;
+          if (w.listId && l.id === w.listId) c += 1;
+          return { ...l, wordCount: Math.max(0, c) };
+        })
+      );
+      setAddInput("");
+      show(
+        data.alreadyExisted ? `"${w.english}" was already saved — moved here` : `Added "${w.english}"`,
+        "success"
+      );
+    } catch (err) {
+      show(err instanceof Error ? err.message : "Failed to add word", "error");
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -160,7 +202,7 @@ export function SavedClient({ initialLists, initialWords }: Props) {
           </Link>
           <div className="flex items-end justify-between flex-wrap gap-3">
             <div>
-              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Saved Words</h1>
+              <h1 className="text-3xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Saved Words</h1>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                 {words.length} {words.length === 1 ? "word" : "words"} across {lists.length} {lists.length === 1 ? "list" : "lists"}
               </p>
@@ -250,6 +292,24 @@ export function SavedClient({ initialLists, initialWords }: Props) {
             </div>
           </div>
         )}
+
+        {/* Add a word — AI fills translation + example */}
+        <div className="flex items-center gap-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 px-3 py-2.5">
+          <Sparkles className="h-4 w-4 text-amber-500 shrink-0" />
+          <input
+            value={addInput}
+            onChange={(e) => setAddInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") addWord(); }}
+            placeholder={`Add a word to ${activeList ? activeList.name : "Unfiled"} — meaning & example auto-filled`}
+            maxLength={60}
+            disabled={adding}
+            className="flex-1 min-w-0 bg-transparent text-sm focus:outline-none disabled:opacity-50 placeholder:text-zinc-400"
+          />
+          <Button size="sm" onClick={addWord} disabled={adding || !addInput.trim()} className="gap-1.5 shrink-0">
+            {adding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            Add
+          </Button>
+        </div>
 
         {/* Word grid */}
         {filteredWords.length === 0 ? (

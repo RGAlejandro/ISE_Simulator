@@ -83,7 +83,7 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
             <Mic className={`h-12 w-12 ${bandColor}`} />
             <Trophy className={`h-12 w-12 ${bandColor}`} />
           </div>
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-4xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             {exam.overallScore != null ? `${exam.overallScore}%` : "Pending"}
           </h1>
           <Badge
@@ -99,13 +99,14 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
       </Card>
 
       {/* Task-by-task feedback */}
-      <h2 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-zinc-50">
+      <h2 className="text-xl font-display font-semibold tracking-tight mb-4 text-zinc-900 dark:text-zinc-50">
         Performance by Task
       </h2>
       <div className="space-y-6">
         {feedback.map((f) => {
           const fb = f.feedback as Record<string, { score: number; comments: string }> & {
             suggestions?: string[];
+            summary?: string;
           };
           const taskLabel = TASK_LABELS[f.taskType as OralTaskType] || f.taskType;
 
@@ -132,20 +133,32 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
               </CardHeader>
               <CardContent>
                 {isPro ? (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    {/* Why this score — plain-language summary */}
+                    {fb.summary && (
+                      <div className="rounded-xl border-l-4 border-brand bg-brand/5 dark:bg-brand/10 p-4">
+                        <h4 className="text-sm font-display font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
+                          Why you got {f.score}/{maxScore}
+                        </h4>
+                        <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+                          {fb.summary}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Skill scores — Trinity 4-criterion rating scale */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                       {skillKeys.map((key) => {
                         const area = fb[key];
                         if (!area || typeof area !== "object") return null;
                         return (
                           <div key={key}>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span>{SKILL_LABELS[key] ?? key}</span>
+                            <div className="flex justify-between text-sm mb-1.5">
+                              <span className="font-medium text-zinc-900 dark:text-zinc-100">{SKILL_LABELS[key] ?? key}</span>
                               <span className="font-semibold">{area.score}/5</span>
                             </div>
                             <Progress value={(area.score / 5) * 100} />
-                            <p className="mt-1 text-xs text-zinc-500">{area.comments}</p>
+                            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{area.comments}</p>
                           </div>
                         );
                       })}
@@ -173,7 +186,7 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
                       <summary className="text-sm font-medium text-zinc-500 cursor-pointer hover:text-zinc-700">
                         View Transcript
                       </summary>
-                      <div className="mt-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 p-4 text-sm leading-relaxed border max-h-60 overflow-y-auto space-y-2">
+                      <div className="mt-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 p-4 text-sm leading-relaxed border max-h-80 sm:max-h-[28rem] overflow-y-auto space-y-3">
                         {exchanges
                           .filter((e) => e.taskType === f.taskType)
                           .map((e, i) => {
@@ -189,16 +202,23 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
                             }
 
                             return (
-                              <div
-                                key={i}
-                                className={
+                              <div key={i}>
+                                <strong
+                                  className={
+                                    e.role === "EXAMINER"
+                                      ? "text-blue-700 dark:text-blue-300"
+                                      : "text-zinc-500 dark:text-zinc-400"
+                                  }
+                                >
+                                  {e.role === "EXAMINER" ? "Examiner" : "You"}
+                                </strong>
+                                <p className={
                                   e.role === "EXAMINER"
-                                    ? "text-blue-700 dark:text-blue-300"
+                                    ? "text-blue-700/90 dark:text-blue-300/90"
                                     : "text-zinc-900 dark:text-zinc-100"
-                                }
-                              >
-                                <strong>{e.role === "EXAMINER" ? "Examiner" : "You"}:</strong>{" "}
-                                {content}
+                                }>
+                                  {content}
+                                </p>
                               </div>
                             );
                           })}

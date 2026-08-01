@@ -143,7 +143,17 @@ export function Flashcard({
               </p>
             </div>
             <div className="rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800 px-4 py-3 w-full text-left">
-              <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1 font-medium">Example</p>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <p className="text-xs text-zinc-400 uppercase tracking-wide font-medium">Example</p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onSpeak(card.example); }}
+                  title="Play example sentence"
+                  aria-label="Play example sentence"
+                  className="h-7 w-7 -mr-1 rounded-full flex items-center justify-center text-amber-600 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors shrink-0"
+                >
+                  <Volume2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
               <p className="text-sm text-zinc-700 dark:text-zinc-300 italic leading-relaxed">
                 &ldquo;{card.example}&rdquo;
               </p>

@@ -139,6 +139,37 @@ Rules:
 - No text outside the JSON`;
 }
 
+/**
+ * Prompt to enrich a single user-supplied English word/phrase: translation,
+ * example, part of speech and an estimated CEFR level. Used when a learner adds
+ * their own word to a saved list.
+ */
+export function generateSingleWordPrompt(english: string, locale = "es"): string {
+  const lang = TRANSLATION_LANG[locale] ?? DEFAULT_TRANSLATION_LANG;
+  return `You are a British English lexicographer helping a ${lang.name} speaker save an English word to their vocabulary list.
+
+Input word or phrase: "${english}"
+
+Produce a flashcard for it. Use British English spellings and conventions.
+
+Return ONLY valid JSON:
+{
+  "english": "the word/phrase in its standard base form (infinitive for verbs, singular for nouns)",
+  "partOfSpeech": "noun|verb|adjective|adverb|phrase|phrasal verb|idiom",
+  "translation": "${lang.hint}",
+  "example": "Natural English sentence showing how to use it correctly",
+  "level": "A1|A2|B1|B2|C1|C2"
+}
+
+Rules:
+- "english": correct any obvious typo and normalise to the standard form; keep multi-word expressions intact
+- "translation": the most common ${lang.name} equivalent, concise
+- "example": clear, natural real usage — NOT a definition, NOT a translation
+- ${lang.noWordNote}
+- "level": your best estimate of the word's CEFR difficulty
+- No text outside the JSON`;
+}
+
 export function generateWordDetailsPrompt(english: string, level: CefrBand): string {
   return `You are a British English lexicographer producing a vocabulary detail card for an English learner at CEFR level ${level}.
 

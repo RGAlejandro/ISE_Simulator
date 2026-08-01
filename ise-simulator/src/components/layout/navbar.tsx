@@ -25,6 +25,7 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
     { href: "/dashboard", label: t("nav.dashboard") },
     { href: "/practice", label: t("nav.practice") },
     { href: "/tips", label: t("nav.tips") },
+    { href: "/chat", label: t("nav.chat") },
     { href: "/pricing", label: t("nav.pricing") },
   ];
 
@@ -33,7 +34,7 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2">
           <BookOpen className="h-7 w-7 text-blue-600" />
-          <span className="text-xl font-bold tracking-tight">ISE Simulator</span>
+          <span className="text-xl font-display font-semibold tracking-tight">ISE Simulator</span>
         </Link>
 
         {/* Desktop nav */}

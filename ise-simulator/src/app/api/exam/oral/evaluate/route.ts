@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Exam not found" }, { status: 404 });
     }
 
+    // Idempotent: clear any prior feedback so re-evaluation doesn't create duplicates.
+    await prisma.oralFeedback.deleteMany({ where: { examId } });
+
     const feedbackResults: Record<string, unknown> = {};
     // Trinity scoring is split: spoken tasks 0-20 (sum of 4 criteria), Listening 0-5.
     // Normalise each task to 0-100 then average for the overall score.

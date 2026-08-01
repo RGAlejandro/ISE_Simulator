@@ -191,6 +191,7 @@ export function StudyClient({ listName, listEmoji, cards: initialCards }: Props)
             {mode === "flashcards" ? (
               <>
                 <Flashcard
+                  key={currentCard.id}
                   card={currentCard}
                   isFlipped={isFlipped}
                   onFlip={() => setIsFlipped((f) => !f)}

@@ -130,9 +130,9 @@ export function TipsClient() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-rose-50 dark:from-blue-950/30 dark:via-purple-950/20 dark:to-rose-950/30 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-rose-400/20 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 paper-bg pointer-events-none" />
+        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -left-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-20">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 lg:gap-8">
@@ -141,7 +141,7 @@ export function TipsClient() {
                 <GraduationCap className="h-3 w-3 mr-1" />
                 {t("tips.badge")}
               </Badge>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
                 {t("tips.title")}
               </h1>
               <p className="mt-3 sm:mt-4 text-base sm:text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed">
@@ -245,7 +245,7 @@ export function TipsClient() {
                             </Badge>
                           )}
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{sd.title}</h2>
+                        <h2 className="text-xl sm:text-2xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{sd.title}</h2>
                         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">{sd.intro}</p>
                       </div>
                     </div>
@@ -311,7 +311,7 @@ export function TipsClient() {
                     <Clock className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("tips.timeAllocation.title")}</h2>
+                    <h2 className="text-xl sm:text-2xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{t("tips.timeAllocation.title")}</h2>
                     <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-300">{t("tips.timeAllocation.subtitle")}</p>
                   </div>
                 </div>

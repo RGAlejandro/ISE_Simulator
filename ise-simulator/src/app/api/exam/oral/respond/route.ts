@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
       ...(candidateTurn ? [`Candidate: ${candidateTurn}`] : []),
     ].join("\n");
 
-    const systemPrompt = getOralExaminerSystemPrompt(exam.level as ExamLevel);
+    const systemPrompt = getOralExaminerSystemPrompt(exam.level as ExamLevel, exam.examinerPersona);
     let userPrompt: string;
     let isTaskTransition = false;
     let nextTask: OralTaskType | null = null;

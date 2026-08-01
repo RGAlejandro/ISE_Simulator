@@ -43,7 +43,7 @@ export default function PricingPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 sm:py-12">
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           {t("pricing.title")}
         </h1>
         <p className="mt-2 sm:mt-3 text-base sm:text-lg text-zinc-500 dark:text-zinc-400 px-2">

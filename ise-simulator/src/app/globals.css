@@ -6,25 +6,65 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
+  /* Academic Press identity */
+  --brand: #1e2a4a;          /* ink navy */
+  --brand-fg: #ffffff;
+  --marker: #fde68a;         /* highlighter */
+  --marker-strong: #facc15;
+  --paper: #faf8f4;          /* warm paper */
+  --paper-line: #e7e1d6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-fg);
+  --color-marker: var(--marker);
+  --color-paper: var(--paper);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
 /* Dark mode via .dark class (controlled by ThemeProvider + anti-flash script) */
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --brand: #93b4ff;
+  --brand-fg: #0e1018;
+  --marker: #4a3f1a;
+  --marker-strong: #b8860b;
+  --paper: #0e1018;
+  --paper-line: #232838;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* ── Academic Press utilities ── */
+
+/* Display serif for headings */
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+}
+
+/* Highlighter / marker underline behind key words */
+.marker-underline {
+  background-image: linear-gradient(transparent 58%, var(--marker) 58%);
+  background-repeat: no-repeat;
+  padding: 0 0.06em;
+}
+
+/* Warm ruled-paper texture for hero/section backgrounds */
+.paper-bg {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+  background-size: 100% 2rem;
+  background-position: 0 -1px;
 }
 
 /* Smooth scrolling */

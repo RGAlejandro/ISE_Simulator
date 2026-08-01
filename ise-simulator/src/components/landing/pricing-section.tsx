@@ -57,7 +57,7 @@ export function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-14 sm:py-20 lg:py-24 bg-zinc-50 dark:bg-zinc-900">
+    <section id="pricing" className="py-14 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export function PricingSection() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
             {t("landing.pricing.title")}
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">

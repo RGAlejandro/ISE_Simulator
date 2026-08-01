@@ -88,7 +88,7 @@ export function SubmitPaperClient({ examId, level, content }: Props) {
         {/* Header */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Submit Paper Exam</h1>
+            <h1 className="text-2xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Submit Paper Exam</h1>
             <Badge variant="outline">{LEVEL_LABELS[level] ?? level}</Badge>
           </div>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">

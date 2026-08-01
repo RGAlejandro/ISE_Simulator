@@ -91,6 +91,8 @@ model OralExam {
   topicGeneral  String?       @db.Text
   /** Full detailed essay candidate prepared for the Topic task. */
   topicDetailed String?       @db.Text
+  /** Chosen examiner persona id (accent/tone/pace only — does not affect scoring). */
+  examinerPersona String?
   /** Soft-delete: hidden from the user's lists but kept in the database. */
   hiddenAt     DateTime?
   startedAt    DateTime       @default(now())

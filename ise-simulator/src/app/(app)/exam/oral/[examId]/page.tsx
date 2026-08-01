@@ -49,6 +49,7 @@ export default async function OralExamPage({ params }: PageProps) {
       initialTask={initialTask}
       topicGeneral={exam.topicGeneral}
       topicDetailed={exam.topicDetailed}
+      examinerPersona={exam.examinerPersona}
     />
   );
 }
