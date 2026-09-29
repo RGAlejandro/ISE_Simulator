@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Volume2, BookOpen, Loader2, PenTool, Mic,
-  Sparkles, AlertCircle, GraduationCap, Layers,
+  Sparkles, AlertCircle, GraduationCap, Layers, Trophy,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -359,6 +359,23 @@ export function PracticeClient({
           </div>
 
           <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* QUESTS */}
+            <ModuleCard
+              icon={<Trophy className="h-5 w-5" />}
+              tone="violet"
+              title={t("practice.cards.quests.title")}
+              description={t("practice.cards.quests.description")}
+              badge={t("practice.badges.unlimited")}
+              bulletsKey="quests"
+              cta={
+                <Link href="/quests" className="block">
+                  <Button className="w-full gap-2 bg-violet-600 hover:bg-violet-700">
+                    <Trophy className="h-4 w-4" /> {t("practice.cards.quests.cta")}
+                  </Button>
+                </Link>
+              }
+            />
+
             {/* LISTENING */}
             <ModuleCard
               icon={<Volume2 className="h-5 w-5" />}
@@ -441,7 +458,7 @@ export function PracticeClient({
   );
 }
 
-type Tone = "blue" | "rose" | "purple" | "green" | "amber" | "sky";
+type Tone = "blue" | "rose" | "purple" | "green" | "amber" | "sky" | "violet";
 
 const TONE_STYLES: Record<Tone, { iconBg: string; iconColor: string; bg: string; ring: string; topBorder: string }> = {
   blue:   { iconBg: "bg-blue-100 dark:bg-blue-900/50",     iconColor: "text-blue-600 dark:text-blue-300",     bg: "from-blue-50/70 to-transparent dark:from-blue-950/30",     ring: "ring-blue-200/60 dark:ring-blue-900/40",     topBorder: "from-blue-500 to-indigo-500" },
@@ -450,9 +467,10 @@ const TONE_STYLES: Record<Tone, { iconBg: string; iconColor: string; bg: string;
   green:  { iconBg: "bg-emerald-100 dark:bg-emerald-900/50", iconColor: "text-emerald-600 dark:text-emerald-300", bg: "from-emerald-50/70 to-transparent dark:from-emerald-950/30", ring: "ring-emerald-200/60 dark:ring-emerald-900/40", topBorder: "from-emerald-500 to-teal-500" },
   amber:  { iconBg: "bg-amber-100 dark:bg-amber-900/50",   iconColor: "text-amber-600 dark:text-amber-300",   bg: "from-amber-50/70 to-transparent dark:from-amber-950/30",   ring: "ring-amber-200/60 dark:ring-amber-900/40",   topBorder: "from-amber-500 to-orange-500" },
   sky:    { iconBg: "bg-sky-100 dark:bg-sky-900/50",       iconColor: "text-sky-600 dark:text-sky-300",       bg: "from-sky-50/70 to-transparent dark:from-sky-950/30",       ring: "ring-sky-200/60 dark:ring-sky-900/40",       topBorder: "from-sky-500 to-cyan-500" },
+  violet: { iconBg: "bg-violet-100 dark:bg-violet-900/50", iconColor: "text-violet-600 dark:text-violet-300", bg: "from-violet-50/70 to-transparent dark:from-violet-950/30", ring: "ring-violet-200/60 dark:ring-violet-900/40", topBorder: "from-violet-500 to-purple-500" },
 };
 
-type BulletsKey = "written" | "oral" | "listening" | "grammar" | "vocab" | "pronunciation";
+type BulletsKey = "written" | "oral" | "listening" | "grammar" | "vocab" | "pronunciation" | "quests";
 
 function ModuleCard({
   icon, tone, title, description, badge, bulletsKey, cta,

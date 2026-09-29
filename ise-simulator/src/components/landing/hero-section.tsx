@@ -284,7 +284,7 @@ export function HeroSection() {
               className="flex flex-col sm:flex-row gap-3"
             >
               <Link href="/sign-up">
-                <Button size="lg" className="text-base px-8 gap-2 w-full sm:w-auto bg-brand text-brand-foreground hover:opacity-90 shadow-lg shadow-brand/20">
+                <Button size="lg" className="text-base px-8 gap-2 w-full sm:w-auto bg-brand-solid text-white hover:opacity-90 shadow-lg shadow-brand/20">
                   {t("landing.hero.ctaPrimary")}
                   <ArrowRight className="h-4 w-4" />
                 </Button>

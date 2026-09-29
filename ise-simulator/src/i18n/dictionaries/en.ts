@@ -279,6 +279,17 @@ export const en = {
         ],
         cta: "Open Grammar",
       },
+      quests: {
+        title: "Quests",
+        description: "Gamified vocabulary: earn XP, keep a daily streak, climb the leaderboard.",
+        bullets: [
+          "Short quizzes, mixed question types",
+          "XP, levels & daily goal",
+          "Streaks and achievements",
+          "Weekly leaderboard",
+        ],
+        cta: "Start Quests",
+      },
       pronunciation: {
         title: "Pronunciation",
         description: "Read aloud and get instant feedback — choose RP or American accent.",

@@ -43,3 +43,6 @@ yarn-error.log*
 next-env.d.ts
 nul
 /src/generated/prisma
+
+# Portfolio 3D: tiene su propio repositorio (github.com/RGAlejandro/portfolio-3d)
+/portfolio-3d/

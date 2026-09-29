@@ -7,8 +7,9 @@
   --background: #ffffff;
   --foreground: #0a0a0a;
   /* Academic Press identity */
-  --brand: #1e2a4a;          /* ink navy */
+  --brand: #1e2a4a;          /* ink navy — text accents */
   --brand-fg: #ffffff;
+  --brand-solid: #1e2a4a;    /* navy surface (stays navy in dark) */
   --marker: #fde68a;         /* highlighter */
   --marker-strong: #facc15;
   --paper: #faf8f4;          /* warm paper */
@@ -20,6 +21,7 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-fg);
+  --color-brand-solid: var(--brand-solid);
   --color-marker: var(--marker);
   --color-paper: var(--paper);
   --font-sans: var(--font-geist-sans);
@@ -31,12 +33,13 @@
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
-  --brand: #93b4ff;
-  --brand-fg: #0e1018;
-  --marker: #4a3f1a;
-  --marker-strong: #b8860b;
-  --paper: #0e1018;
-  --paper-line: #232838;
+  --brand: #93b4ff;          /* light periwinkle — readable accent text on dark */
+  --brand-fg: #ffffff;
+  --brand-solid: #1e2a4a;    /* navy surface stays navy in dark */
+  --marker: #3b4a6b;         /* muted navy highlight for dark */
+  --marker-strong: #4a5f8a;
+  --paper: #09090b;          /* match zinc-950 so sections blend seamlessly */
+  --paper-line: transparent; /* no ruled lines in dark */
 }
 
 body {

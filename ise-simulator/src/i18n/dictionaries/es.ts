@@ -281,6 +281,17 @@ export const es: Dictionary = {
         ],
         cta: "Abrir Gramática",
       },
+      quests: {
+        title: "Misiones",
+        description: "Vocabulario gamificado: gana XP, mantén tu racha diaria y sube en el ranking.",
+        bullets: [
+          "Retos cortos con tipos de pregunta variados",
+          "XP, niveles y objetivo diario",
+          "Rachas y logros",
+          "Ranking semanal",
+        ],
+        cta: "Empezar Misiones",
+      },
       pronunciation: {
         title: "Pronunciación",
         description: "Lee en voz alta y recibe feedback al instante — elige acento RP o americano.",

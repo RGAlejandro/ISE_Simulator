@@ -281,6 +281,17 @@ export const fr: Dictionary = {
         ],
         cta: "Ouvrir Grammaire",
       },
+      quests: {
+        title: "Quêtes",
+        description: "Vocabulaire gamifié : gagne des XP, garde ta série quotidienne, grimpe au classement.",
+        bullets: [
+          "Défis courts, types de questions variés",
+          "XP, niveaux et objectif quotidien",
+          "Séries et succès",
+          "Classement hebdomadaire",
+        ],
+        cta: "Démarrer les Quêtes",
+      },
       pronunciation: {
         title: "Prononciation",
         description: "Lis à voix haute et reçois un retour instantané — accent RP ou américain.",

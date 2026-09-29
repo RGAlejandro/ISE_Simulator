@@ -24,8 +24,43 @@ model User {
   subscription      Subscription?
   vocabularyLists   VocabularyList[]
   writtenExams      WrittenExam[]
+  gamification      GamificationStats?
+  weeklyXp          WeeklyXp[]
 
   @@index([clerkId])
+}
+
+/** Per-user gamification state for the Quests mode (XP, level, streak, goal, badges). */
+model GamificationStats {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  xp             Int       @default(0)
+  currentStreak  Int       @default(0)
+  longestStreak  Int       @default(0)
+  /** Last calendar day the user earned XP (drives streak + daily goal reset). */
+  lastActiveDate DateTime? @db.Date
+  /** XP earned during lastActiveDate (resets when a new day starts). */
+  todayXp        Int       @default(0)
+  dailyGoal      Int       @default(30)
+  totalAnswered  Int       @default(0)
+  totalCorrect   Int       @default(0)
+  questsDone     Int       @default(0)
+  /** Unlocked achievement ids. */
+  achievements   String[]  @default([])
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/** Weekly XP totals, powering the leaderboard. weekStart = Monday (date). */
+model WeeklyXp {
+  id        String   @id @default(cuid())
+  userId    String
+  weekStart DateTime @db.Date
+  xp        Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([weekStart])
 }
 
 model Subscription {

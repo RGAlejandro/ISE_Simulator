@@ -15,14 +15,14 @@ export function CTASection() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-3xl bg-brand px-6 py-12 text-center sm:px-12 sm:py-16 lg:px-16 lg:py-24"
+          className="relative overflow-hidden rounded-3xl bg-brand-solid px-6 py-12 text-center sm:px-12 sm:py-16 lg:px-16 lg:py-24"
         >
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-50" />
           <div className="relative">
             <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-semibold text-white">
               {t("landing.cta.title")}
             </h2>
-            <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-blue-100 px-2">
+            <p className="mx-auto mt-3 sm:mt-4 max-w-xl text-base sm:text-lg text-white/80 px-2">
               {t("landing.cta.body")}
             </p>
             <div className="mt-8 flex justify-center gap-4">
