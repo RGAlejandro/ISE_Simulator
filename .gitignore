@@ -1,6 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-.md*
+
+# Private notes and docs (HANDOFF, BUSINESS_PLAN…) stay out of the repo
 *.md
+.md*
 /.claude
 # dependencies
 /node_modules
@@ -14,6 +16,10 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
 # next.js
 /.next/
@@ -41,8 +47,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-nul
-/src/generated/prisma
 
-# Portfolio 3D: tiene su propio repositorio (github.com/RGAlejandro/portfolio-3d)
-/portfolio-3d/
+/src/generated/prisma
