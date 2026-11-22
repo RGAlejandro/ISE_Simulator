@@ -18,10 +18,11 @@ test.describe("Landing page", () => {
 
   test("navbar links present", async ({ page, isMobile }) => {
     test.skip(!!isMobile, "Desktop nav links are hidden on mobile (md:flex). Covered by mobile menu spec.");
-    // Desktop navbar shows core links (use getByRole to avoid duplicates from mobile menu)
+    // Visitors see only what they can open without an account (no Dashboard link).
     const nav = page.locator("header").first();
     await expect(nav).toBeVisible();
-    await expect(nav.getByText(/Dashboard|Tableau|Panel/).first()).toBeVisible();
+    await expect(nav.getByText(/Features|Funciones|Fonctionnalités/).first()).toBeVisible();
+    await expect(nav.getByText(/^(Dashboard|Panel|Tableau de bord)$/)).toHaveCount(0);
     await expect(nav.getByText(/Pricing|Precios|Tarifs/).first()).toBeVisible();
   });
 

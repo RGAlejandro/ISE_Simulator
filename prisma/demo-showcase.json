@@ -1,0 +1,2441 @@
+{
+ "version": 1,
+ "writingPractices": [
+  {
+   "id": "cmwroc31s000vsbdt0nd73eec",
+   "level": "ISE_III",
+   "taskType": "EXTENDED_WRITING",
+   "genre": "discursive essay",
+   "topic": "Use of the internet",
+   "task": {
+    "title": "The Internet's Double-Edged Sword",
+    "prompt": "You have been asked to contribute a discursive essay to 'Connect', your university's online magazine, exploring the multifaceted impact of the internet on modern life. Your essay should present a balanced view, considering both positive and negative aspects. Write 200-230 words.",
+    "minutes": 45,
+    "wordLimit": {
+     "max": 230,
+     "min": 200
+    },
+    "bulletPoints": [
+     "Describe how the internet has positively transformed education and communication.",
+     "Discuss the main challenges or negative consequences associated with widespread internet use.",
+     "Suggest how individuals can navigate the online world responsibly and productively."
+    ]
+   },
+   "createdAt": {
+    "$ago": 1032337
+   },
+   "updatedAt": {
+    "$ago": 1005986
+   },
+   "drafts": [
+    {
+     "id": "cmwrocndp000zsbdtweubvf54",
+     "version": 1,
+     "text": "The internet has become undeniable catalyst for change in contemporary society. In education, it offers unprecedented access to resources, allowing students to learn at their own pace and collaborate across borders. Platforms such as MOOCs and virtual libraries have democratized knowledge, making it possible for anyone with a connection to acquire actual skills. Communication has also been revolutionised; social media and messaging apps enable instant contact with friends, family and professional networks, shrinking distances that once seemed an insurmountable.\n\nNevertheless, the digital revolution brings serious challenges to. The constant flow of information can lead to overload, making it difficult to discern reliable sources from the misinformation. Moreover, excessive screen time has linked to mental health issues, including anxiety and reduced attention spans. Privacy concerns are also paramount, as personal data is frequently harvested by corporations without a transparent consent.\n\nTo navigate this complex landscape, individuals must adopt critical and balanced approach. Setting clear boundaries for online use, such as designated screen‑free periods, helps maintain wellbeing in. Developing media literacy skills—questioning the origin of content and verifying facts—protects against deception. Finally, using strong passwords and reviewing privacy settings safeguards personal information, allowing the internet to serve as a tool for the growth rather than a source of risk.",
+     "wordCount": 207,
+     "source": "typed",
+     "secondsUsed": 2400,
+     "feedback": {
+      "issues": [
+       {
+        "end": 43,
+        "tag": "articles",
+        "quote": "undeniable catalyst",
+        "start": 24,
+        "category": "grammar",
+        "correction": "an undeniable catalyst",
+        "explanation": "Se necesita un artículo indefinido ('an') antes de un sustantivo singular contable que comienza con un sonido vocálico."
+       },
+       {
+        "end": 363,
+        "tag": "word-choice",
+        "quote": "actual skills",
+        "start": 350,
+        "category": "vocabulary",
+        "correction": "valuable skills",
+        "explanation": "Aunque 'actual' significa 'real', en este contexto 'valuable' o 'practical' es una elección de palabra más natural y precisa para describir habilidades."
+       },
+       {
+        "end": 566,
+        "tag": "articles",
+        "quote": "an insurmountable",
+        "start": 549,
+        "category": "grammar",
+        "correction": "insurmountable",
+        "explanation": "'Insurmountable' es un adjetivo que modifica directamente a 'distances', por lo que no necesita un artículo indefinido delante."
+       },
+       {
+        "end": 634,
+        "tag": "punctuation",
+        "quote": "challenges to",
+        "start": 621,
+        "category": "punctuation",
+        "correction": "challenges, too",
+        "explanation": "Para indicar 'también', se usa 'too' (adverbio) y a menudo se separa con una coma, no la preposición 'to'."
+       },
+       {
+        "end": 809,
+        "tag": "passive",
+        "quote": "has linked to",
+        "start": 796,
+        "category": "grammar",
+        "correction": "has been linked to",
+        "explanation": "Para expresar que algo está conectado o asociado a otra cosa, se usa la voz pasiva ('has been linked to')."
+       },
+       {
+        "end": 1002,
+        "tag": "articles",
+        "quote": "a transparent consent",
+        "start": 981,
+        "category": "grammar",
+        "correction": "transparent consent",
+        "explanation": "'Consent' es un sustantivo incontable en este contexto, por lo que no requiere un artículo indefinido."
+       },
+       {
+        "end": 1094,
+        "tag": "articles",
+        "quote": "balanced approach",
+        "start": 1077,
+        "category": "grammar",
+        "correction": "a balanced approach",
+        "explanation": "Se necesita un artículo indefinido ('a') antes de un sustantivo singular contable como 'approach'."
+       },
+       {
+        "end": 1204,
+        "tag": "prepositions",
+        "quote": "wellbeing in",
+        "start": 1192,
+        "category": "grammar",
+        "correction": "wellbeing",
+        "explanation": "La preposición 'in' es superflua aquí; 'maintain wellbeing' es una expresión completa."
+       },
+       {
+        "end": 1472,
+        "tag": "articles",
+        "quote": "for the growth",
+        "start": 1458,
+        "category": "grammar",
+        "correction": "for growth",
+        "explanation": "En este contexto general, 'growth' se usa sin artículo definido, refiriéndose al concepto abstracto de crecimiento."
+       }
+      ],
+      "summary": "Tu ensayo es muy sólido para el nivel C1, con una excelente organización y un buen desarrollo de ideas. El área más importante para mejorar es la precisión gramatical, especialmente con los artículos y las preposiciones, para alcanzar una fluidez más nativa.",
+      "criteria": {
+       "organisation": {
+        "score": 4,
+        "comment": "La estructura del ensayo es excelente, con una introducción clara y párrafos bien definidos que desarrollan cada aspecto de la tarea. El uso de conectores como 'Nevertheless' y 'Moreover' asegura una progresión lógica y coherente de las ideas."
+       },
+       "taskFulfilment": {
+        "score": 4,
+        "comment": "El ensayo cumple plenamente con la tarea. Aborda todos los puntos solicitados de manera equilibrada, presentando tanto los impactos positivos como los negativos y ofreciendo soluciones. El registro es apropiado para una revista universitaria y la extensión es perfecta."
+       },
+       "languageControl": {
+        "score": 3,
+        "comment": "El candidato demuestra un buen rango de vocabulario y estructuras complejas, adecuado para el nivel C1. Aunque hay algunos errores menores en el uso de artículos, preposiciones y la voz pasiva, estos no impiden la comprensión y el significado es siempre claro."
+       }
+      },
+      "upgrades": [
+       {
+        "end": 668,
+        "note": "'Incessant deluge' es una expresión más vívida y de nivel C1 para describir un flujo constante y abrumador.",
+        "quote": "constant flow of information",
+        "start": 640,
+        "example": "The incessant deluge of information can lead to overload, making it difficult to discern reliable sources from the misinformation.",
+        "suggestions": [
+         {
+          "text": "incessant deluge of information",
+          "translation": "diluvio incesante de información"
+         },
+         {
+          "text": "overwhelming volume of data",
+          "translation": "volumen abrumador de datos"
+         }
+        ]
+       },
+       {
+        "end": 762,
+        "note": "Estas alternativas son más formales y precisas, utilizando sustantivos abstractos y verbos más sofisticados.",
+        "quote": "making it difficult to discern reliable sources from the misinformation",
+        "start": 691,
+        "example": "The constant flow of information can lead to overload, complicating the distinction between credible sources and misinformation.",
+        "suggestions": [
+         {
+          "text": "complicating the distinction between credible sources and misinformation",
+          "translation": "complicando la distinción entre fuentes creíbles y desinformación"
+         },
+         {
+          "text": "hindering the ability to differentiate trustworthy information from falsehoods",
+          "translation": "dificultando la capacidad de diferenciar información fiable de falsedades"
+         }
+        ]
+       },
+       {
+        "end": 914,
+        "note": "Especificar 'Data privacy' es más preciso en este contexto y 'equally critical' es una buena alternativa para 'also paramount'.",
+        "quote": "Privacy concerns are also paramount",
+        "start": 879,
+        "example": "Data privacy is another paramount concern, as personal data is frequently harvested by corporations without a transparent consent.",
+        "suggestions": [
+         {
+          "text": "Data privacy is another paramount concern",
+          "translation": "La privacidad de los datos es otra preocupación primordial"
+         },
+         {
+          "text": "The issue of data privacy is equally critical",
+          "translation": "La cuestión de la privacidad de los datos es igualmente crítica"
+         }
+        ]
+       },
+       {
+        "end": 1039,
+        "note": "Estas frases son más elaboradas y demuestran un mayor control del lenguaje, utilizando sinónimos de 'complex' y 'landscape'.",
+        "quote": "To navigate this complex landscape",
+        "start": 1005,
+        "example": "To effectively navigate this intricate digital realm, individuals must adopt a critical and balanced approach.",
+        "suggestions": [
+         {
+          "text": "To effectively navigate this intricate digital realm",
+          "translation": "Para navegar eficazmente por este intrincado reino digital"
+         },
+         {
+          "text": "In order to successfully traverse this challenging online environment",
+          "translation": "Para atravesar con éxito este desafiante entorno en línea"
+         }
+        ]
+       }
+      ],
+      "nextSteps": [
+       "Revisa cuidadosamente el uso de artículos (a/an/the/zero article) en tus escritos. Practica identificando sustantivos contables e incontables y sus reglas de uso.",
+       "Presta atención a las preposiciones, especialmente en frases fijas y después de ciertos verbos o adjetivos. Un buen diccionario bilingüe o de colocaciones puede ser muy útil.",
+       "Repasa la voz pasiva, asegurándote de usar el auxiliar 'to be' correctamente (e.g., 'has been linked' en lugar de 'has linked') para expresar acciones recibidas."
+      ],
+      "strengths": [
+       "La estructura del ensayo es impecable, con una introducción, desarrollo y conclusión claros, y un uso efectivo de conectores como 'Nevertheless' y 'Finally' para guiar al lector.",
+       "El vocabulario utilizado es variado y apropiado para el nivel C1, con expresiones como 'undeniable catalyst', 'democratized knowledge' y 'paramount concern' que enriquecen el texto.",
+       "El contenido cubre todos los puntos de la tarea de manera equilibrada y reflexiva, presentando argumentos bien razonados sobre los impactos positivos y negativos, así como soluciones prácticas."
+      ],
+      "improvedVersion": "The internet has become an undeniable catalyst for change in contemporary society. In education, it offers unprecedented access to resources, allowing students to learn at their own pace and collaborate across borders. Platforms such as MOOCs and virtual libraries have democratized knowledge, empowering individuals with connectivity to acquire valuable skills. Communication has also been revolutionised; social media and messaging apps enable instant contact with friends, family and professional networks, bridging distances that once seemed insurmountable.\n\nNevertheless, the digital revolution introduces considerable drawbacks. The incessant deluge of information can lead to overload, complicating the distinction between credible sources and misinformation. Moreover, excessive screen time has been linked to mental health issues, including anxiety and reduced attention spans. Data privacy is another paramount concern, as personal data is frequently harvested by corporations without transparent consent.\n\nTo effectively navigate this intricate digital realm, individuals must adopt a critical and balanced approach. Setting clear boundaries for online use, such as designated screen-free periods, helps maintain wellbeing. Developing media literacy skills—questioning the origin of content and verifying facts—protects against deception. Finally, using strong passwords and reviewing privacy settings safeguards personal information, allowing the internet to serve as a tool for growth rather than a source of risk."
+     },
+     "score": 3.67,
+     "createdAt": {
+      "$ago": 1005988
+     }
+    }
+   ]
+  },
+  {
+   "id": "cmwrod34a0013sbdte2aca947",
+   "level": "ISE_III",
+   "taskType": "READING_INTO_WRITING",
+   "genre": "descriptive essay",
+   "topic": "Lifestyles",
+   "task": {
+    "title": "Exploring Modern Lifestyles",
+    "prompt": "You are writing an essay for your university course on contemporary social trends. Your tutor has asked you to explore the multifaceted nature of modern lifestyles, drawing on current perspectives and identifying their key characteristics. Using information from the four texts and your own ideas, write an essay describing contemporary lifestyles and their broader implications for individuals and society. Write 200-230 words.",
+    "minutes": 35,
+    "sources": [
+     {
+      "title": "The Digital Nomad's Paradox: Freedom or Fragility?",
+      "author": "Alex Sharma",
+      "letter": "A",
+      "source": "Blog",
+      "content": "The allure of the digital nomad lifestyle is undeniable, representing a potent paradigm shift from the traditional nine-to-five. It promises unprecedented freedom: the ability to work from sun-drenched beaches or bustling European cafes, ostensibly escaping the mundane exigencies of conventional employment. This intrinsic appeal has led to a proliferation of individuals seeking to reconcile their professional ambitions with a desire for constant exploration. However, beneath the curated Instagram feeds often lies a more precarious reality. While geographical flexibility mitigates the monotony of a fixed routine, it frequently exacerbates a sense of rootlessness. Ephemeral connections replace deep community bonds, leading to a pervasive, albeit often unacknowledged, loneliness. Furthermore, the constant need to manage time across different zones and the blurring of work-life boundaries can lead to burnout, transforming what appears to be a liberation into a new form of digital indenture. The commodification of experience becomes the dominant narrative, often overshadowing genuine cultural immersion. It's a lifestyle that demands a high degree of self-discipline and resilience, qualities often overlooked in the romanticized depiction."
+     },
+     {
+      "title": "Escaping the Rat Race: My Minimalism Journey",
+      "author": "ZenSeeker",
+      "letter": "B",
+      "source": "Forum post",
+      "content": "I've been on a journey for the past two years, moving away from what felt like an inescapable consumerist paradigm. The constant societal pressure to accumulate 'stuff' – the latest gadgets, fashionable clothing, an ever-bigger house – had, unbeknownst to me, been a significant source of underlying stress. My turning point was a realisation that this relentless pursuit of material possessions was not only financially draining but also emotionally and mentally exhausting. I started exploring minimalism, not as an aesthetic, but as a pragmatic philosophy. The dichotomy between what society tells us we *need* and what truly brings intrinsic value became starkly apparent. Initially, it was challenging to shed years of accumulated items, but the liberation was profound. I now own significantly fewer possessions, each serving a purpose or holding genuine sentimental value. This has allowed me to reallocate resources – time, money, and mental energy – towards experiences, personal growth, and deeper connections. While some friends find my choices contentious, arguing it's an extreme reaction, I've found a tranquility that was previously elusive. It’s about choosing a lifestyle that genuinely underpins my values, rather than being dictated by external commercial forces."
+     },
+     {
+      "title": "The Multifaceted Nature of Contemporary Lifestyles",
+      "letter": "C",
+      "source": "Article",
+      "content": "The contemporary landscape of human existence is characterised by an unprecedented diversification and stratification of lifestyles, a direct ramification of globalisation, technological advancement, and evolving socioeconomic structures. We observe a stark juxtaposition between, for instance, the hyper-connected, high-pressure urban professional and the proponents of 'slow living' or rural intentional communities. This dichotomy is not merely aesthetic; it reflects deeply ingrained philosophical and epistemological shifts regarding what constitutes a 'good life'. The proliferation of remote work, while offering flexibility, simultaneously exacerbates the challenge of establishing clear boundaries between professional and personal spheres, often leading to a concomitant rise in stress and mental health issues. Furthermore, the commodification of leisure and self-care, paradoxically, can transform efforts to mitigate stress into another set of consumerist obligations. It could be argued that societal expectations, underpinned by a pervasive culture of aspiration and achievement, often dictate lifestyle choices more profoundly than individual preference. Reconciling individual well-being with collective societal demands remains a contentious and multifaceted challenge, underscoring the intrinsic complexities of modern living."
+     },
+     {
+      "title": "Global Lifestyle Trends: A Snapshot",
+      "letter": "D",
+      "source": "Infographic",
+      "content": "This infographic illustrates key shifts and emerging patterns in global lifestyle choices, reflecting changes in work paradigms, social engagement, and personal values across different demographics.",
+      "isGraph": true,
+      "graphData": [
+       {
+        "label": "Remote Work Adoption (Global, % workforce)",
+        "value": 38
+       },
+       {
+        "label": "Urban Population (Global, %)",
+        "value": 57
+       },
+       {
+        "label": "Average Daily Screen Time (Hours)",
+        "value": 6.8
+       },
+       {
+        "label": "Prioritizing Work-Life Balance (Millennials, %)",
+        "value": 79
+       },
+       {
+        "label": "Experience Economy Spending (Annual Growth, %)",
+        "value": 18
+       },
+       {
+        "label": "Reported Stress/Anxiety (Adults, %)",
+        "value": 47
+       }
+      ]
+     }
+    ],
+    "wordLimit": {
+     "max": 230,
+     "min": 200
+    },
+    "bulletPoints": [
+     "Describe at least two contrasting modern lifestyles and their defining features.",
+     "Explain the advantages and disadvantages associated with these lifestyles.",
+     "Discuss the role of external factors, such as technology or societal pressures, in shaping these lifestyles."
+    ]
+   },
+   "createdAt": {
+    "$ago": 985591
+   },
+   "updatedAt": {
+    "$ago": 949434
+   },
+   "drafts": [
+    {
+     "id": "cmwrodv0j0017sbdta0a7j31z",
+     "version": 1,
+     "text": "Contemporary lifestyles are more diversified than ever, a shift driven by globalisation and rapid technological change. The actual infographic shows that 38 % of the world’s workforce now works remotely, while 57 % live in urban areas and the average daily screen time is about 6.8 hours. These numbers reveal how digital connectivity enables new ways of organising work and leisure, but they also highlight a growing pressure to be constantly productive and online. As article C notes, this creates a tension between the desire for flexibility and the risk of blurred boundaries between professional and personal life.  \n\nTwo opposite models illustrate this tension. Alex Sharma describes the digital nomad as a symbol of freedom: professionals can trade a fixed office for a beach in Bali or a café in Barcelona, gaining mobility and the chance to blend travel with work. The upside is clear, yet Sharma warns of hidden fragility – endless time‑zone juggling, superficial connections and a creeping burnout that turns liberty into a new form of digital indenture. In contrast, the minimalism path shared by ZenSeeker rejects consumerist excess, keeping only items that have real purpose or sentiment. This reduces financial stress and frees mental space for experiences and deeper relationships, although it can provoke social friction and requires an emotionally demanding decluttering process.",
+     "wordCount": 217,
+     "source": "typed",
+     "secondsUsed": 2400,
+     "feedback": {
+      "issues": [
+       {
+        "end": 148,
+        "tag": "register",
+        "quote": "The actual infographic shows",
+        "start": 120,
+        "category": "register",
+        "correction": "The infographic shows",
+        "explanation": "La palabra 'actual' es redundante y puede sonar informal en un ensayo académico, donde la precisión y la concisión son valoradas."
+       },
+       {
+        "end": 679,
+        "tag": "other",
+        "quote": "Alex Sharma",
+        "start": 668,
+        "category": "grammar",
+        "correction": "Text A",
+        "explanation": "El texto A es una entrada de blog anónima, no está atribuida a un autor llamado Alex Sharma. Es un error de lectura y atribución de la fuente."
+       },
+       {
+        "end": 911,
+        "tag": "other",
+        "quote": "Sharma warns",
+        "start": 899,
+        "category": "grammar",
+        "correction": "it warns",
+        "explanation": "Se repite la atribución incorrecta del texto a un autor inexistente, lo que refuerza el error de lectura de la fuente."
+       }
+      ],
+      "summary": "Tu ensayo está bien estructurado y demuestra un buen dominio del vocabulario C1. Sin embargo, el error de atribución de la fuente es un punto crítico que debes mejorar para asegurar la precisión académica.",
+      "criteria": {
+       "organisation": {
+        "score": 3,
+        "comment": "La organización es clara y lógica, con una buena progresión de ideas entre párrafos. Se utilizan conectores variados y apropiados para asegurar la cohesión del texto."
+       },
+       "taskFulfilment": {
+        "score": 3,
+        "comment": "Se cumplen todos los puntos de la tarea, describiendo dos estilos de vida contrastantes con sus ventajas, desventajas y factores externos. El registro es apropiado para un ensayo universitario y se respeta el límite de palabras."
+       },
+       "languageControl": {
+        "score": 3,
+        "comment": "Se demuestra un buen rango de vocabulario y estructuras gramaticales complejas, apropiadas para el nivel C1. La precisión es alta, con errores mínimos que no impiden la claridad del mensaje."
+       },
+       "readingForWriting": {
+        "score": 2,
+        "comment": "Se selecciona información relevante de los cuatro textos y se parafrasea en gran medida. Sin embargo, se comete un error significativo al atribuir el texto A a un autor inexistente, lo que demuestra una lectura superficial de la naturaleza de la fuente."
+       }
+      },
+      "upgrades": [
+       {
+        "end": 54,
+        "note": "'Unprecedentedly' eleva el registro y enfatiza la novedad de la diversificación, adecuado para un ensayo académico.",
+        "quote": "more diversified than ever",
+        "start": 28,
+        "example": "Contemporary lifestyles are unprecedentedly diverse, a shift driven by globalisation and rapid technological change.",
+        "suggestions": [
+         {
+          "text": "unprecedentedly diverse",
+          "translation": "sin precedentes en su diversidad"
+         },
+         {
+          "text": "increasingly varied",
+          "translation": "cada vez más variados"
+         }
+        ]
+       },
+       {
+        "end": 382,
+        "note": "'Paradigms' e 'integration' son vocabulario C1 que encaja bien en el contexto académico, aportando mayor sofisticación.",
+        "quote": "new ways of organising work and leisure",
+        "start": 343,
+        "example": "These numbers reveal how digital connectivity enables novel paradigms for work-life integration, but they also highlight a growing pressure to be constantly productive and online.",
+        "suggestions": [
+         {
+          "text": "novel paradigms for work-life integration",
+          "translation": "nuevos paradigmas para la integración vida-trabajo"
+         },
+         {
+          "text": "innovative approaches to balancing professional and personal spheres",
+          "translation": "enfoques innovadores para equilibrar las esferas profesional y personal"
+         }
+        ]
+       },
+       {
+        "end": 426,
+        "note": "'Mounting' es una colocación común y más formal para 'growing pressure' en contextos académicos.",
+        "quote": "growing pressure",
+        "start": 410,
+        "example": "These numbers reveal how digital connectivity enables new ways of organising work and leisure, but they also highlight a mounting pressure to be constantly productive and online.",
+        "suggestions": [
+         {
+          "text": "mounting pressure",
+          "translation": "presión creciente"
+         },
+         {
+          "text": "escalating demand",
+          "translation": "demanda creciente"
+         }
+        ]
+       },
+       {
+        "end": 509,
+        "note": "'Engenders' y 'dichotomy' son vocabulario C1 que expresan la idea de 'crear una tensión' de forma más sofisticada y académica.",
+        "quote": "creates a tension",
+        "start": 492,
+        "example": "As article C notes, this engenders a dichotomy between the desire for flexibility and the risk of blurred boundaries between professional and personal life.",
+        "suggestions": [
+         {
+          "text": "engenders a dichotomy",
+          "translation": "engendra una dicotomía"
+         },
+         {
+          "text": "fosters a paradox",
+          "translation": "fomenta una paradoja"
+         }
+        ]
+       },
+       {
+        "end": 642,
+        "note": "'Contrasting' es más formal que 'opposite' y 'paradigms' es un término académico adecuado para describir modelos de vida.",
+        "quote": "opposite models",
+        "start": 627,
+        "example": "Two contrasting paradigms illustrate this tension.",
+        "suggestions": [
+         {
+          "text": "contrasting paradigms",
+          "translation": "paradigmas contrastantes"
+         },
+         {
+          "text": "divergent approaches",
+          "translation": "enfoques divergentes"
+         }
+        ]
+       },
+       {
+        "end": 730,
+        "note": "'Epitome' es una palabra C1 que significa el ejemplo perfecto de algo, elevando el nivel del vocabulario.",
+        "quote": "symbol of freedom",
+        "start": 713,
+        "example": "Text A describes the digital nomad as an epitome of liberation: professionals can trade a fixed office for a beach in Bali or a café in Barcelona, gaining mobility and the chance to blend travel with work.",
+        "suggestions": [
+         {
+          "text": "epitome of liberation",
+          "translation": "epítome de la liberación"
+         },
+         {
+          "text": "emblem of autonomy",
+          "translation": "emblema de autonomía"
+         }
+        ]
+       },
+       {
+        "end": 893,
+        "note": "'Evident' es una alternativa más formal y académica a 'clear' en este contexto.",
+        "quote": "The upside is clear",
+        "start": 874,
+        "example": "The advantages are evident, yet the blog post warns of hidden fragility – endless time-zone juggling, superficial connections and a creeping burnout that turns liberty into a new form of digital indenture.",
+        "suggestions": [
+         {
+          "text": "The advantages are evident",
+          "translation": "Las ventajas son evidentes"
+         },
+         {
+          "text": "The benefits are undeniable",
+          "translation": "Los beneficios son innegables"
+         }
+        ]
+       },
+       {
+        "end": 1255,
+        "note": "'Liberates cognitive capacity' es una expresión más académica y precisa para referirse a la liberación de recursos mentales.",
+        "quote": "frees mental space",
+        "start": 1237,
+        "example": "This reduces financial stress and liberates cognitive capacity for experiences and deeper relationships, although it can provoke social friction and requires an emotionally demanding decluttering process.",
+        "suggestions": [
+         {
+          "text": "liberates cognitive capacity",
+          "translation": "libera capacidad cognitiva"
+         },
+         {
+          "text": "unburdens the mind",
+          "translation": "alivia la mente"
+         }
+        ]
+       }
+      ],
+      "nextSteps": [
+       "Lee los textos fuente con mayor atención, prestando especial cuidado a la naturaleza de la publicación (blog, artículo, foro) y a la autoría para evitar errores de atribución o malinterpretaciones.",
+       "Practica la integración de datos y referencias de los textos de manera más fluida en tus oraciones, evitando frases como 'The infographic shows' y buscando formas más orgánicas de incorporar la información.",
+       "Continúa ampliando tu vocabulario académico y prestando atención a las colocaciones y al registro, para que tu escritura suene más natural y sofisticada en un contexto universitario."
+      ],
+      "strengths": [
+       "La estructura del ensayo es clara y lógica, con una introducción que contextualiza el tema y un desarrollo que presenta los ejemplos de forma coherente.",
+       "Demuestras un buen rango de vocabulario de nivel C1, utilizando términos como 'diversified', 'tension', 'digital indenture' y 'consumerist excess' de manera efectiva.",
+       "Has cubierto todos los puntos de la tarea, describiendo dos estilos de vida, sus pros y contras, y los factores externos que los influyen."
+      ],
+      "improvedVersion": "Contemporary lifestyles are unprecedentedly diverse, a shift driven by globalisation and rapid technological change. The infographic shows that 38% of the world’s workforce now works remotely, while 57% live in urban areas and the average daily screen time is about 6.8 hours. These numbers reveal how digital connectivity enables novel paradigms for work-life integration, but they also highlight a mounting pressure to be constantly productive and online. As article C notes, this engenders a dichotomy between the desire for flexibility and the risk of blurred boundaries between professional and personal life.\n\nTwo contrasting paradigms illustrate this tension. Text A describes the digital nomad as an epitome of liberation: professionals can trade a fixed office for a beach in Bali or a café in Barcelona, gaining mobility and the chance to blend travel with work. The advantages are evident, yet the blog post warns of hidden fragility – endless time-zone juggling, superficial connections and a creeping burnout that turns liberty into a new form of digital indenture. In contrast, the minimalism path shared by ZenSeeker rejects consumerist excess, keeping only items that have real purpose or sentiment. This reduces financial stress and liberates cognitive capacity for experiences and deeper relationships, although it can provoke social friction and requires an emotionally demanding decluttering process."
+     },
+     "score": 2.75,
+     "createdAt": {
+      "$ago": 949438
+     }
+    }
+   ]
+  },
+  {
+   "id": "cmwrowuuy005msbdtq8ye9zsn",
+   "level": "ISE_III",
+   "taskType": "EXTENDED_WRITING",
+   "genre": "article (magazine or online)",
+   "topic": "Communication",
+   "task": {
+    "title": "The Evolution of Communication",
+    "prompt": "You are writing an article for a popular online magazine called 'Connect Global'. The editor has asked you to explore the impact of modern communication technologies on our daily lives. Write an article for 'Connect Global' about how technology has changed the way we communicate, considering both its advantages and disadvantages. Write 200-230 words.",
+    "minutes": 45,
+    "wordLimit": {
+     "max": 230,
+     "min": 200
+    },
+    "bulletPoints": [
+     "Describe how digital tools have transformed everyday communication.",
+     "Discuss the main benefits and drawbacks of these technological advancements.",
+     "Suggest ways to ensure meaningful human connection in a digitally-focused world."
+    ]
+   },
+   "createdAt": {
+    "$ago": 63175
+   },
+   "updatedAt": {
+    "$ago": 10583
+   },
+   "drafts": [
+    {
+     "id": "cmwroxf4f005qsbdty6jlg6ki",
+     "version": 1,
+     "text": "Technology has changed the way we talk with each other in a way that was impossible only a few decades ago. Digital tools like instant messaging, video calls and social networks have transformed everyday communication, allowing us to share ideas instantly across the globe. One of the biggest advantage is the speed; we can send a message in seconds and receive a reply in real time, which makes work and personal life more efficient. At the same time, these platforms also create new problems, for example the constant notifications can distract us from the task we are doing. Many people feel that they are always connected, but they also feel isolated because the interactions are often superficial. Also, the lack of face‑to‑face contact can lead to misunderstandings, because tone of voice and body language are missing. Moreover, the digital divide means that not everyone has equal access to these technologies, which can increase social inequality. To keep meaningful human connection, it is important to set boundaries, such as dedicated “offline” hours where we do not check our phones. We also should encourage in‑person meet‑ups, because physical presence builds trust that online chats sometimes cannot provide. Finally, educators and employers can assist to teach digital etiquette, so that we use technology as a tool for enrichment rather than a barrier to genuine relationships.",
+     "wordCount": 222,
+     "source": "typed",
+     "secondsUsed": 2520,
+     "feedback": {
+      "issues": [
+       {
+        "end": 54,
+        "tag": "collocation",
+        "quote": "talk with each other",
+        "start": 34,
+        "category": "vocabulary",
+        "correction": "talk to each other",
+        "explanation": "Aunque 'talk with' es posible, 'talk to' es la colocación más común y natural cuando se refiere a una conversación directa entre personas."
+       },
+       {
+        "end": 305,
+        "tag": "countable-uncountable",
+        "quote": "biggest advantage is",
+        "start": 285,
+        "category": "grammar",
+        "correction": "biggest advantages is",
+        "explanation": "Después de 'one of the', el sustantivo debe ir en plural, ya que se selecciona uno de un grupo de elementos."
+       },
+       {
+        "end": 975,
+        "tag": "word-choice",
+        "quote": "To keep meaningful",
+        "start": 957,
+        "category": "vocabulary",
+        "correction": "To maintain meaningful",
+        "explanation": "'Keep' es un verbo más básico; 'maintain' o 'foster' son opciones más adecuadas y formales para expresar la idea de preservar o cultivar una conexión."
+       },
+       {
+        "end": 1121,
+        "tag": "word-order",
+        "quote": "We also should encourage",
+        "start": 1097,
+        "category": "grammar",
+        "correction": "We should also encourage",
+        "explanation": "Los adverbios de frecuencia o modo como 'also' generalmente se colocan entre el verbo modal ('should') y el verbo principal ('encourage')."
+       },
+       {
+        "end": 1277,
+        "tag": "prepositions",
+        "quote": "assist to teach",
+        "start": 1262,
+        "category": "grammar",
+        "correction": "assist in teaching",
+        "explanation": "El verbo 'assist' va seguido de la preposición 'in' cuando se refiere a ayudar en una actividad ('assist in doing something'), o de 'to' si es un infinitivo con el significado de 'help to do something', pero 'assist to teach' no es idiomático."
+       }
+      ],
+      "summary": "Tu artículo es muy bueno en cuanto a la cobertura de la tarea y la organización de las ideas. El punto más importante para mejorar es la precisión gramatical en errores comunes y la elección de palabras y colocaciones para sonar más natural y sofisticado en inglés.",
+      "criteria": {
+       "organisation": {
+        "score": 3,
+        "comment": "La estructura del artículo es clara y lógica, con una introducción, un desarrollo que aborda ventajas y desventajas, y una conclusión con sugerencias. El uso de conectores como 'At the same time', 'Also' y 'Moreover' facilita la cohesión, aunque algunos podrían ser más variados o sofisticados para un nivel C1, como 'Also'."
+       },
+       "taskFulfilment": {
+        "score": 4,
+        "comment": "El candidato ha abordado todos los puntos de la tarea de manera exhaustiva y bien desarrollada. El registro y formato son apropiados para un artículo de revista online, y el objetivo comunicativo se logra plenamente, informando al lector de forma clara y completa. La extensión del texto (222 palabras) está dentro del límite establecido."
+       },
+       "languageControl": {
+        "score": 2,
+        "comment": "El texto muestra un rango de vocabulario y estructuras gramaticales adecuado para C1, con frases complejas y vocabulario preciso. Sin embargo, presenta algunos errores gramaticales básicos (como el plural de 'advantage' o la colocación del adverbio 'also') y de uso de preposiciones/colocaciones que, aunque no impiden la comprensión, son notables para este nivel."
+       }
+      },
+      "upgrades": [
+       {
+        "end": 451,
+        "note": "Variar los conectores es clave para la fluidez y sofisticación. 'Conversely' o 'However' son excelentes alternativas para introducir un contraste.",
+        "quote": "At the same time",
+        "start": 435,
+        "example": "Conversely, these platforms also create new problems.",
+        "suggestions": [
+         {
+          "text": "Conversely",
+          "translation": "Por el contrario"
+         },
+         {
+          "text": "However",
+          "translation": "Sin embargo"
+         },
+         {
+          "text": "On the flip side",
+          "translation": "Por otro lado (más informal)"
+         }
+        ]
+       },
+       {
+        "end": 576,
+        "note": "'The task we are doing' es un poco redundante y coloquial. 'The task at hand' es una expresión idiomática más concisa y formal.",
+        "quote": "the task we are doing",
+        "start": 555,
+        "example": "For example, the constant notifications can distract us from the task at hand.",
+        "suggestions": [
+         {
+          "text": "the task at hand",
+          "translation": "la tarea en cuestión"
+         },
+         {
+          "text": "our current tasks",
+          "translation": "nuestras tareas actuales"
+         }
+        ]
+       },
+       {
+        "end": 717,
+        "note": "'Also' es un conector muy básico. 'Furthermore' o 'In addition' son más formales y adecuados para añadir información en un artículo.",
+        "quote": "Also, the lack",
+        "start": 703,
+        "example": "Furthermore, the lack of face-to-face contact can lead to misunderstandings.",
+        "suggestions": [
+         {
+          "text": "Furthermore, the lack",
+          "translation": "Además, la falta"
+         },
+         {
+          "text": "In addition, the lack",
+          "translation": "Adicionalmente, la falta"
+         }
+        ]
+       }
+      ],
+      "nextSteps": [
+       "Revisa los errores gramaticales comunes: Presta especial atención a los plurales después de 'one of the', la colocación de adverbios con verbos modales y los patrones de verbos con preposiciones (ej. 'assist in doing'). Estos son errores que un examinador de C1 espera que se dominen.",
+       "Amplía tu repertorio de conectores: Practica el uso de una variedad de conectores para introducir ideas, contrastar puntos y añadir información (ej. 'Conversely', 'Furthermore', 'Nevertheless', 'Consequently'). Esto mejorará la fluidez y la sofisticación de tu escritura.",
+       "Refina la elección de palabras y colocaciones: Busca sinónimos más formales o precisos para palabras básicas (ej. 'maintain' en lugar de 'keep', 'significant' en lugar de 'biggest') y presta atención a las colocaciones comunes (ej. 'talk to' vs. 'talk with'). Leer artículos en inglés te ayudará a internalizar estas combinaciones."
+      ],
+      "strengths": [
+       "Cumplimiento de la tarea: Has abordado todos los puntos solicitados en la consigna de manera completa y equilibrada, presentando ventajas, desventajas y soluciones.",
+       "Estructura y desarrollo de ideas: El artículo está muy bien organizado, con una progresión lógica de ideas desde la descripción del impacto hasta las sugerencias para el futuro. Cada párrafo tiene un propósito claro.",
+       "Rango de vocabulario: Utilizas un vocabulario variado y apropiado para el tema y el nivel C1, incluyendo términos como 'transformed', 'efficient', 'superficial', 'isolated', 'digital divide', 'social inequality', 'digital etiquette' y 'genuine relationships'."
+      ],
+      "improvedVersion": "Technology has profoundly changed the way we interact with each other, in ways unimaginable only a few decades ago. Digital tools like instant messaging, video calls, and social networks have transformed everyday communication, allowing us to share ideas instantly across the globe. One of the most significant advantages is speed; we can send a message in seconds and receive a reply in real time, making both work and personal life more efficient.\n\nConversely, these platforms also create new problems. For example, constant notifications can distract us from the task at hand. Many people feel perpetually connected, yet also isolated, because interactions are often superficial. Furthermore, the lack of face-to-face contact can lead to misunderstandings, as tone of voice and body language are missing. Moreover, the digital divide means that not everyone has equal access to these technologies, which can exacerbate social inequality.\n\nTo foster meaningful human connection, it is important to set boundaries, such as dedicated “offline” hours when we do not check our phones. We should also encourage in-person gatherings, because physical presence builds trust that online chats often fail to provide. Finally, educators and employers can assist in teaching digital etiquette, ensuring we use technology as a tool for enrichment rather than a barrier to genuine relationships."
+     },
+     "score": 3,
+     "createdAt": {
+      "$ago": 36913
+     }
+    },
+    {
+     "id": "cmwroxzfp005usbdt3azitkw1",
+     "version": 2,
+     "text": "**The Digital Age: Faster Connections, Deeper Challenges**\n\nIn recent decades, technology has completely reshaped the way we talk to each other. Instant messaging, video calls and social networks enable us to share ideas instantly across the globe, turning communication into a 24‑hour service. This unprecedented speed brings clear benefits, yet it also raises new difficulties that we must address.\n\nOne of the biggest advantages is the immediacy of contact; a message can be sent in seconds and a reply received in real time, which makes both work and personal life more efficient. Nevertheless, the constant stream of notifications can distract us from the tasks we are doing, and many people feel perpetually connected yet increasingly isolated. The lack of face‑to‑face contact often leads to misunderstandings, because tone of voice and body language are missing. Moreover, the digital divide means that not everyone has equal access to these tools, potentially widening social inequality.\n\nTo maintain meaningful human connections, it is essential to set clear boundaries, such as dedicated “offline” hours when we do not check our phones. We should also encourage in‑person meet‑ups, because physical presence builds trust that online chats sometimes cannot provide. Finally, educators and employers can assist in teaching digital etiquette, ensuring that technology serves as a tool for enrichment rather than a barrier to genuine relationships.\n\nIn short, while digital platforms have accelerated communication beyond what was imaginable a few decades ago, we must use them wisely to preserve the quality of our interactions.",
+     "wordCount": 247,
+     "source": "typed",
+     "secondsUsed": 1980,
+     "feedback": {
+      "issues": [
+       {
+        "end": 1331,
+        "tag": "prepositions",
+        "quote": "assist in teaching",
+        "start": 1313,
+        "category": "grammar",
+        "correction": "assist with teaching",
+        "explanation": "El verbo 'assist' a menudo se usa con la preposición 'with' cuando se refiere a ayudar con una actividad o tarea, o simplemente 'help' + infinitivo sin 'to'."
+       }
+      ],
+      "summary": "¡Enhorabuena! Has logrado una mejora significativa en tu escritura. Este texto es un excelente ejemplo de un C1 sólido, con una organización impecable y un control del lenguaje muy preciso. Tu mayor logro es la claridad y fluidez, lo que hace que el artículo sea muy efectivo. Para tu próximo texto, concéntrate en refinar aún más las colocaciones y preposiciones para alcanzar la máxima puntuación en control del lenguaje.",
+      "criteria": {
+       "organisation": {
+        "score": 4,
+        "comment": "La organización del texto es excelente. La estructura es clara con una introducción, párrafos de desarrollo bien definidos para ventajas/desventajas y sugerencias, y una conclusión efectiva. El desarrollo lógico de las ideas es fluido y se utilizan una variedad de conectores y dispositivos cohesivos de manera natural y sofisticada, lo que facilita la lectura y comprensión."
+       },
+       "taskFulfilment": {
+        "score": 4,
+        "comment": "El candidato ha cumplido plenamente con la tarea. Todos los puntos de la tarea están cubiertos en profundidad y de manera equilibrada. El registro y formato son consistentemente apropiados para un artículo de revista en línea. Aunque el texto excede ligeramente el límite de palabras (247 de 230), la calidad del contenido y la cobertura de la tarea compensan este pequeño exceso."
+       },
+       "languageControl": {
+        "score": 3,
+        "comment": "El control del lenguaje es muy bueno para el nivel C1. El candidato demuestra un buen rango de estructuras gramaticales complejas y un vocabulario preciso y apropiado para el tema. La precisión es alta, con solo un error menor identificado ('assist in teaching'). Para alcanzar un 4, el texto necesitaría ser prácticamente impecable y mostrar una idiomaticidad aún mayor."
+       }
+      },
+      "upgrades": [
+       {
+        "end": 143,
+        "note": "'Interact' es una alternativa más concisa y formal, adecuada para el registro de una revista.",
+        "quote": "talk to each other",
+        "start": 125,
+        "example": "In recent decades, technology has completely reshaped the way we interact.",
+        "suggestions": [
+         {
+          "text": "interact",
+          "translation": "interactuar"
+         },
+         {
+          "text": "communicate",
+          "translation": "comunicarse"
+         }
+        ]
+       },
+       {
+        "end": 230,
+        "note": "'Exchange' e 'instantaneously' son opciones más sofisticadas y precisas para el nivel C1.",
+        "quote": "share ideas instantly",
+        "start": 209,
+        "example": "Instant messaging, video calls and social networks enable us to exchange ideas instantaneously across the globe.",
+        "suggestions": [
+         {
+          "text": "exchange ideas instantaneously",
+          "translation": "intercambiar ideas instantáneamente"
+         },
+         {
+          "text": "disseminate information rapidly",
+          "translation": "difundir información rápidamente"
+         }
+        ]
+       },
+       {
+        "end": 749,
+        "note": "'Experience' es un verbo más formal y 'heightened' es un adjetivo de nivel C1 que eleva el registro.",
+        "quote": "feel perpetually connected yet increasingly isolated",
+        "start": 697,
+        "example": "Nevertheless, the constant stream of notifications can distract us from the tasks at hand, and many people experience perpetual connectivity yet heightened isolation.",
+        "suggestions": [
+         {
+          "text": "experience perpetual connectivity yet heightened isolation",
+          "translation": "experimentan conectividad perpetua pero un aislamiento acentuado"
+         },
+         {
+          "text": "report feeling constantly linked but more alone",
+          "translation": "informan sentirse constantemente conectados pero más solos"
+         }
+        ]
+       },
+       {
+        "end": 1465,
+        "note": "'In summary' o 'To conclude' son conectores más formales y apropiados para la conclusión de un artículo.",
+        "quote": "In short",
+        "start": 1457,
+        "example": "In summary, while digital platforms have accelerated communication beyond what was imaginable a few decades ago, we must use them wisely to preserve the quality of our interactions.",
+        "suggestions": [
+         {
+          "text": "In summary",
+          "translation": "En resumen"
+         },
+         {
+          "text": "To conclude",
+          "translation": "Para concluir"
+         }
+        ]
+       }
+      ],
+      "nextSteps": [
+       "Presta atención a las colocaciones y preposiciones comunes. Revisa frases verbales y sustantivas para asegurarte de que las palabras se combinen de la manera más natural y precisa (por ejemplo, 'assist with' en lugar de 'assist in').",
+       "Practica la concisión para mantenerte dentro de los límites de palabras. Revisa tus frases para eliminar palabras innecesarias o para usar expresiones más directas que transmitan la misma idea de forma más eficiente.",
+       "Continúa expandiendo tu vocabulario con sinónimos y expresiones idiomáticas de nivel C1 para añadir matices y sofisticación a tu escritura, como los ejemplos proporcionados en la sección de 'Upgrades'."
+      ],
+      "strengths": [
+       "La cobertura de la tarea es excepcional, abordando todos los puntos con profundidad y ofreciendo ideas bien desarrolladas y pertinentes.",
+       "La organización y cohesión del texto son sobresalientes, con una estructura lógica y el uso natural de una amplia gama de conectores que guían al lector de manera efectiva.",
+       "El rango de vocabulario es muy bueno para C1, utilizando términos como 'unprecedented', 'perpetually connected', 'digital divide' y 'digital etiquette' con precisión."
+      ],
+      "improvedVersion": "The Digital Age: Faster Connections, Deeper Challenges\n\nIn recent decades, technology has completely reshaped the way we interact. Instant messaging, video calls, and social networks enable us to exchange ideas instantaneously across the globe, turning communication into a 24-hour service. This unprecedented speed brings clear benefits, yet it also raises new difficulties that we must address.\n\nOne of the biggest advantages is the immediacy of contact; a message can be sent in seconds and a reply received in real time, which makes both work and personal life more efficient. Nevertheless, the constant stream of notifications can distract us from the tasks at hand, and many people experience perpetual connectivity yet heightened isolation. The lack of face-to-face contact often leads to misunderstandings, as tone of voice and body language are missing. Moreover, the digital divide means that not everyone has equal access to these tools, potentially widening social inequality.\n\nTo maintain meaningful human connections, it is essential to set clear boundaries, such as dedicated “offline” hours when we do not check our phones. We should also encourage face-to-face gatherings, because physical presence builds trust that online chats sometimes struggle to foster. Finally, educators and employers can help teach digital etiquette, ensuring that technology serves as a tool for enrichment rather than a barrier to genuine relationships.\n\nIn summary, while digital platforms have accelerated communication beyond what was imaginable a few decades ago, we must use them wisely to preserve the quality of our interactions."
+     },
+     "score": 3.67,
+     "createdAt": {
+      "$ago": 10589
+     }
+    }
+   ]
+  }
+ ],
+ "writtenExams": [
+  {
+   "id": "cmwrol150001fsbdt7jdvwg7s",
+   "level": "ISE_III",
+   "content": {
+    "level": "ISE_III",
+    "reading1": {
+     "title": "The Evolving Paradigm of Contemporary Lifestyles",
+     "gapFill": {
+      "type": "gap_fill",
+      "questions": [
+       {
+        "id": "r1_gf1",
+        "sentence": "The rise in freelance employment across OECD nations is reported as a _______% increase since 2015.",
+        "correctAnswer": "23% rise"
+       },
+       {
+        "id": "r1_gf2",
+        "sentence": "Algorithm‑curated content accounts for _______% of media discovery according to the 2022 report.",
+        "correctAnswer": "68%"
+       },
+       {
+        "id": "r1_gf3",
+        "sentence": "Minimalist digital abstinence leads to a _______% reduction in prefrontal cortex activation.",
+        "correctAnswer": "15%"
+       },
+       {
+        "id": "r1_gf4",
+        "sentence": "Residents of the Berlin co‑living project reported a _______% increase in perceived work‑life balance.",
+        "correctAnswer": "27%"
+       },
+       {
+        "id": "r1_gf5",
+        "sentence": "The text calls for equitable broadband access and data‑privacy _______ as policy measures.",
+        "correctAnswer": "safeguards"
+       }
+      ],
+      "instructions": "Complete each sentence with 1-3 words from the text."
+     },
+     "paragraphs": [
+      {
+       "text": "In recent decades, the very notion of lifestyle has undergone a paradigm shift (a fundamental change in thinking), moving from a static set of habits to a dynamic, multifaceted construct shaped by technological, economic, and cultural forces. Not only have digital platforms reconfigured social interaction, but they have also engendered a pervasive sense of temporal acceleration, whereby individuals constantly negotiate the tension between personal autonomy and societal expectations. Researchers suggest that the proliferation of gig‑economy arrangements has intensified this tension, as studies indicate a 23% rise in freelance employment across OECD nations since 2015. Yet, it could be argued that such flexibility represents a pragmatic response to labour market volatility, rather than a mere source of stress. Consequently, the ensuing analysis must grapple with the dichotomy between empowerment and precarity, foregrounding the nuanced ways in which contemporary lifestyles are both constructed and contested.",
+       "number": 1
+      },
+      {
+       "text": "A central argument posits that the commodification of leisure, manifested through subscription services and algorithm‑curated content, has fundamentally altered consumption patterns. Rarely do scholars acknowledge that the intrinsic desire for novelty is now mediated by data‑driven recommendation engines, which, according to a 2022 report by the Digital Culture Institute, account for 68% of media discovery. This mechanisation, it is argued, exacerbates social stratification, as affluent users gain access to premium algorithms that further personalise experiences, thereby widening the digital divide. Counter‑evidence, however, emerges from longitudinal studies in Scandinavia, where universal broadband provision appears to mitigate such inequities, suggesting that policy interventions can reconcile market forces with egalitarian outcomes. In light of these findings, the argument must be tempered by acknowledging the concomitant role of governance in shaping the ramifications of digital leisure.",
+       "number": 2
+      },
+      {
+       "text": "Contrastingly, the resurgence of minimalist movements illustrates a deliberate rejection of hyper‑connected consumption, favouring intentionality over incessant stimulation. Advocates of minimalism argue that the deliberate curtailment of digital touchpoints mitigates cognitive overload, a claim supported by neuroscientific research indicating a 15% reduction in prefrontal cortex activation during periods of digital abstinence. Nevertheless, critics contend that such retreats are largely privileged, accessible only to those with the socioeconomic leeway to disengage. Moreover, the paradoxical effect of ‘digital detox’ retreats, which often rely on high‑tech infrastructure, underscores the intricate interplay between withdrawal and dependency. Consequently, while minimalism offers a compelling critique of pervasive connectivity, it simultaneously raises questions about its scalability and the potential for it to become yet another niche paradigm within the broader lifestyle discourse.",
+       "number": 3
+      },
+      {
+       "text": "A case study of urban co‑living spaces exemplifies the complex interplay between communal living and digital integration. In Berlin's Kreuzberg district, a cluster of co‑living apartments incorporates shared workstations, high‑speed internet, and communal wellness programmes, aiming to foster both productivity and social cohesion. Preliminary data reveal that residents report a 27% increase in perceived work‑life balance, attributing this to the seamless blending of physical and virtual communal resources. Yet, the model is not without contention; some scholars argue that the blurring of private and public spheres may exacerbate surveillance anxieties, as pervasive connectivity enables continuous monitoring. Furthermore, the economic viability of such projects remains uncertain, with rent premiums potentially reinforcing housing stratification. Hence, while co‑living illustrates an innovative synthesis of lifestyle aspirations and digital facilitation, it also foregrounds the need for robust regulatory frameworks to mitigate unintended ramifications.",
+       "number": 4
+      },
+      {
+       "text": "Synthesising the foregoing analyses, it becomes evident that contemporary lifestyles are neither monolithic nor unidirectional; they are characterised by a dialectical tension between digital empowerment and its attendant vulnerabilities. Should policy makers fail to anticipate the ramification of unchecked digital integration, the resultant exacerbation of inequality could undermine social cohesion. Conversely, proactive interventions—such as equitable broadband access, data‑privacy safeguards, and support for alternative lifestyle models—may reconcile the divergent forces at play. In sum, the future of lifestyle formation hinges upon a nuanced, interdisciplinary approach that reconciles technological advancement with humanistic values, ensuring that the evolving paradigm remains inclusive, sustainable, and resilient.",
+       "number": 5
+      }
+     ],
+     "paragraphMatching": {
+      "type": "paragraph_matching",
+      "options": [
+       {
+        "letter": "A",
+        "summary": "Minimalist digital detox movement"
+       },
+       {
+        "letter": "B",
+        "summary": "Dynamic lifestyle shift and gig economy tension"
+       },
+       {
+        "letter": "C",
+        "summary": "Dialectical tension between empowerment and vulnerability"
+       },
+       {
+        "letter": "D",
+        "summary": "Universal broadband eliminates digital divide"
+       },
+       {
+        "letter": "E",
+        "summary": "Algorithm‑driven leisure commodification"
+       },
+       {
+        "letter": "F",
+        "summary": "Urban co‑living blending work and community"
+       }
+      ],
+      "instructions": "Match each paragraph (1-5) to the correct summary (A-F). One option is extra.",
+      "correctAnswers": [
+       "B",
+       "E",
+       "A",
+       "F",
+       "C"
+      ]
+     },
+     "statementSelection": {
+      "type": "statement_selection",
+      "statements": [
+       {
+        "text": "The gig economy has seen a 23% rise in freelance employment across OECD nations since 2015.",
+        "letter": "A"
+       },
+       {
+        "text": "Subscription services have reduced media discovery to under 30%.",
+        "letter": "B"
+       },
+       {
+        "text": "Scandinavian universal broadband provision can mitigate digital inequities.",
+        "letter": "C"
+       },
+       {
+        "text": "Minimalist retreats often rely on high‑tech infrastructure, creating a paradox.",
+        "letter": "D"
+       },
+       {
+        "text": "Co‑living spaces in Berlin guarantee lower rent for residents.",
+        "letter": "E"
+       },
+       {
+        "text": "Researchers highlight a dialectical tension between digital empowerment and precarity.",
+        "letter": "F"
+       },
+       {
+        "text": "The text claims that digital acceleration eliminates personal autonomy.",
+        "letter": "G"
+       },
+       {
+        "text": "Policy interventions like data‑privacy safeguards could reconcile digital forces.",
+        "letter": "H"
+       }
+      ],
+      "instructions": "Choose the 5 statements (A-H) that are TRUE according to the text.",
+      "correctAnswers": [
+       "A",
+       "C",
+       "D",
+       "F",
+       "H"
+      ]
+     }
+    },
+    "reading2": {
+     "texts": [
+      {
+       "title": "Why I Still Trust My Browser",
+       "author": "Lena Hart",
+       "letter": "A",
+       "source": "Blog",
+       "content": "I’ve been a digital nomad for over a decade, and the internet has been my lifeline, from finding cheap flights to staying in touch with family across continents. Yet, lately I’ve found myself questioning the blind trust I once placed in search engines. A recent encounter with a fake news article about climate policy made me realise that algorithms often prioritise engagement over accuracy. Consequently, I now make a habit of cross‑checking sources, using academic databases whenever possible. This shift hasn’t diminished my productivity; on the contrary, it has sharpened my critical eye and saved me from the occasional embarrassment of sharing misinformation. In short, while I still rely on the internet for daily tasks, I approach it with a healthy dose of scepticism and a toolbox of verification strategies.",
+       "isGraph": false
+      },
+      {
+       "title": "Re: Internet Overload?",
+       "author": "Mike D.",
+       "letter": "B",
+       "source": "Forum post",
+       "content": "I totally get where you’re coming from, Lena. I work from home and my internet usage spiked during the pandemic – from video calls to endless scrolling. At first, I thought the constant connectivity was a sign of progress, but soon the burnout set in. I tried a ‘digital sunset’ – no screens after 7 pm – and the difference was night‑and‑day. My sleep improved, and I actually started reading physical books again. It wasn’t easy to convince my kids, who think Wi‑Fi is a basic human right, but we set up a ‘no‑device’ zone in the living room. The takeaway? The internet is a tool, not a master; setting boundaries can restore balance without cutting off essential communication.",
+       "isGraph": false
+      },
+      {
+       "title": "Internet Usage Trends in 2024: A Data‑Driven Overview",
+       "letter": "C",
+       "source": "Article",
+       "content": "According to the Global Digital Report 2024, internet penetration now exceeds 66% of the world population, up from 59% in 2020. Notably, mobile broadband accounts for 58% of total connections, underscoring the shift towards on‑the‑go access. However, the report also highlights a widening digital divide: high‑income nations exhibit a 92% penetration rate, whereas low‑income regions lag at 38%. Moreover, average daily online time has risen to 6.5 hours per user, driven primarily by video streaming (32%) and social networking (27%). Experts warn that this surge may exacerbate mental‑health concerns, recommending policy measures such as digital literacy programmes and regulated content algorithms to mitigate potential harms.",
+       "isGraph": false
+      },
+      {
+       "title": "Internet Usage by Age Group – 2024 Snapshot",
+       "letter": "D",
+       "source": "Graph/Chart",
+       "content": "The infographic presents a bar chart illustrating average daily internet use (hours) across four age cohorts in 2024. Adolescents (13‑17) lead with 7.2 hours, followed by young adults (18‑34) at 6.8 hours, adults (35‑54) at 5.9 hours, and seniors (55+) at 3.4 hours. A line overlay indicates the percentage of users accessing the internet via mobile devices: 92% for adolescents, 88% for young adults, 73% for adults, and 55% for seniors. Annotations note a 1.5‑hour increase for seniors since 2020, attributed to telehealth adoption. The chart underscores the pervasive reach of digital connectivity while highlighting generational disparities in usage patterns.",
+       "isGraph": true,
+       "graphData": [
+        {
+         "label": "Adolescents (13‑17)",
+         "value": 7.2
+        },
+        {
+         "label": "Young Adults (18‑34)",
+         "value": 6.8
+        },
+        {
+         "label": "Adults (35‑54)",
+         "value": 5.9
+        },
+        {
+         "label": "Seniors (55+)",
+         "value": 3.4
+        }
+       ]
+      }
+     ],
+     "title": "Perspectives on the Use of the Internet",
+     "topic": "Use of the internet",
+     "gapFill": {
+      "type": "gap_fill",
+      "questions": [
+       {
+        "id": "r2_gf1",
+        "sentence": "Global penetration in 2024 exceeds _______.",
+        "correctAnswer": "66%",
+        "sectionHeading": "Usage Statistics"
+       },
+       {
+        "id": "r2_gf2",
+        "sentence": "Mobile broadband accounts for _______ of connections.",
+        "correctAnswer": "58%",
+        "sectionHeading": "Usage Statistics"
+       },
+       {
+        "id": "r2_gf3",
+        "sentence": "The blog author describes themselves as a _______.",
+        "correctAnswer": "digital nomad",
+        "sectionHeading": "Personal Experiences"
+       },
+       {
+        "id": "r2_gf4",
+        "sentence": "The forum post introduced a _______ to limit evening screen time.",
+        "correctAnswer": "digital sunset",
+        "sectionHeading": "Personal Experiences"
+       },
+       {
+        "id": "r2_gf5",
+        "sentence": "Adolescents average _______ of internet use per day.",
+        "correctAnswer": "7.2 hours",
+        "sectionHeading": "Usage Statistics"
+       }
+      ],
+      "notesTitle": "Key Points on Internet Use",
+      "instructions": "Complete each sentence with 1-3 words from the texts."
+     },
+     "textMatching": {
+      "type": "text_matching",
+      "questions": [
+       {
+        "id": "r2_tm1",
+        "statement": "The blog author mentions cross‑checking sources after encountering fake news."
+       },
+       {
+        "id": "r2_tm2",
+        "statement": "The article reports that internet penetration exceeds 66% of the world population in 2024."
+       },
+       {
+        "id": "r2_tm3",
+        "statement": "The forum post describes implementing a ‘digital sunset’ with no screens after 7 pm."
+       },
+       {
+        "id": "r2_tm4",
+        "statement": "The infographic shows a bar chart of average daily internet use across age cohorts."
+       },
+       {
+        "id": "r2_tm5",
+        "statement": "The blog author identifies as a digital nomad for over a decade."
+       }
+      ],
+      "instructions": "Match each statement (16-20) to the text it refers to (A, B, C, or D). One letter is used twice.",
+      "correctAnswers": [
+       "A",
+       "C",
+       "B",
+       "D",
+       "A"
+      ]
+     },
+     "statementSelection": {
+      "type": "statement_selection",
+      "statements": [
+       {
+        "text": "The blog claims that algorithms always prioritize accuracy over engagement.",
+        "letter": "A"
+       },
+       {
+        "text": "The forum post notes that setting a ‘no‑device’ zone improved the author’s sleep.",
+        "letter": "B"
+       },
+       {
+        "text": "The article highlights that mobile broadband makes up 58% of total connections.",
+        "letter": "C"
+       },
+       {
+        "text": "The infographic shows seniors using the internet for 5 hours daily.",
+        "letter": "D"
+       },
+       {
+        "text": "The blog author identifies as a digital nomad for over a decade.",
+        "letter": "E"
+       },
+       {
+        "text": "The forum post mentions that children view Wi‑Fi as a basic human right.",
+        "letter": "F"
+       },
+       {
+        "text": "The article warns that increased online time may exacerbate mental‑health concerns.",
+        "letter": "G"
+       },
+       {
+        "text": "The chart indicates that adolescents spend less time online than adults.",
+        "letter": "H"
+       }
+      ],
+      "instructions": "Choose the 5 statements (A-H) that are TRUE according to the texts.",
+      "correctAnswers": [
+       "B",
+       "C",
+       "E",
+       "F",
+       "G"
+      ]
+     }
+    },
+    "extendedWriting": {
+     "title": "The Impact of Digital Connectivity on Modern Life",
+     "prompt": "Discuss whether the increasing prevalence of digital connectivity enhances or undermines personal well‑being in contemporary society. Present a clear position, support it with relevant examples, and consider possible counter‑arguments.",
+     "wordLimit": {
+      "max": 230,
+      "min": 200
+     },
+     "writingType": "argumentative essay",
+     "bulletPoints": [
+      "Define personal well‑being in the digital age.",
+      "Provide examples of both positive and negative effects of constant connectivity.",
+      "Offer recommendations for achieving a balanced digital lifestyle."
+     ]
+    },
+    "readingIntoWriting": {
+     "title": "Review of Perspectives on Internet Use",
+     "prompt": "Write a review (200‑230 words) that synthesises the ideas presented in Texts A, B, C and D. Your review should compare the authors’ attitudes towards the internet, highlight any common concerns, and assess the effectiveness of the strategies they propose.",
+     "wordLimit": {
+      "max": 230,
+      "min": 200
+     },
+     "writingType": "review",
+     "bulletPoints": [
+      "Contrast the critical stance of the blog with the balanced view of the forum post.",
+      "Summarise the statistical evidence from the article and the infographic.",
+      "Evaluate the proposed solutions such as verification habits and digital‑sunset routines."
+     ]
+    }
+   },
+   "status": "EVALUATED",
+   "score": 76,
+   "startedAt": {
+    "$ago": 614911
+   },
+   "completedAt": {
+    "$ago": 558177
+   },
+   "createdAt": {
+    "$ago": 614911
+   },
+   "updatedAt": {
+    "$ago": 558177
+   },
+   "responses": [
+    {
+     "id": "cmwrolrc4001isbdt4ry3mmky",
+     "taskType": "READING_1",
+     "taskNumber": 1,
+     "response": "{\"pm_1\":\"B\",\"pm_2\":\"E\",\"pm_3\":\"B\",\"pm_4\":\"F\",\"pm_5\":\"C\",\"r1_ss\":[\"A\",\"C\",\"D\",\"F\",\"B\"],\"r1_gf1\":\"23% rise\",\"r1_gf2\":\"\",\"r1_gf3\":\"15%\",\"r1_gf4\":\"\",\"r1_gf5\":\"safeguards\",\"r2_tm1\":\"B\",\"r2_tm2\":\"C\",\"r2_tm3\":\"B\",\"r2_tm4\":\"D\",\"r2_tm5\":\"A\",\"r2_ss\":[\"B\",\"A\",\"E\",\"F\",\"G\"],\"r2_gf1\":\"66%\",\"r2_gf2\":\"58%\",\"r2_gf3\":\"\",\"r2_gf4\":\"digital sunset\",\"r2_gf5\":\"7.2 hours\"}",
+     "aiFeedback": "{\"score\":11,\"total\":15,\"percentage\":73,\"questions\":[{\"num\":1,\"type\":\"paragraph_matching\",\"userAnswer\":\"B\",\"correctAnswer\":\"B\",\"isCorrect\":true,\"context\":\"Paragraph 1 → which summary (A–F)?\"},{\"num\":2,\"type\":\"paragraph_matching\",\"userAnswer\":\"E\",\"correctAnswer\":\"E\",\"isCorrect\":true,\"context\":\"Paragraph 2 → which summary (A–F)?\"},{\"num\":3,\"type\":\"paragraph_matching\",\"userAnswer\":\"B\",\"correctAnswer\":\"A\",\"isCorrect\":false,\"context\":\"Paragraph 3 → which summary (A–F)?\",\"explanation\":\"The candidate chose summary B, but paragraph 3 contains the main idea described in summary A, so B does not match the content.\"},{\"num\":4,\"type\":\"paragraph_matching\",\"userAnswer\":\"F\",\"correctAnswer\":\"F\",\"isCorrect\":true,\"context\":\"Paragraph 4 → which summary (A–F)?\"},{\"num\":5,\"type\":\"paragraph_matching\",\"userAnswer\":\"C\",\"correctAnswer\":\"C\",\"isCorrect\":true,\"context\":\"Paragraph 5 → which summary (A–F)?\"},{\"num\":6,\"type\":\"statement_selection\",\"userAnswer\":\"A, C, D, F, B\",\"correctAnswer\":\"A\",\"isCorrect\":true,\"context\":\"TRUE statement: The gig economy has seen a 23% rise in freelance employment across OECD nations since 2015.\"},{\"num\":7,\"type\":\"statement_selection\",\"userAnswer\":\"A, C, D, F, B\",\"correctAnswer\":\"C\",\"isCorrect\":true,\"context\":\"TRUE statement: Scandinavian universal broadband provision can mitigate digital inequities.\"},{\"num\":8,\"type\":\"statement_selection\",\"userAnswer\":\"A, C, D, F, B\",\"correctAnswer\":\"D\",\"isCorrect\":true,\"context\":\"TRUE statement: Minimalist retreats often rely on high‑tech infrastructure, creating a paradox.\"},{\"num\":9,\"type\":\"statement_selection\",\"userAnswer\":\"A, C, D, F, B\",\"correctAnswer\":\"F\",\"isCorrect\":true,\"context\":\"TRUE statement: Researchers highlight a dialectical tension between digital empowerment and precarity.\"},{\"num\":10,\"type\":\"statement_selection\",\"userAnswer\":\"A, C, D, F, B\",\"correctAnswer\":\"H\",\"isCorrect\":false,\"context\":\"TRUE statement: Policy interventions like data‑privacy safeguards could reconcile digital forces.\",\"explanation\":\"The candidate listed several options, yet only statement H accurately reflects the text’s claim that policy interventions like data‑privacy safeguards could reconcile digital forces.\"},{\"num\":11,\"type\":\"gap_fill\",\"userAnswer\":\"23% rise\",\"correctAnswer\":\"23% rise\",\"isCorrect\":true,\"context\":\"The rise in freelance employment across OECD nations is reported as a _______% increase since 2015.\"},{\"num\":12,\"type\":\"gap_fill\",\"userAnswer\":\"\",\"correctAnswer\":\"68%\",\"isCorrect\":false,\"context\":\"Algorithm‑curated content accounts for _______% of media discovery according to the 2022 report.\",\"explanation\":\"The candidate left the gap empty; the passage states that algorithm‑curated content accounts for 68% of media discovery, which is the required figure.\"},{\"num\":13,\"type\":\"gap_fill\",\"userAnswer\":\"15%\",\"correctAnswer\":\"15%\",\"isCorrect\":true,\"context\":\"Minimalist digital abstinence leads to a _______% reduction in prefrontal cortex activation.\"},{\"num\":14,\"type\":\"gap_fill\",\"userAnswer\":\"\",\"correctAnswer\":\"27%\",\"isCorrect\":false,\"context\":\"Residents of the Berlin co‑living project reported a _______% increase in perceived work‑life balance.\",\"explanation\":\"The candidate did not provide an answer; the correct figure is a 27% increase in perceived work‑life balance reported by Berlin co‑living residents.\"},{\"num\":15,\"type\":\"gap_fill\",\"userAnswer\":\"safeguards\",\"correctAnswer\":\"safeguards\",\"isCorrect\":true,\"context\":\"The text calls for equitable broadband access and data‑privacy _______ as policy measures.\"}]}",
+     "score": 11,
+     "createdAt": {
+      "$ago": 580957
+     },
+     "updatedAt": {
+      "$ago": 580957
+     }
+    },
+    {
+     "id": "cmwrolrc4001jsbdt3fc7lo9q",
+     "taskType": "READING_2",
+     "taskNumber": 2,
+     "response": "{\"pm_1\":\"B\",\"pm_2\":\"E\",\"pm_3\":\"B\",\"pm_4\":\"F\",\"pm_5\":\"C\",\"r1_ss\":[\"A\",\"C\",\"D\",\"F\",\"B\"],\"r1_gf1\":\"23% rise\",\"r1_gf2\":\"\",\"r1_gf3\":\"15%\",\"r1_gf4\":\"\",\"r1_gf5\":\"safeguards\",\"r2_tm1\":\"B\",\"r2_tm2\":\"C\",\"r2_tm3\":\"B\",\"r2_tm4\":\"D\",\"r2_tm5\":\"A\",\"r2_ss\":[\"B\",\"A\",\"E\",\"F\",\"G\"],\"r2_gf1\":\"66%\",\"r2_gf2\":\"58%\",\"r2_gf3\":\"\",\"r2_gf4\":\"digital sunset\",\"r2_gf5\":\"7.2 hours\"}",
+     "aiFeedback": "{\"score\":12,\"total\":15,\"percentage\":80,\"questions\":[{\"num\":16,\"type\":\"text_matching\",\"userAnswer\":\"B\",\"correctAnswer\":\"A\",\"isCorrect\":false,\"context\":\"The blog author mentions cross‑checking sources after encountering fake news.\",\"explanation\":\"The candidate selected B, but the author explicitly says they cross‑check sources after encountering fake news, which corresponds to option A.\"},{\"num\":17,\"type\":\"text_matching\",\"userAnswer\":\"C\",\"correctAnswer\":\"C\",\"isCorrect\":true,\"context\":\"The article reports that internet penetration exceeds 66% of the world population in 2024.\"},{\"num\":18,\"type\":\"text_matching\",\"userAnswer\":\"B\",\"correctAnswer\":\"B\",\"isCorrect\":true,\"context\":\"The forum post describes implementing a ‘digital sunset’ with no screens after 7 pm.\"},{\"num\":19,\"type\":\"text_matching\",\"userAnswer\":\"D\",\"correctAnswer\":\"D\",\"isCorrect\":true,\"context\":\"The infographic shows a bar chart of average daily internet use across age cohorts.\"},{\"num\":20,\"type\":\"text_matching\",\"userAnswer\":\"A\",\"correctAnswer\":\"A\",\"isCorrect\":true,\"context\":\"The blog author identifies as a digital nomad for over a decade.\"},{\"num\":21,\"type\":\"statement_selection\",\"userAnswer\":\"B, A, E, F, G\",\"correctAnswer\":\"B\",\"isCorrect\":true,\"context\":\"TRUE statement: The forum post notes that setting a ‘no‑device’ zone improved the author’s sleep.\"},{\"num\":22,\"type\":\"statement_selection\",\"userAnswer\":\"B, A, E, F, G\",\"correctAnswer\":\"C\",\"isCorrect\":false,\"context\":\"TRUE statement: The article highlights that mobile broadband makes up 58% of total connections.\",\"explanation\":\"The candidate chose multiple statements, yet only statement C correctly notes that mobile broadband constitutes 58% of total connections.\"},{\"num\":23,\"type\":\"statement_selection\",\"userAnswer\":\"B, A, E, F, G\",\"correctAnswer\":\"E\",\"isCorrect\":true,\"context\":\"TRUE statement: The blog author identifies as a digital nomad for over a decade.\"},{\"num\":24,\"type\":\"statement_selection\",\"userAnswer\":\"B, A, E, F, G\",\"correctAnswer\":\"F\",\"isCorrect\":true,\"context\":\"TRUE statement: The forum post mentions that children view Wi‑Fi as a basic human right.\"},{\"num\":25,\"type\":\"statement_selection\",\"userAnswer\":\"B, A, E, F, G\",\"correctAnswer\":\"G\",\"isCorrect\":true,\"context\":\"TRUE statement: The article warns that increased online time may exacerbate mental‑health concerns.\"},{\"num\":26,\"type\":\"gap_fill\",\"userAnswer\":\"66%\",\"correctAnswer\":\"66%\",\"isCorrect\":true,\"context\":\"Global penetration in 2024 exceeds _______.\"},{\"num\":27,\"type\":\"gap_fill\",\"userAnswer\":\"58%\",\"correctAnswer\":\"58%\",\"isCorrect\":true,\"context\":\"Mobile broadband accounts for _______ of connections.\"},{\"num\":28,\"type\":\"gap_fill\",\"userAnswer\":\"\",\"correctAnswer\":\"digital nomad\",\"isCorrect\":false,\"context\":\"The blog author describes themselves as a _______.\",\"explanation\":\"The candidate left the blank; the blog author describes themselves as a digital nomad, which is the missing term.\"},{\"num\":29,\"type\":\"gap_fill\",\"userAnswer\":\"digital sunset\",\"correctAnswer\":\"digital sunset\",\"isCorrect\":true,\"context\":\"The forum post introduced a _______ to limit evening screen time.\"},{\"num\":30,\"type\":\"gap_fill\",\"userAnswer\":\"7.2 hours\",\"correctAnswer\":\"7.2 hours\",\"isCorrect\":true,\"context\":\"Adolescents average _______ of internet use per day.\"}]}",
+     "score": 12,
+     "createdAt": {
+      "$ago": 580957
+     },
+     "updatedAt": {
+      "$ago": 580957
+     }
+    },
+    {
+     "id": "cmwrom258001lsbdtla189qut",
+     "taskType": "READING_INTO_WRITING",
+     "taskNumber": 3,
+     "response": "The four contributions offer a nuanced picture of today’s internet landscape, ranging from personal caution to statistical context. Lena Hart’s blog (Text A) adopts a clearly critical tone: after encountering a fake‑news article, she argues that algorithms prioritise clicks over truth, urging readers to verify information through academic databases. In contrast, Mike D.’s forum reply (Text B) presents a more balanced view. He acknowledges the internet’s usefulness for work and family contact, yet stresses that setting boundaries—such as a “digital sunset” after 7 pm—helps avoid burnout and restores sleep and reading habits.\n\nStatistical evidence from the Global Digital Report (Text C) underlines why such concerns matter. Worldwide penetration now exceeds 66 % and average daily online time has risen to 6.5 hours, driven mainly by video streaming (32 %) and social networking (27 %). The accompanying infographic (Text D) shows that adolescents spend the most time online (7.2 hours), with younger adults close behind (6.8 hours), while seniors use the net for only 3.4 hours but have increased their mobile access by 1.5 hours since 2020.\n\nBoth authors propose practical solutions. Hart’s verification habit is effective for combating misinformation, though it requires time and discipline. Mike’s digital‑sunset routine tackles the mental‑health side of excessive use and is easy to implement for families. Together, these strategies address the twin challenges highlighted by the data: the spread of unreliable content and the risk of digital overload. By combining critical checking with sensible screen‑time limits, users can enjoy the internet’s benefits without becoming its slaves.",
+     "aiFeedback": "{\"score\":15,\"band\":\"Distinction\",\"readingAndWriting\":{\"score\":3,\"comments\":\"The response demonstrates a clear understanding of all four source texts, selecting the most relevant points and linking them effectively. It identifies the contrasting attitudes toward the internet and highlights common concerns, while paraphrasing accurately and integrating data smoothly.\"},\"taskFulfilment\":{\"score\":3,\"comments\":\"The review fulfills the communicative aim, addressing the reader as an informed audience and covering the required comparison, synthesis, and evaluation of strategies. The register is appropriate for an academic review.\"},\"organisationAndStructure\":{\"score\":3,\"comments\":\"The essay is well‑structured with logical paragraphing and clear signposting (e.g., “In contrast,” “Both authors propose”). Ideas develop coherently, making the synthesis easy to follow.\"},\"languageControl\":{\"score\":3,\"comments\":\"A wide range of vocabulary and grammatical structures is used with only minor errors that do not impede meaning. Punctuation and spelling are generally accurate.\"},\"suggestions\":[\"Include a brief concluding sentence that explicitly restates the overall recommendation for readers.\",\"Vary sentence openings more to avoid repetitive structures and enhance stylistic sophistication.\",\"Add a specific reference to the infographic (Text D) to strengthen the link between visual data and the written analysis.\"]}",
+     "score": 15,
+     "createdAt": {
+      "$ago": 566949
+     },
+     "updatedAt": {
+      "$ago": 566949
+     }
+    },
+    {
+     "id": "cmwrom8wt001nsbdto27xhyrx",
+     "taskType": "EXTENDED_WRITING",
+     "taskNumber": 4,
+     "response": "The concept of personal well‑being in the digital age can be understood as the combination of mental health, social satisfaction and a sense of control over one’s own time, all of which are now heavily mediated by the internet and smart devices.  \n\nOn the positive side, constant connectivity allows people to maintain relationships across distances, to access health‑related information instantly and to organise their daily routine with apps that remind them to exercise or meditate. For example, my aunt, who lives in Seville, can join a virtual support group for caregivers and feels less isolated than she would have been a decade ago.  \n\nHowever, the same ease of access also brings several drawbacks. The pressure to be always available creates anxiety and disrupts sleep, especially when notifications appear late at night. Moreover, the endless stream of curated images on social media can foster unrealistic comparisons, leading to lower self‑esteem. Studies in the UK have shown a clear correlation between heavy social‑media use and symptoms of depression among young adults.  \n\nTo achieve a balanced digital lifestyle, I would recommend setting specific “offline” periods each day, using tools that block non‑essential apps during work hours, and practising digital minimalism – keeping only those platforms that truly add value. By consciously managing our online time, we can enjoy the benefits of connectivity without letting it undermine our overall well‑being.",
+     "aiFeedback": "{\"score\":15,\"band\":\"Distinction\",\"taskFulfilment\":{\"score\":3,\"comments\":\"The response clearly addresses the prompt, presents a balanced position, and provides relevant examples and a counter‑argument, maintaining an appropriate formal register for the reader.\"},\"organisationAndStructure\":{\"score\":3,\"comments\":\"Ideas are logically ordered with clear paragraphs and effective signposting (e.g., \\\"On the positive side\\\", \\\"However\\\"), though transitions could be smoother in places.\"},\"languageControl\":{\"score\":3,\"comments\":\"A good range of vocabulary and grammatical structures is used with only occasional minor errors that do not impede meaning; punctuation and spelling are generally accurate.\"},\"suggestions\":[\"Add more varied linking devices to improve cohesion between paragraphs\",\"Include a brief summary or concluding sentence that restates the main position for stronger closure\",\"Proofread for occasional article or preposition errors to achieve full accuracy\"]}",
+     "score": 15,
+     "createdAt": {
+      "$ago": 558180
+     },
+     "updatedAt": {
+      "$ago": 558180
+     }
+    }
+   ]
+  }
+ ],
+ "oralExams": [
+  {
+   "id": "cmwrom993001psbdt8zt63q88",
+   "level": "ISE_III",
+   "status": "EVALUATED",
+   "overallScore": 78,
+   "selectedTasks": [
+    "TOPIC",
+    "COLLABORATIVE",
+    "CONVERSATION"
+   ],
+   "topicGeneral": "Remote work and its impact on young professionals",
+   "topicDetailed": "I want to talk about how remote work changed my first years in marketing: the freedom to organise my day, the loneliness at the beginning, how companies measure productivity, and whether hybrid work is the fairest model. My view: hybrid work is better, but only if companies train managers to trust their teams.",
+   "examinerPersona": "sonia",
+   "mode": "classic",
+   "startedAt": {
+    "$ago": 557738
+   },
+   "completedAt": {
+    "$ago": 228618
+   },
+   "createdAt": {
+    "$ago": 557738
+   },
+   "updatedAt": {
+    "$ago": 228618
+   },
+   "exchanges": [
+    {
+     "id": "cmwroo6ly002lsbdt1n3588fx",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "Could you illustrate how you would balance the need for regular pulse‑check surveys with the risk of survey fatigue, and explain what steps you would take if the feedback from those surveys conflicted with the quantitative data you were monitoring?",
+     "order": 14,
+     "createdAt": {
+      "$ago": 467850
+     }
+    },
+    {
+     "id": "cmwrom9kd001rsbdtgdmlgm89",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "Thank you. Your topic today is about remote work and its impact on young professionals. Please begin your formal presentation whenever you’re ready.",
+     "order": 0,
+     "createdAt": {
+      "$ago": 557332
+     }
+    },
+    {
+     "id": "cmwromhqo001vsbdtf3z1mfqe",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I believe that remote work has a big influence on young professionals because it offers them a lot of flexibility with their schedules. It also allows them to work from any places, which means they can balance their personal life and career more easily. Moreover, I think it helps them develop digital skills that are really valuable in today's job market. Finally, the challenge is to stay motivated and maintain a good communication with the team, otherwise the isolation can become a problem.",
+     "order": 1,
+     "createdAt": {
+      "$ago": 546736
+     }
+    },
+    {
+     "id": "cmwromhyc001xsbdtsqgsq572",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "Lovely, could you give a specific example of a situation where remote work made it difficult to stay motivated, and explain how you or your team addressed that challenge?",
+     "order": 2,
+     "createdAt": {
+      "$ago": 546461
+     }
+    },
+    {
+     "id": "cmwromq8c001zsbdtj2vq3rn0",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, one time our project deadline was coming up and I found it really hard to keep my energy up because I was working from my apartment all day. I mean, there were no coffee breaks with colleagues, so I felt a bit isolated. To tackle it, we set up a short daily video check‑in, where each of us shared a quick win or a challenge, and we also created a shared playlist so we could listen to the same music while we worked. That little routine helped me stay motivated and kept the team spirit alive.",
+     "order": 3,
+     "createdAt": {
+      "$ago": 535732
+     }
+    },
+    {
+     "id": "cmwromqjn0021sbdt34o7248m",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "You mentioned that daily video check‑ins and a shared playlist helped maintain motivation. Do you think such informal practices would be as effective in a larger, more dispersed team, and why might they succeed or fail in that context?",
+     "order": 4,
+     "createdAt": {
+      "$ago": 535325
+     }
+    },
+    {
+     "id": "cmwromzl60023sbdt5vfeeo7t",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I think it could work, but it would definitely need some adjustments. In a bigger team you’d have to schedule the video check‑ins at a time that suits different time zones, otherwise people might feel left out, and the playlist might become a bit chaotic if everyone tries to add their own songs at the same time. So, if you keep it simple – maybe a short stand‑up call and a curated playlist managed by one person – it can still create that sense of connection, even when the group is spread across several countries.",
+     "order": 5,
+     "createdAt": {
+      "$ago": 523607
+     }
+    },
+    {
+     "id": "cmwromzxy0025sbdt588v7q3g",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "Do you think there are any risks that such informal practices might blur professional boundaries or reduce productivity, and how could a manager balance maintaining connection with preserving clear work standards?",
+     "order": 6,
+     "createdAt": {
+      "$ago": 523147
+     }
+    },
+    {
+     "id": "cmwronbc70027sbdtb7xnppjd",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I think there are definitely some risks, because when you mix social stuff with work it can sometimes blur the boundaries and people might end up spending too much time chatting instead of actually delivering. So, a manager could set clear expectations – like defining a specific time for those informal check‑ins and making sure the rest of the day stays focused on tasks. Also, it helps to have some guidelines about what’s appropriate to share in a playlist or a casual video call, so the team stays professional while still feeling connected.",
+     "order": 7,
+     "createdAt": {
+      "$ago": 508378
+     }
+    },
+    {
+     "id": "cmwronbl30029sbdtqit94z4l",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "You’ve suggested setting clear expectations and guidelines to keep informal practices from undermining productivity. Could you explain how a manager might determine the right balance between structure and flexibility, and what indicators they could use to know when the balance needs adjusting?",
+     "order": 8,
+     "createdAt": {
+      "$ago": 508058
+     }
+    },
+    {
+     "id": "cmwronofn002bsbdtt09qz96r",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I think a manager could start by setting some basic structure – like fixed core hours for collaboration and clear deadlines for deliverables – but also leave room for flexibility, for example by allowing people to choose when they do their deep‑work tasks. To find the right mix, they could keep an eye on a few indicators: the team's overall output, the number of missed deadlines, and also more qualitative signs such as how engaged people seem during meetings or whether they’re reporting burnout. If productivity starts to drop or you notice a lot of people complaining about feeling micromanaged, that’s a cue to loosen the structure a bit, whereas if the informal activities are taking too much time and the quality of work is suffering, you’d tighten the guidelines again.",
+     "order": 9,
+     "createdAt": {
+      "$ago": 491406
+     }
+    },
+    {
+     "id": "cmwrononb002dsbdt9639o5lf",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "You’ve mentioned using indicators such as output, missed deadlines and signs of burnout to adjust the balance between structure and flexibility. Could you describe a concrete situation where a manager might misinterpret one of these indicators, and explain how they could avoid making the wrong adjustment?",
+     "order": 10,
+     "createdAt": {
+      "$ago": 491129
+     }
+    },
+    {
+     "id": "cmwronxof002fsbdta2ii5zfk",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, for example, a manager might see a sudden dip in the number of messages in the team chat and think that everyone is getting more focused, when in fact it could be a sign that people are feeling isolated and are actually disengaged. So, to avoid that mistake, they should combine the quantitative data with a quick pulse‑check survey or one‑to‑one conversations, to make sure they’re not reading too much into just one metric.",
+     "order": 11,
+     "createdAt": {
+      "$ago": 479425
+     }
+    },
+    {
+     "id": "cmwronxv6002hsbdtvm7shkm3",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "Considering the possibility that low chat activity might signal isolation rather than focus, how could a manager design a reliable system to distinguish between these two scenarios and ensure they respond appropriately?",
+     "order": 12,
+     "createdAt": {
+      "$ago": 479182
+     }
+    },
+    {
+     "id": "cmwroo677002jsbdtln1qz0mn",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I think the manager could set up a short, regular pulse‑check – maybe a quick anonymous survey or a 5‑minute check‑in during the weekly stand‑up – that asks directly about feeling connected and supported, while still keeping an eye on the chat metrics. If the survey shows that people feel isolated even though the message volume is low, then it’s a clear sign they need more structured social time, like a brief virtual coffee break; but if both the chat activity and the survey responses indicate high engagement, then the low‑chat period was probably just a phase of focused work. So, by triangulating quantitative data with qualitative feedback, the manager can tell the difference and adjust the balance accordingly.",
+     "order": 13,
+     "createdAt": {
+      "$ago": 468382
+     }
+    },
+    {
+     "id": "cmwroolyq002nsbdtxziuoa2b",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I’d say the trick is to keep the surveys short and spaced out – maybe a one‑question pulse every week and a slightly longer check‑in once a month – so people don’t feel like they’re being bombarded. And if the numbers start to clash – let’s say the response rate is high and the qualitative comments say “I’m overwhelmed” while the productivity metrics are actually looking good – then I’d dig a little deeper, maybe have a quick one‑to‑one chat to understand what’s really going on, and adjust the approach accordingly.",
+     "order": 15,
+     "createdAt": {
+      "$ago": 447951
+     }
+    },
+    {
+     "id": "cmwroomay002psbdt3k64et46",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "You mentioned using short, occasional pulse surveys to avoid fatigue, yet sometimes the qualitative feedback may clash with the productivity data. How would you decide which source of information should take priority when they give contradictory signals, and what rationale would guide that decision?",
+     "order": 16,
+     "createdAt": {
+      "$ago": 447511
+     }
+    },
+    {
+     "id": "cmwrop5ac002rsbdtkp4tpze0",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I’d say I’d first look at the human side of things – if the team keeps telling me they’re feeling stressed or disconnected, I’d give that more weight than a temporary spike in output, because sustainable performance usually comes from wellbeing. So, I’d probably treat the qualitative feedback as the priority when it directly points to morale issues, and then I’d use the quantitative data to see if any adjustments I make are actually improving the numbers over the following weeks.",
+     "order": 17,
+     "createdAt": {
+      "$ago": 422908
+     }
+    },
+    {
+     "id": "cmwrop5l7002tsbdtcfoaxk4c",
+     "taskType": "TOPIC",
+     "role": "EXAMINER",
+     "content": "You’ve argued that team wellbeing should outweigh a temporary rise in output when the two conflict. Could you explain why you place more importance on the qualitative feedback, and illustrate a situation where prioritising wellbeing might actually lead to a longer‑term improvement in productivity?",
+     "order": 18,
+     "createdAt": {
+      "$ago": 422518
+     }
+    },
+    {
+     "id": "cmwropgy0002vsbdt3tis3vm3",
+     "taskType": "TOPIC",
+     "role": "CANDIDATE",
+     "content": "Well, I think the reason is that if people feel burnt‑out or disconnected they’ll eventually start missing deadlines or making mistakes, so by tackling the morale issue first you actually protect the long‑term output; for example, in a previous project we noticed the team was hitting all the targets but the weekly pulse showed rising stress levels, so we introduced a short “no‑meeting” day and some informal coffee chats – after a couple of weeks the stress scores dropped and, interestingly, the delivery speed actually improved because everyone was more focused and less fatigued.",
+     "order": 19,
+     "createdAt": {
+      "$ago": 407800
+     }
+    },
+    {
+     "id": "cmwroph4q002xsbdtqo8mfmfh",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "I’ve been thinking about how media often rely on stereotypes when portraying different cultures, and I’m not sure whether that helps people understand each other better or just reinforces shallow assumptions.",
+     "order": 20,
+     "createdAt": {
+      "$ago": 407559
+     }
+    },
+    {
+     "id": "cmwroppce002zsbdtgi8khxkw",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, I mean, I think media representations can be a bit of a double‑edged sword – on the one hand they give us a quick shortcut to recognise cultural traits, but on the other hand they often flatten the reality and end up reinforcing shallow assumptions. If the stereotypes are used just for comic effect or to sell a story, they usually do more harm than good, because viewers may start to believe those oversimplifications are actually accurate. That’s why I’d argue it’s more helpful when media try to show a richer, more nuanced picture, even if it takes a little more effort. Do you think there’s a way for journalists or filmmakers to balance entertainment value with a responsibility to avoid reinforcing clichés?",
+     "order": 21,
+     "createdAt": {
+      "$ago": 396914
+     }
+    },
+    {
+     "id": "cmwroppso0031sbdtt4uz4wsc",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "Indeed, I believe it is possible when creators commit to thorough research and involve cultural consultants, ensuring that entertainment does not come at the expense of accurate, respectful representation.",
+     "order": 22,
+     "createdAt": {
+      "$ago": 396329
+     }
+    },
+    {
+     "id": "cmwroq15s0033sbdtrgd2jj5j",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, I totally agree – having cultural consultants on board can really make a difference, because they can point out the little nuances that most writers would miss. In my last campaign we actually brought in a local expert to review the script, and they suggested swapping a generic “spicy” comment for a more specific reference to the regional dish, which ended up resonating much better with the audience. So, I guess my question is: do you think that the extra time and budget spent on this kind of research is justified by the potential boost in audience trust and engagement, or do you see it more as a nice‑to‑have rather than a must‑have?",
+     "order": 23,
+     "createdAt": {
+      "$ago": 381600
+     }
+    },
+    {
+     "id": "cmwroq1e70035sbdtn7bbiujk",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "I think the investment is well worth it, because audiences increasingly value authenticity, and that credibility can translate into stronger engagement and longer‑term loyalty.",
+     "order": 24,
+     "createdAt": {
+      "$ago": 381298
+     }
+    },
+    {
+     "id": "cmwroqah20037sbdtusdlw0gc",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, that makes a lot of sense – I guess the return on that kind of authenticity can really pay off in the long run. So, I’m curious, in your experience, have you seen any particular metrics, like social‑media engagement or brand sentiment, improve noticeably after a campaign that invested in cultural accuracy? And, do you think those gains are usually enough to cover the extra cost, or is it more about building a reputation that pays off later on?",
+     "order": 25,
+     "createdAt": {
+      "$ago": 369531
+     }
+    },
+    {
+     "id": "cmwroqaz90039sbdtfwynjs0w",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "I’ve observed that campaigns which prioritise cultural accuracy often see noticeable lifts in social‑media interaction and a more positive brand sentiment, and while the immediate financial return can vary, the enhanced credibility tends to generate longer‑term loyalty that usually justifies the additional investment.",
+     "order": 26,
+     "createdAt": {
+      "$ago": 368875
+     }
+    },
+    {
+     "id": "cmwroqqej003bsbdt3e2uni8g",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, that’s really encouraging to hear – I guess the data you mentioned line up with what I’ve seen in a few of my own projects. Actually, one thing I’m still wondering about is how we can measure that “long‑term loyalty” in a more concrete way. Do you think metrics like repeat purchase rate or Net Promoter Score are the best indicators, or would you suggest looking at something else, maybe the depth of community engagement over time? And, just as a follow‑up, when a brand does see those positive shifts, do you think they usually reinvest the same amount in cultural research for the next campaign, or do they tend to scale it back once the initial success is proven?",
+     "order": 27,
+     "createdAt": {
+      "$ago": 348886
+     }
+    },
+    {
+     "id": "cmwroqqqy003dsbdt75xvrr0t",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "Both repeat‑purchase rates and Net Promoter Scores can give useful indications of long‑term loyalty, but tracking the ongoing depth of community interaction—such as forum activity, user‑generated content and sustained brand‑related conversations—often reveals a richer picture of how genuinely engaged customers remain. In practice, many brands that experience clear positive shifts do maintain, or even increase, their budget for cultural research on subsequent campaigns, recognising that consistency in authenticity tends to reinforce the trust they have built.",
+     "order": 28,
+     "createdAt": {
+      "$ago": 348439
+     }
+    },
+    {
+     "id": "cmwror21s003fsbdt508c44op",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, that’s really helpful – I guess it’s clear that keeping that consistency can actually cement the trust you mentioned. So, if I may, do you think there’s a point where the cost of continuously updating cultural research outweighs the benefits, maybe for brands that operate in many very different markets, or is it generally better to keep investing no matter what? And, just out of curiosity, have you ever seen any examples where a brand decided to cut back on that kind of research and then suffered a noticeable drop in those community‑engagement metrics?",
+     "order": 29,
+     "createdAt": {
+      "$ago": 333792
+     }
+    },
+    {
+     "id": "cmwror2hn003hsbdtx80t0zzt",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "Indeed, there comes a point—particularly for brands juggling dozens of very distinct markets—where the marginal expense of exhaustive, ongoing cultural research can exceed the incremental gains, especially if the core audience is already well‑established and the product offering is relatively static. I have observed a case in which a multinational apparel label reduced its cultural‑consultant budget after an initial successful campaign; within a year, their social‑media sentiment slipped noticeably and engagement levels fell, suggesting that the cut‑back had a tangible negative impact.",
+     "order": 30,
+     "createdAt": {
+      "$ago": 333222
+     }
+    },
+    {
+     "id": "cmwrorhtf003jsbdtrmohshky",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, that’s a great example – it really shows how quickly the goodwill you’ve built can start to erode if you pull back on the research. So, thinking about that, I wonder: when a brand notices that dip, do they usually try to re‑invest the same amount they had before, or do they tend to adopt a more targeted approach, maybe focusing only on the markets where the drop was most evident? And, just to get a clearer picture, could you share what kind of indicators they monitor first to decide whether it’s time to ramp the cultural research back up – is it mainly sentiment scores, or do they also look at things like churn rate or even qualitative feedback from community forums?",
+     "order": 31,
+     "createdAt": {
+      "$ago": 313358
+     }
+    },
+    {
+     "id": "cmwrori4g003lsbdt2giu99lw",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "I'd like us to talk about the media. How would you describe its role in your everyday life?",
+     "order": 32,
+     "createdAt": {
+      "$ago": 312961
+     }
+    },
+    {
+     "id": "cmwrorqaj003nsbdtyp2wkhr9",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, I’d say media is pretty much the backbone of my daily routine – I’m constantly checking news apps on my phone while I’m commuting, and I use social platforms not only to keep up with trends for work but also to unwind with podcasts or short videos in my spare moments. I guess it also shapes the way I think about marketing strategies, because I’m always observing how different brands communicate with their audiences, which gives me a lot of inspiration for my own projects.",
+     "order": 33,
+     "createdAt": {
+      "$ago": 302373
+     }
+    },
+    {
+     "id": "cmwrorqg6003psbdtazdn2lnl",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "That's interesting. How do you think the media influences the way people form their opinions about social issues?",
+     "order": 34,
+     "createdAt": {
+      "$ago": 302171
+     }
+    },
+    {
+     "id": "cmwrory0o003rsbdti4jahz7o",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, I think the media plays a huge part in shaping opinions on social issues – we’re constantly bombarded with headlines, stories and even memes that frame a problem in a certain light, so people tend to adopt those narratives almost automatically. I mean, when a platform highlights a campaign or a protest, it can bring the topic into everyday conversation and make it feel more urgent, which in turn pushes individuals to take a stance or at least discuss it with their friends. And, of course, the way the coverage is balanced – whether it’s presenting multiple viewpoints or just one side – really determines whether the audience ends up forming a nuanced view or just a quick, sometimes biased, impression.",
+     "order": 35,
+     "createdAt": {
+      "$ago": 292361
+     }
+    },
+    {
+     "id": "cmwroryf2003tsbdt672iwnj7",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "That’s a thoughtful answer. In your view, what responsibilities do media organisations have when reporting on controversial topics, and how should they balance freedom of expression with the risk of influencing public opinion?",
+     "order": 36,
+     "createdAt": {
+      "$ago": 291842
+     }
+    },
+    {
+     "id": "cmwros8v4003vsbdt5e1y9bkp",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, I’d say the responsibility lies in maintaining a clear distinction between fact and opinion, which is often quite blurred in fast-paced news cycles. I mean, they should strive to present multiple perspectives so the audience can form their own judgment, rather than pushing a specific agenda. It’s a delicate balance, because if they are too cautious, they might avoid important conversations, but if they are too sensationalist, they risk polarising public opinion.",
+     "order": 37,
+     "createdAt": {
+      "$ago": 278304
+     }
+    },
+    {
+     "id": "cmwros91t003xsbdtpeknzw9l",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "That's a very balanced view. Can you give an example of a recent story where you think the media handled that balance well, or perhaps missed the mark, and explain why you feel that way?",
+     "order": 38,
+     "createdAt": {
+      "$ago": 278063
+     }
+    },
+    {
+     "id": "cmwrosdb6003zsbdtwcq6astv",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, one example that comes to mind is the coverage of the climate‑summit that took place in Madrid last month – I think the media did a pretty good job of giving a balanced picture. They presented the official statements from the politicians, but they also included interviews with activists and some scientists, so you could see the different angles. At the same time, though, I felt some of the smaller outlets focused too much on the protest scenes and sort of sensationalised the clashes, which kind of diverted the attention from the actual policy proposals that were being discussed.",
+     "order": 39,
+     "createdAt": {
+      "$ago": 272542
+     }
+    },
+    {
+     "id": "cmwrosdh10041sbdtm23opad8",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "That's an insightful observation. How do you think audiences can protect themselves from becoming overly influenced by sensationalist coverage while still staying well‑informed?",
+     "order": 40,
+     "createdAt": {
+      "$ago": 272332
+     }
+    },
+    {
+     "id": "cmwrosjhb0043sbdtfq9d4ccg",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, I think the best thing listeners can do is to diversify the sources they follow, you know, not just stick to the headline‑grabbers but also check a couple of more specialised or even international outlets, because that way you get a broader picture and you can spot when something is being blown out of proportion. I also try to take a moment before sharing or reacting, just to verify if the article gives enough evidence or if it’s mainly using emotive language – that little pause can help you keep a more critical distance. And, finally, it doesn’t hurt to use fact‑checking tools or even look at the original data when it’s available, so you’re not just taking the narrative at face value.",
+     "order": 41,
+     "createdAt": {
+      "$ago": 264546
+     }
+    },
+    {
+     "id": "cmwrosjhc0045sbdtyh44lnbj",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "Thank you. That concludes your speaking exam. Well done — your results will be available shortly.",
+     "order": 42,
+     "createdAt": {
+      "$ago": 264544
+     }
+    }
+   ],
+   "feedback": [
+    {
+     "id": "cmwrotb760046sbdtsdkobtv8",
+     "taskType": "TOPIC",
+     "feedback": {
+      "band": "Merit",
+      "score": 16,
+      "summary": "You achieved a Merit band, which indicates a good command of C1 level English, though you fell short of the Distinction band due to a lack of lexical variety and occasional reliance on basic sentence structures. Your biggest strength was your interactive listening and ability to extend the topic logically, as seen when you explained 'triangulating quantitative data with qualitative feedback'. However, the single most valuable change to reach Distinction would be to replace repetitive fillers like 'Well, I think' with more sophisticated discourse markers and to use a wider range of advanced vocabulary to avoid sounding repetitive.",
+      "delivery": {
+       "score": 4,
+       "comments": "Your fluency is good, but you rely heavily on the filler 'Well' to start your sentences, which can make your delivery sound hesitant. For instance, you began multiple responses with 'Well, I think...'. To deliver this more cleanly, you should pause briefly instead of using a filler. Instead of 'Well, I’d say the trick is to keep the surveys short', try 'The key to avoiding fatigue is to keep the surveys concise and spaced out'."
+      },
+      "suggestions": [
+       "Replace the repetitive opener 'Well, I think' with a variety of discourse markers such as 'From my perspective', 'It is worth noting that', or 'I would argue that'. For example, instead of 'Well, I think there are definitely some risks', say 'I would argue that there are inherent risks in mixing social and professional interactions'.",
+       "Expand your vocabulary by replacing common words with more precise C1-level alternatives. For instance, instead of saying 'a lot of flexibility', use 'substantial autonomy' or 'considerable leeway'.",
+       "When answering complex questions, try to include a brief counter-point or nuance to show critical thinking. For example, when discussing the balance of structure and flexibility, you could add 'However, this approach assumes a high level of self-discipline, which may not be present in all teams'."
+      ],
+      "languageControl": {
+       "score": 4,
+       "comments": "Your grammar is generally accurate, but your vocabulary range is limited by frequent use of basic phrases. For example, you said 'it offers them a lot of flexibility', which is correct but basic. A stronger C1 answer would be 'it affords them considerable autonomy'. Additionally, you used 'I think' or 'I believe' at the start of almost every response. Instead of 'Well, I think it could work', a more sophisticated opening would be 'While it is feasible, it would require significant adaptation'."
+      },
+      "interactiveListening": {
+       "score": 4,
+       "comments": "You demonstrated excellent understanding of the examiner's prompts, such as when you responded to the question about misinterpreting indicators by saying, 'a manager might see a sudden dip in the number of messages... when in fact it could be a sign that people are feeling isolated'. This shows you are fully engaged. To improve to a 5, you should occasionally challenge the premise of the question or offer a counter-argument. For example, instead of just agreeing that 'wellbeing should outweigh a temporary rise in output', you could say 'While wellbeing is crucial, I would argue that in high-stakes environments, a temporary dip in morale might be a necessary trade-off for meeting a critical deadline'."
+      },
+      "communicativeEffectiveness": {
+       "score": 4,
+       "comments": "You fulfilled the task well and maintained a logical flow, for instance when you stated, 'by triangulating quantitative data with qualitative feedback, the manager can tell the difference'. This shows strong coherence. However, to reach a 5, you need to be more proactive in extending the discussion rather than just answering the immediate question. Instead of simply answering 'I’d say I’d first look at the human side of things', a stronger C1 answer would be 'While I prioritize the human element, I would also cross-reference this with historical performance data to ensure the decision is not based on a temporary anomaly'."
+      }
+     },
+     "score": 16,
+     "createdAt": {
+      "$ago": 228623
+     }
+    },
+    {
+     "id": "cmwrotb760047sbdts46dd7vr",
+     "taskType": "COLLABORATIVE",
+     "feedback": {
+      "band": "Merit",
+      "score": 16,
+      "summary": "You earned a Merit (13‑16) because you generally communicated well and showed good language control, but occasional hesitations and a few vague answers kept you from the top band. The biggest mark‑deduction was a moment of uncertainty: you said \"...do you think there’s a way for journalists or filmmakers to balance entertainment value with a responsibility to avoid reinforcing clichés?\" and then gave a brief, non‑specific answer. Your main strength is your ability to extend the discussion with relevant examples. To reach Distinction, focus on delivering more precise, fully developed answers without hesitation.",
+      "delivery": {
+       "score": 4,
+       "comments": "Your fluency is good and you are intelligible, but you use hesitations and fillers (e.g., \"Well, I totally agree – having cultural consultants on board can really make a difference\"). A cleaner delivery would drop the filler: \"I totally agree; cultural consultants make a real difference\"."
+      },
+      "suggestions": [
+       "When answering a question, give a concise, fully developed point before moving on. Model phrase: \"A practical way to balance entertainment and responsibility is to involve cultural consultants during the concept phase and to test jokes with focus groups\".",
+       "Replace filler phrases with direct language to improve fluency. Model phrase: \"I agree; cultural consultants add real value\" instead of \"Well, I totally agree – having cultural consultants on board can really make a difference\".",
+       "Expand your answers with specific examples or data to show depth. Model phrase: \"In my last campaign, the inclusion of a local expert increased social‑media engagement by 18 % and lifted brand sentiment scores by three points\"."
+      ],
+      "languageControl": {
+       "score": 4,
+       "comments": "Your vocabulary and grammar are mostly strong, but there are minor slips such as \"...they suggested swapping a generic “spicy” comment for a more specific reference to the regional dish, which ended up resonating much better with the audience.\" The phrase \"ended up resonating\" is acceptable, yet a more precise C1 structure would be \"which resonated significantly better with the target audience\". Also watch for filler constructions like \"Well, I mean\" which can be streamlined."
+      },
+      "interactiveListening": {
+       "score": 4,
+       "comments": "You generally responded to the examiner’s prompts, but occasionally you drifted from the specific question. For example, when asked \"do you think there’s a way for journalists or filmmakers to balance entertainment value with a responsibility to avoid reinforcing clichés?\" you answered with a general agreement rather than proposing concrete strategies. A better answer would be \"Yes, by involving cultural consultants early in the script‑writing stage and using them to vet jokes and visual tropes, creators can maintain entertainment value while avoiding clichés\"."
+      },
+      "communicativeEffectiveness": {
+       "score": 4,
+       "comments": "\"Well, I mean, I think media representations can be a bit of a double‑edged sword…\" shows you fulfilled the task and kept the conversation flowing, but at times you gave short, generic replies (e.g., \"Well, that makes a lot of sense – I guess the return on that kind of authenticity can really pay off in the long run\"). Instead of a brief wrap‑up, a stronger C1 response would be \"Indeed, the long‑term payoff is evident in both brand loyalty metrics and repeat purchase data, which I’ve observed in several campaigns\"."
+      }
+     },
+     "score": 16,
+     "createdAt": {
+      "$ago": 228623
+     }
+    },
+    {
+     "id": "cmwrotb760048sbdtzh8ir8ac",
+     "taskType": "CONVERSATION",
+     "feedback": {
+      "band": "Merit",
+      "score": 15,
+      "summary": "You are in the Merit band (13‑16), which means you can communicate clearly and handle the task well, but there are still some gaps that keep you from a Distinction. The biggest thing that held you back was a lack of precise language and occasional hesitation, for example you said \"...the media is pretty much the backbone of my daily routine...\" which is vague and repetitive. Your main strength is your ability to develop ideas and give relevant examples. To reach Distinction, focus on tightening your language and reducing filler pauses.",
+      "delivery": {
+       "score": 4,
+       "comments": "Your speech is generally fluent, but you have hesitations like \"...I think the media plays a huge part...\" with a slight pause after \"huge part\". Deliver it more smoothly: \"I think the media plays a huge part in shaping opinions.\" Reducing such pauses will improve intelligibility."
+      },
+      "suggestions": [
+       "Replace vague phrases with precise language: instead of \"backbone of my daily routine\", say \"central to my daily routine\".",
+       "Add linking expressions to show contrast or consequence, e.g., \"however\" or \"as a result\", to strengthen cohesion.",
+       "Practice delivering sentences without filler pauses; rehearse sentences like \"I think the media plays a huge part in shaping opinions\" to improve fluency."
+      ],
+      "languageControl": {
+       "score": 3,
+       "comments": "You used many good lexical items, but there are occasional inaccuracies, such as \"...the media did a pretty good job of giving a balanced picture\" (missing article \"a\" before \"balanced picture\"). A C1‑level correction would be \"the media did a pretty good job of presenting a balanced picture.\" Also, vary connectors: replace \"and also\" with \"moreover\" or \"furthermore\"."
+      },
+      "interactiveListening": {
+       "score": 4,
+       "comments": "When asked about responsibilities you answered \"...the responsibility lies in maintaining a clear distinction between fact and opinion...\" which directly addresses the question. At the end you could have linked back to the examiner’s prompt about balancing freedom of expression more explicitly. An upgraded answer: \"They must safeguard factual reporting while allowing diverse opinions, ensuring freedom of expression doesn’t become a tool for bias.\""
+      },
+      "communicativeEffectiveness": {
+       "score": 4,
+       "comments": "You said \"...I’m constantly checking news apps on my phone while I’m commuting...\" which shows you fulfil the task and keep the conversation flowing. However, you sometimes repeat ideas (e.g., \"backbone of my daily routine\" and later \"shapes the way I think\"). A stronger C1 response would be \"I rely on news apps during my commute, which not only informs me but also inspires my marketing projects.\""
+      }
+     },
+     "score": 15,
+     "createdAt": {
+      "$ago": 228623
+     }
+    }
+   ]
+  },
+  {
+   "id": "cmwrotbnh004asbdtxzut8357",
+   "level": "ISE_III",
+   "status": "EVALUATED",
+   "overallScore": 75,
+   "selectedTasks": [
+    "COLLABORATIVE",
+    "CONVERSATION"
+   ],
+   "examinerPersona": "sonia",
+   "mode": "live",
+   "liveMetrics": {
+    "wpm": 129,
+    "nudges": [
+     "onTrack"
+    ],
+    "fillers": [
+     {
+      "term": "I think (that)",
+      "count": 4
+     },
+     {
+      "term": "you know",
+      "count": 3
+     },
+     {
+      "term": "I mean",
+      "count": 3
+     }
+    ],
+    "perTask": {
+     "CONVERSATION": {
+      "questions": 0,
+      "candidateWords": 175
+     },
+     "COLLABORATIVE": {
+      "questions": 0,
+      "candidateWords": 185
+     }
+    },
+    "talkShare": 0.6605504587155964,
+    "connectors": [
+     "as far as i'm concerned",
+     "having said that",
+     "on the other hand"
+    ],
+    "fillerRate": 2.8,
+    "lexicalRange": 0.9,
+    "examinerWords": 185,
+    "candidateWords": 360,
+    "candidateSeconds": 167,
+    "longestTurnWords": 36,
+    "candidateQuestions": 0
+   },
+   "startedAt": {
+    "$ago": 228035
+   },
+   "completedAt": {
+    "$ago": 184345
+   },
+   "createdAt": {
+    "$ago": 228035
+   },
+   "updatedAt": {
+    "$ago": 184345
+   },
+   "exchanges": [
+    {
+     "id": "cmwrotlek004hsbdt7i21ohi6",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "What about the impact on her personal life?",
+     "order": 4,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004gsbdt2mi8by79",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "On the other hand, a higher salary could mean more financial stability, but having said that, the cost of living in a big city is also higher, so the net benefit might not be that big.",
+     "order": 3,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004dsbdtoeeys2cj",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "Good morning, Lucía. For the first part, I'd like you to discuss a dilemma with me. Imagine your friend Ana has two job offers: one is a well‑paid position in a big city, the other is a lower‑paid role close to her family. What do you think she should consider?",
+     "order": 0,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004esbdtz3qm6w8b",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Well, I think the first thing is to look at her long‑term career goals, you know, whether she wants to climb the corporate ladder quickly or she values being near her parents.",
+     "order": 1,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004fsbdt6uj1epdz",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "That's a good start. How might the salary difference affect her decision?",
+     "order": 2,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004isbdt4e859zvy",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "I mean, being close to family can give her emotional support and maybe help with childcare, which could be priceless, especially if she plans to start a family soon.",
+     "order": 5,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004jsbdtamwz9u98",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "Do you think the type of work itself matters?",
+     "order": 6,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004ksbdtabo3pz5q",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "Yes, definitely. If the city job offers more challenging projects, it could boost her skills, but if the local job aligns better with her passions, that might be more fulfilling.",
+     "order": 7,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004lsbdtk7az7g1g",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "How could she weigh the pros and cons?",
+     "order": 8,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004msbdticz41p00",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "She could make a list, maybe a simple table, comparing salary, commute time, family time, and career development, and then rank what's most important for her right now.",
+     "order": 9,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004nsbdtgudie4rd",
+     "taskType": "COLLABORATIVE",
+     "role": "EXAMINER",
+     "content": "What would you advise her to do finally?",
+     "order": 10,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004osbdtcr2uhhij",
+     "taskType": "COLLABORATIVE",
+     "role": "CANDIDATE",
+     "content": "As far as I'm concerned, she should choose the option that balances both her professional ambitions and personal happiness, even if that means a bit of compromise on salary.",
+     "order": 11,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004psbdt77wlnu0u",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "Now let's move on to the conversation part. Let's talk about the world of work in general. How do you think the workplace has changed in the last ten years?",
+     "order": 12,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004qsbdt9piodjpi",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, I think that technology has transformed a lot, you know, with remote working becoming a norm and digital tools making collaboration easier.",
+     "order": 13,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004rsbdtbgqtpjgl",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "Do you see any disadvantages to these changes?",
+     "order": 14,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004ssbdtcqpluoel",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "I mean, one downside is that people can feel isolated, and sometimes the boundaries between work and personal life get blurred, especially when you're at home.",
+     "order": 15,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004tsbdtnv6cj1bq",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "How about the role of gender equality in the workplace?",
+     "order": 16,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004usbdtyv7vl2yc",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Having said that, there has been progress, but still a lot of gaps, especially in leadership positions, and many companies need to implement more inclusive policies.",
+     "order": 17,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004vsbdtu4rf8r9x",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "What skills do you think are most important for employees today?",
+     "order": 18,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004wsbdtu6zihymr",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Besides the technical know‑how, I think adaptability and communication are key, because the market changes so fast and you need to work with diverse teams.",
+     "order": 19,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004xsbdtp5e84kpd",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "Do you think formal education is still essential?",
+     "order": 20,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004ysbdtn3wlpj60",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "Well, I mean, formal education gives a solid foundation, but many employers also value experience and continuous learning, like online courses.",
+     "order": 21,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek004zsbdt2ytvtvf9",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "How would you describe the ideal work environment?",
+     "order": 22,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek0050sbdty5jpj04l",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "I think an ideal place would be supportive, with clear goals, opportunities for growth, and a good work‑life balance, you know, where people feel valued.",
+     "order": 23,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek0051sbdt830u55cz",
+     "taskType": "CONVERSATION",
+     "role": "EXAMINER",
+     "content": "Finally, what advice would you give to someone starting their career now?",
+     "order": 24,
+     "createdAt": {
+      "$ago": 215397
+     }
+    },
+    {
+     "id": "cmwrotlek0052sbdtlpoinmr0",
+     "taskType": "CONVERSATION",
+     "role": "CANDIDATE",
+     "content": "My advice would be to stay curious, build a network, and don't be afraid to take calculated risks, because the career paths are less linear than before.",
+     "order": 25,
+     "createdAt": {
+      "$ago": 215397
+     }
+    }
+   ],
+   "feedback": [
+    {
+     "id": "cmwrou9d10053sbdtm6mcm6ti",
+     "taskType": "COLLABORATIVE",
+     "feedback": {
+      "band": "Merit",
+      "score": 15,
+      "summary": "You achieved a Merit (13‑16) because you generally responded well to the prompts and kept the conversation flowing. The biggest mark loss was in language control – you said \"On the other hand, a higher salary could mean more financial stability, but having said that...\" which is a bit clumsy. Your main strength is your ability to organise ideas and give clear advice. To reach Distinction, focus on polishing your language accuracy and using more sophisticated connectors.",
+      "delivery": {
+       "score": 4,
+       "comments": "Your speech was generally fluent, but you hesitated with \"I mean, being close to family can give her emotional support and maybe help with childcare, which could be priceless...\" Try a smoother delivery: \"Being close to family provides emotional support and practical help with childcare, which is invaluable.\""
+      },
+      "suggestions": [
+       "Replace redundant connectors with precise ones: instead of \"On the other hand... but having said that,\" say \"While...,\" e.g., \"While a higher salary offers stability, the city’s living costs offset it.\"",
+       "Add comparative language when discussing salary impact: practice saying \"The city job would net roughly 15% more after expenses, compared to the local role.\"",
+       "Practice concise, confident delivery of complex ideas: rehearse the sentence \"Being close to family provides emotional support and practical help with childcare, which is invaluable.\""
+      ],
+      "languageControl": {
+       "score": 3,
+       "comments": "You used \"On the other hand\" and \"having said that\" together, which is redundant and slightly inaccurate. A stronger C1 phrasing would be \"While a higher salary offers greater financial stability, the higher cost of living in the city reduces the net benefit.\" Also watch article use: \"a lower‑paid role\" should be \"a lower‑paid position.\""
+      },
+      "interactiveListening": {
+       "score": 4,
+       "comments": "When asked \"How might the salary difference affect her decision?\" you answered \"On the other hand, a higher salary could mean more financial stability, but having said that, the cost of living in a big city is also higher...\" which addresses the question. To improve, you could explicitly compare net earnings, e.g., \"Even after higher living costs, the city job would still net about 15% more per month.\""
+      },
+      "communicativeEffectiveness": {
+       "score": 4,
+       "comments": "You said \"She could make a list, maybe a simple table, comparing salary, commute time, family time, and career development, and then rank what's most important for her right now.\" This shows good turn‑taking and task fulfilment. To reach a 5, you could add a brief summary of the decision, e.g., \"In short, she should weigh the long‑term career benefits against personal happiness before deciding.\""
+      }
+     },
+     "score": 15,
+     "createdAt": {
+      "$ago": 184347
+     }
+    },
+    {
+     "id": "cmwrou9d10054sbdty04j0qw4",
+     "taskType": "CONVERSATION",
+     "feedback": {
+      "band": "Merit",
+      "score": 15,
+      "summary": "You are in the Merit band (13‑16), meaning you can communicate well but still have room for improvement. The biggest thing that cost you marks was the occasional lack of development in your answers, for example you said \"...you know, with remote working becoming a norm...\" without expanding the idea. Your main strength is your clear, relevant responses to the examiner’s prompts. To reach Distinction, work on extending each point with examples or elaboration.",
+      "delivery": {
+       "score": 4,
+       "comments": "Your speech is fluent and intelligible, but you use fillers like \"well, I think\" and \"I mean\" which slightly disrupt flow. For example, you said \"Well, I mean, formal education gives a solid foundation...\" Try delivering it cleanly: \"Formal education provides a solid foundation, yet many employers also value experience and continuous learning, such as online courses.\""
+      },
+      "suggestions": [
+       "Extend each answer with a brief example: after saying remote work is now a norm, add \"For instance, my company shifted 70% of staff to home offices within a month.\"",
+       "Replace informal fillers with precise connectors: change \"Well, I think\" to \"In my view\" or \"I believe\".",
+       "Practice article and preposition accuracy: revise \"the market changes so fast\" to \"the market changes so quickly\" and check collocations like \"implement more inclusive policies\" instead of \"need to implement more inclusive policies.\""
+      ],
+      "languageControl": {
+       "score": 3,
+       "comments": "You used solid C1 vocabulary, but there are minor inaccuracies such as \"the market changes so fast and you need to work with diverse teams\" (missing article). A corrected version: \"the market changes so quickly that you need to work with diverse teams.\" Also, the phrase \"Having said that, there has been progress\" is a bit informal for an academic register. A stronger phrasing would be \"Nevertheless, there has been progress.\""
+      },
+      "interactiveListening": {
+       "score": 4,
+       "comments": "When asked about disadvantages you replied \"...people can feel isolated, and sometimes the boundaries between work and personal life get blurred...\" which directly answers the question. However, you could have linked it back to the previous point for tighter cohesion. A better response would be \"One downside is that, while remote work offers flexibility, it can also lead to isolation and blurred boundaries between work and personal life, especially when the office is at home.\""
+      },
+      "communicativeEffectiveness": {
+       "score": 4,
+       "comments": "You said \"...technology has transformed a lot, you know, with remote working becoming a norm and digital tools making collaboration easier.\" This fulfills the task and shows turn‑taking, but the filler \"you know\" and the brief statement limit depth. Instead of that, a stronger C1 answer would be \"Technology has radically transformed work: remote working is now commonplace and digital tools enable seamless collaboration across borders, which has increased productivity and flexibility.\""
+      }
+     },
+     "score": 15,
+     "createdAt": {
+      "$ago": 184347
+     }
+    }
+   ]
+  }
+ ],
+ "listeningSessions": [
+  {
+   "id": "cmwroudck0056sbdtr3ofs428",
+   "level": "ISE_III",
+   "status": "COMPLETED",
+   "passageText": "In recent years the debate over whether competitiveness drives societal progress or erodes collective wellbeing has intensified, and two leading scholars illustrate the clash of perspectives. Professor Amelia Hart, a behavioural economist at the University of Oxford, argues that competition functions as a catalyst for innovation, productivity and personal development. By contrast, Dr. Luis Ortega, a sociologist from the University of Barcelona, contends that relentless rivalry fuels inequality, stress and the degradation of cooperative norms.\n\nHart begins by citing a longitudinal study conducted by the European Innovation Council, which tracked research output in thirty‑seven countries over a fifteen‑year period. The data reveal that nations ranking in the top quintile for competitive intensity – measured through the Global Competitiveness Index – produced on average twenty‑four percent more patents per capita than those in the lowest quintile. She interprets this correlation as evidence that competition incentivises firms to invest in research and development, thereby accelerating technological advancement. Moreover, Hart points to the case of South Korea, where a government‑led meritocratic education system has produced a sustained rise in high‑technology exports, contributing to a Gross Domestic Product growth rate of three point five percent annually since the early 2000s. The advantage, she maintains, lies in the way competition rewards merit, encourages risk‑taking, and cultivates a culture of continuous improvement.\n\nOrtega, however, foregrounds the human cost of such relentless striving. He references a recent World Health Organization report that linked high competitive pressure in workplaces to a thirty‑seven percent increase in reported burnout cases across Europe. In his analysis of the same South Korean model, Ortega notes that the country also exhibits one of the world’s highest youth suicide rates – twenty‑nine per one hundred thousand – a statistic he attributes to the pressure of academic and professional ranking. He argues that competition, when unchecked, creates a zero‑sum environment where success for one individual often translates into loss for another, thereby widening socioeconomic gaps. Ortega cites the United States as an illustration: despite being the most competitive economy, the nation’s Gini coefficient has risen from thirty‑four to forty‑one over the past two decades, indicating growing income disparity.\n\nBoth experts acknowledge that competition is not inherently good or bad; rather, its impact depends on the surrounding institutional framework. Hart suggests that transparent regulations, anti‑monopoly laws and equitable access to education can amplify the benefits while mitigating the downsides. Ortega counters that policies must also promote collaborative structures, such as cooperative enterprises and collective bargaining, to balance the competitive drive. The contrast between their positions highlights a core cause‑and‑effect relationship: competitive incentives can spur economic growth, yet without safeguards they may also precipitate social fragmentation. In sum, the discourse underscores the need for a nuanced approach that harnesses the motivational power of competition while protecting the social fabric from its potential excesses.",
+   "passageTitle": "Rethinking Competition",
+   "passageTopic": "competitiveness",
+   "round1Response": "The recording talks about a debate on whether competition helps societies progress or harms them by breaking down cooperation. Professor Amelia Hart says competition pushes innovation, more patents and economic growth – she even uses South Korea as an example of a merit‑based system that raised high‑tech exports. Dr. Luis Ortega, on the other hand, points out the dark side: higher stress, burnout and even rising youth suicide rates in highly competitive countries, and he mentions the growing income inequality in the United States. Both agree that competition isn’t simply good or bad, but its effects depend on the policies that surround it.",
+   "round1Feedback": {
+    "score": 9,
+    "comments": "Well done – you captured the core debate and both scholars’ positions clearly. To improve, you could mention some of the specific evidence each expert used, such as the patent statistics or burnout figures.",
+    "missedPoints": [
+     "Specific data on patents and innovation rates",
+     "WHO burnout statistic",
+     "Hart’s suggestion of transparent regulations"
+    ],
+    "mainIdeaCaptured": true,
+    "informationTypeIdentified": true
+   },
+   "round1Score": 9,
+   "round2Response": "- The debate about competition’s role in society is getting louder, with two scholars representing opposite views.  \n- Prof. Amelia Hart (Oxford) says competition boosts innovation, productivity and personal growth.  \n- She cites a European Innovation Council study of 37 countries over 15 years, showing the top‑quintile nations produce about **26 %** more patents per capita than the lowest quintile.  \n- Hart also mentions South Korea’s merit‑based education system, linking it to a steady GDP growth of roughly 3.5 % per year since the early 2000s.  \n- Dr. Luis Ortega (Barcelona) argues that intense rivalry raises inequality, stress and harms cooperation.  \n- He refers to a WHO report that ties high workplace competition to a 37 % rise in burnout cases across Europe, and notes South Korea’s youth suicide rate of 29 per 100 000 as a negative side‑effect.  \n- Ortega points out that in the United States the Gini coefficient has jumped from 34 to 41 over the past two decades, highlighting growing income gaps.  \n- Both agree that competition isn’t inherently good or bad; it needs proper regulation and collaborative policies to balance its benefits and risks.",
+   "round2Feedback": {
+    "score": 10,
+    "comments": "The notes capture the core contrast between Hart and Ortega and most of the quantitative examples, but the patent increase figure is inaccurate (24% vs 26%). Important nuances such as Hart’s call for transparent regulations and anti‑monopoly laws, and Ortega’s recommendation for cooperative enterprises, are omitted. Overall the notes are well‑organized, but the factual error and missing policy details lower the scores.",
+    "accuracyScore": 3,
+    "missedDetails": [
+     "Correct patent increase figure (24% not 26%)",
+     "Hart’s suggestion of transparent regulations and anti‑monopoly laws",
+     "Ortega’s recommendation for collaborative structures like cooperatives",
+     "Specific mention of the longitudinal study’s 15‑year span across 37 countries",
+     "The nuance that both experts see competition as neither wholly good nor bad"
+    ],
+    "capturedDetails": [
+     "Debate framing with two scholars opposing views",
+     "Hart’s claim that competition drives innovation and productivity",
+     "Ortega’s claim that competition raises inequality and stress",
+     "South Korea’s merit‑based education linked to ~3.5% GDP growth",
+     "WHO report linking competition to 37% rise in burnout"
+    ],
+    "completenessScore": 3
+   },
+   "round2Score": 10,
+   "overallScore": 76,
+   "startedAt": {
+    "$ago": 179180
+   },
+   "completedAt": {
+    "$ago": 138581
+   },
+   "createdAt": {
+    "$ago": 179180
+   },
+   "updatedAt": {
+    "$ago": 138580
+   },
+   "informationType": "contrasting expert opinions"
+  }
+ ],
+ "vocabularyLists": [
+  {
+   "id": "cmwrov92v005asbdtmqf477ej",
+   "name": "Fichas de clase · semana 6",
+   "emoji": "📸",
+   "color": "blue",
+   "createdAt": {
+    "$ago": 138058
+   },
+   "updatedAt": {
+    "$ago": 138058
+   },
+   "words": [
+    {
+     "id": "cmwrov92w005bsbdti31tpgl2",
+     "english": "to cut down on",
+     "spanish": "reducir (consumo)",
+     "example": "I'm trying to cut down on screen time before bed.",
+     "partOfSpeech": "phrasal verb",
+     "level": "B2",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005csbdtp43pz0xr",
+     "english": "thorough",
+     "spanish": "minucioso, exhaustivo",
+     "example": "The report needs a thorough review before Friday.",
+     "partOfSpeech": "adjective",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005dsbdtz01zjxdu",
+     "english": "to take for granted",
+     "spanish": "dar por sentado",
+     "example": "We often take reliable internet for granted.",
+     "partOfSpeech": "idiom",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005esbdt8zelf1gc",
+     "english": "a breakthrough",
+     "spanish": "un gran avance",
+     "example": "The new treatment was a real breakthrough.",
+     "partOfSpeech": "noun",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005fsbdt8qob5n8w",
+     "english": "nevertheless",
+     "spanish": "sin embargo",
+     "example": "The plan was risky; nevertheless, it worked.",
+     "partOfSpeech": "adverb",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005gsbdt7216bs2u",
+     "english": "to address an issue",
+     "spanish": "abordar un problema",
+     "example": "Managers must address the issue of burnout.",
+     "partOfSpeech": "collocation",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005hsbdtbh8hjhwo",
+     "english": "work-life balance",
+     "spanish": "conciliación",
+     "example": "Hybrid work can improve your work-life balance.",
+     "partOfSpeech": "noun",
+     "level": "B2",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005isbdt4kdrn318",
+     "english": "to be torn between",
+     "spanish": "estar dividido entre",
+     "example": "She was torn between the two job offers.",
+     "partOfSpeech": "idiom",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005jsbdtlgikxtw7",
+     "english": "far-reaching",
+     "spanish": "de gran alcance",
+     "example": "The decision had far-reaching consequences.",
+     "partOfSpeech": "adjective",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    },
+    {
+     "id": "cmwrov92w005ksbdt8bt9kzwe",
+     "english": "to weigh up",
+     "spanish": "sopesar",
+     "example": "You should weigh up the pros and cons first.",
+     "partOfSpeech": "phrasal verb",
+     "level": "C1",
+     "srsBox": 0,
+     "dueAt": {
+      "$ago": 138056
+     },
+     "reviewCount": 0,
+     "lapses": 0,
+     "createdAt": {
+      "$ago": 138056
+     }
+    }
+   ]
+  }
+ ]
+}

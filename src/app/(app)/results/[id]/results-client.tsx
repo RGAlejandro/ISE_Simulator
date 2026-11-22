@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import {
-  Trophy, ArrowLeft, Lock, BookOpen, PenTool, CheckCircle2, XCircle,
-  ChevronDown, ChevronUp, Sparkles, Award,
-} from "lucide-react";
-import Link from "next/link";
+import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/i18n/language-provider";
+import { Ledger, LedgerRow, NotebookHeader, NotebookPage, Section } from "@/components/notebook/notebook";
+import {
+  BackLink, CriterionScore, LockedNote, NextSteps, ScoreTitle, SkillScore, Suggestions, useResultEyebrow,
+} from "@/components/results/results-parts";
 import type { WritingFeedback, ReadingQuestionResult } from "@/types";
 
 interface ReadingAggregate {
@@ -20,6 +17,14 @@ interface ReadingAggregate {
   questions?: ReadingQuestionResult[];
 }
 
+type Response = {
+  taskType: string;
+  taskNumber: number;
+  response: string;
+  aiFeedback: (WritingFeedback | ReadingAggregate) | null;
+  score: number | null;
+};
+
 interface ResultsClientProps {
   exam: {
     id: string;
@@ -28,460 +33,236 @@ interface ResultsClientProps {
     score: number | null;
     createdAt: string;
   };
-  responses: Array<{
-    taskType: string;
-    taskNumber: number;
-    response: string;
-    aiFeedback: (WritingFeedback | ReadingAggregate) | null;
-    score: number | null;
-  }>;
+  responses: Response[];
   isPro: boolean;
+  /** An admin viewing a learner's result: no "what next" actions. */
+  readOnly?: boolean;
+  /** READING = Practice → Reading (Tasks 1 and 2 only). */
+  mode?: "FULL" | "READING";
 }
 
-function getBand(score: number | null) {
-  if (score === null) return "N/A";
-  if (score >= 80) return "Distinction";
-  if (score >= 65) return "Merit";
-  if (score >= 50) return "Pass";
-  return "Fail";
-}
+const WRITING_CRITERIA = ["readingAndWriting", "taskFulfilment", "organisationAndStructure", "languageControl"] as const;
 
-function bandColor(band: string) {
-  return band === "Distinction" ? "text-purple-600 dark:text-purple-400" :
-    band === "Merit" ? "text-blue-600 dark:text-blue-400" :
-    band === "Pass" ? "text-green-600 dark:text-green-400" :
-    "text-red-600 dark:text-red-400";
-}
+export function ResultsClient({ exam, responses, isPro, readOnly = false, mode = "FULL" }: ResultsClientProps) {
+  const { dict, t } = useI18n();
+  const r = dict.results;
+  const readingOnly = mode === "READING";
+  const eyebrow = useResultEyebrow(exam.level, readingOnly ? r.readingPractice : r.written, exam.createdAt);
 
-function bandBg(band: string) {
-  return band === "Distinction" ? "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300" :
-    band === "Merit" ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300" :
-    band === "Pass" ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300" :
-    "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300";
-}
-
-const QUESTION_TYPE_LABEL: Record<string, string> = {
-  paragraph_matching: "Paragraph matching",
-  statement_selection: "Statement selection",
-  text_matching: "Text matching",
-  gap_fill: "Gap fill",
-};
-
-export function ResultsClient({ exam, responses, isPro }: ResultsClientProps) {
-  const r1 = responses.find(r => r.taskType === "READING_1");
-  const r2 = responses.find(r => r.taskType === "READING_2");
-  const w1 = responses.find(r => r.taskType === "READING_INTO_WRITING");
-  const w2 = responses.find(r => r.taskType === "EXTENDED_WRITING");
-
-  const r1fb = r1?.aiFeedback as ReadingAggregate | undefined;
-  const r2fb = r2?.aiFeedback as ReadingAggregate | undefined;
+  const r1fb = responses.find((x) => x.taskType === "READING_1")?.aiFeedback as ReadingAggregate | undefined;
+  const r2fb = responses.find((x) => x.taskType === "READING_2")?.aiFeedback as ReadingAggregate | undefined;
+  const writings = ["READING_INTO_WRITING", "EXTENDED_WRITING"]
+    .map((type) => responses.find((x) => x.taskType === type))
+    .filter((x): x is Response => !!x);
 
   const readingScore = (r1fb?.score ?? 0) + (r2fb?.score ?? 0);
   const readingTotal = (r1fb?.total ?? 0) + (r2fb?.total ?? 0);
-  const readingPct = readingTotal > 0 ? Math.round((readingScore / readingTotal) * 100) : 0;
-  const readingBand = getBand(readingPct);
+  const readingPct = readingTotal > 0 ? Math.round((readingScore / readingTotal) * 100) : null;
 
-  // Writing: avg of completed tasks (each scored 0-20, normalize to 0-100)
-  const wScores: number[] = [];
-  if (w1?.score != null) wScores.push((w1.score / 20) * 100);
-  if (w2?.score != null) wScores.push((w2.score / 20) * 100);
+  // Writing: average of the marked tasks (each 0–20, normalised to 0–100).
+  const wScores = writings.filter((w) => w.score != null).map((w) => ((w.score as number) / 20) * 100);
   const writingPct = wScores.length > 0 ? Math.round(wScores.reduce((a, b) => a + b, 0) / wScores.length) : null;
-  const writingBand = writingPct !== null ? getBand(writingPct) : "N/A";
-
-  const overallBand = getBand(exam.score);
 
   return (
-    <>
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <div className="absolute inset-0 paper-bg pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
+    <div className="flex-1 bg-paper">
+      <NotebookPage className="pb-16">
+        {!readOnly && <BackLink />}
+        <NotebookHeader eyebrow={eyebrow} title={<ScoreTitle score={exam.score} />} subtitle={readingOnly ? r.subtitleReading : r.subtitleWritten} />
 
-        <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 mb-4">
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to dashboard
-          </Link>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className={cn("flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-3xl", bandBg(overallBand))}>
-              <Trophy className="h-10 w-10 sm:h-12 sm:w-12" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-300">
-                {exam.level.replace("_", " ")} · {new Date(exam.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}
-              </p>
-              <h1 className="mt-1 text-3xl sm:text-5xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                {exam.score != null ? `${exam.score}%` : "Pending"}
-              </h1>
-              <div className="mt-2 flex items-center gap-2">
-                <Badge className={cn("border-0 px-3 py-1 text-sm gap-1.5", bandBg(overallBand))}>
-                  <Award className="h-3.5 w-3.5" /> {overallBand}
-                </Badge>
-                <span className="text-xs text-zinc-500 dark:text-zinc-400">Overall result</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-
-        {/* SECTION SCORES SUMMARY */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <SectionCard
-            icon={<BookOpen className="h-5 w-5" />}
-            tone="blue"
-            label="Reading"
-            sublabel="Tasks 1 & 2"
-            score={readingPct}
-            band={readingBand}
-            detail={`${readingScore} / ${readingTotal} questions correct`}
-          />
-          <SectionCard
-            icon={<PenTool className="h-5 w-5" />}
-            tone="emerald"
-            label="Writing"
-            sublabel="Tasks 3 & 4"
-            score={writingPct}
-            band={writingBand}
-            detail={
-              wScores.length === 0
-                ? "No writing submitted"
-                : `${wScores.length} of 2 tasks evaluated`
-            }
-          />
-        </div>
-
-        {/* READING — per-task + per-question breakdown */}
-        <section className="space-y-4">
-          <div className="flex items-end gap-2">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              Reading breakdown
-            </h2>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400 pb-1">{readingScore}/30 correct</span>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <ReadingTaskCard label="Task 1 — Long Reading" fb={r1fb} startQ={1} endQ={15} />
-            <ReadingTaskCard label="Task 2 — Multi-text Reading" fb={r2fb} startQ={16} endQ={30} />
-          </div>
-
-          {/* Per-question detail (Pro) */}
-          {isPro && (r1fb?.questions || r2fb?.questions) && (
-            <ReadingQuestionDetail
-              r1Questions={r1fb?.questions ?? []}
-              r2Questions={r2fb?.questions ?? []}
+        {!readingOnly && (
+        <Section n={1} title={r.summary}>
+          <div className="grid gap-x-12 gap-y-8 sm:grid-cols-2">
+            <SkillScore
+              label={r.reading}
+              sublabel={r.readingTasks}
+              score={readingPct}
+              detail={readingTotal > 0 ? t("results.correctOf", { score: readingScore, total: readingTotal }) : r.noData}
             />
-          )}
-
-          {!isPro && (
-            <UpgradeCard
-              title="Unlock detailed reading feedback"
-              body="Pro users see per-question breakdown with examiner explanations for every wrong answer."
+            <SkillScore
+              label={r.writing}
+              sublabel={r.writingTasks}
+              score={writingPct}
+              detail={wScores.length === 0 ? r.noWriting : t("results.tasksMarked", { n: wScores.length })}
             />
-          )}
-        </section>
-
-        {/* WRITING — per-task feedback */}
-        <section className="space-y-4">
-          <div className="flex items-end gap-2">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <PenTool className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-              Writing feedback
-            </h2>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400 pb-1">
-              {wScores.length === 0 ? "Not submitted" : `${wScores.length} task${wScores.length === 1 ? "" : "s"}`}
-            </span>
           </div>
+        </Section>
+        )}
 
-          {[w1, w2].filter(Boolean).length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50/60 dark:bg-zinc-900/40 p-8 text-center">
-              <PenTool className="h-8 w-8 mx-auto mb-2 text-zinc-400" />
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">No writing submitted</p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                Task 3 (Reading into Writing) and Task 4 (Extended Writing) were not completed.
-              </p>
+        <Section n={readingOnly ? 1 : 2} title={r.reading}>
+          <Ledger className="max-w-2xl">
+            <ReadingTaskRow label={r.task1} fb={r1fb} from={1} to={15} />
+            <ReadingTaskRow label={r.task2} fb={r2fb} from={16} to={30} />
+          </Ledger>
+          <div className="mt-6">
+            {isPro ? (
+              (r1fb?.questions || r2fb?.questions) && (
+                <ReadingQuestionDetail questions={[...(r1fb?.questions ?? []), ...(r2fb?.questions ?? [])]} />
+              )
+            ) : (
+              <LockedNote title={r.lockedReadingTitle} body={r.lockedReadingBody} />
+            )}
+          </div>
+        </Section>
+
+        {!readingOnly && (
+        <Section n={3} title={r.writing}>
+          {writings.length === 0 ? (
+            <div className="max-w-2xl">
+              <p className="font-display text-lg font-semibold text-ink">{r.noWriting}</p>
+              <p className="mt-1 text-sm text-ink-soft">{r.noWritingBody}</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {[w1, w2].filter((x): x is NonNullable<typeof x> => !!x).map((r) => (
-                <WritingTaskCard key={r.taskType} r={r} isPro={isPro} />
-              ))}
+            <div className="space-y-10">
+              {writings.map((w) => <WritingTask key={w.taskType} r={w} isPro={isPro} />)}
+              {!isPro && <LockedNote title={r.lockedWritingTitle} body={r.lockedWritingBody} />}
             </div>
           )}
-        </section>
+        </Section>
 
-        {/* Actions */}
-        <div className="flex flex-wrap justify-center gap-3 pt-2">
-          <Link href="/practice">
-            <Button size="lg" className="gap-2">Take another exam</Button>
-          </Link>
-          <Link href="/dashboard">
-            <Button variant="outline" size="lg">Back to dashboard</Button>
-          </Link>
-        </div>
-      </div>
-    </>
+        )}
+
+        {!readOnly && (
+          <NextSteps
+            n={readingOnly ? 2 : 4}
+            again={readingOnly ? { href: "/practice?start=reading", label: r.againReading } : undefined}
+          />
+        )}
+      </NotebookPage>
+    </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────
 
-function SectionCard({
-  icon, tone, label, sublabel, score, band, detail,
-}: {
-  icon: React.ReactNode;
-  tone: "blue" | "emerald";
-  label: string;
-  sublabel: string;
-  score: number | null;
-  band: string;
-  detail: string;
-}) {
-  const toneClasses = tone === "blue"
-    ? { iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300", ring: "ring-blue-200/60 dark:ring-blue-900/40", grad: "from-blue-50/80 to-transparent dark:from-blue-950/30" }
-    : { iconBg: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-300", ring: "ring-emerald-200/60 dark:ring-emerald-900/40", grad: "from-emerald-50/80 to-transparent dark:from-emerald-950/30" };
-
+function ReadingTaskRow({ label, fb, from, to }: { label: string; fb?: ReadingAggregate; from: number; to: number }) {
+  const { dict, t } = useI18n();
   return (
-    <div className={cn("relative overflow-hidden rounded-2xl border border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-900 p-5 sm:p-6 ring-1", toneClasses.ring)}>
-      <div className={cn("absolute inset-0 bg-gradient-to-br pointer-events-none", toneClasses.grad)} />
-      <div className="relative">
-        <div className="flex items-start justify-between gap-2">
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", toneClasses.iconBg)}>
-            {icon}
-          </div>
-          {score !== null && (
-            <Badge className={cn("border-0", bandBg(band))}>
-              <Award className="h-3 w-3 mr-1" /> {band}
-            </Badge>
-          )}
-        </div>
-        <p className="mt-3 text-[10px] uppercase tracking-wide font-semibold text-zinc-500 dark:text-zinc-400">{sublabel}</p>
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">{label}</h3>
-        <p className="mt-3 text-3xl sm:text-4xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
-          {score !== null ? `${score}%` : "—"}
-        </p>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{detail}</p>
-        {score !== null && (
-          <div className="mt-3 h-2 w-full rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                bandColor(band).includes("purple") ? "bg-purple-500" :
-                bandColor(band).includes("blue") ? "bg-blue-500" :
-                bandColor(band).includes("green") ? "bg-green-500" :
-                "bg-red-500",
-              )}
-              style={{ width: `${score}%` }}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <LedgerRow
+      label={label}
+      value={fb ? `${fb.score}/${fb.total}` : "—"}
+      hint={fb ? t("results.questionsRange", { from, to, p: fb.percentage }) : dict.results.noData}
+    />
   );
 }
 
-function ReadingTaskCard({ label, fb, startQ, endQ }: {
-  label: string;
-  fb?: ReadingAggregate;
-  startQ: number;
-  endQ: number;
-}) {
-  return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{label}</p>
-          {fb && (
-            <Badge variant={fb.percentage >= 60 ? "success" : "warning"}>
-              {fb.score}/{fb.total}
-            </Badge>
-          )}
-        </div>
-        {fb ? (
-          <>
-            <Progress value={fb.percentage} />
-            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-              Questions {startQ}–{endQ} · {fb.percentage}% correct
-            </p>
-          </>
-        ) : (
-          <p className="text-xs text-zinc-400">No data</p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function ReadingQuestionDetail({ r1Questions, r2Questions }: {
-  r1Questions: ReadingQuestionResult[];
-  r2Questions: ReadingQuestionResult[];
-}) {
+function ReadingQuestionDetail({ questions }: { questions: ReadingQuestionResult[] }) {
+  const { dict, t } = useI18n();
+  const r = dict.results;
   const [open, setOpen] = useState(false);
-  const all = [...r1Questions, ...r2Questions];
-  const wrongCount = all.filter(q => !q.isCorrect).length;
-
-  if (all.length === 0) return null;
+  const [showAll, setShowAll] = useState(false);
+  const wrong = questions.filter((q) => !q.isCorrect).length;
+  if (questions.length === 0) return null;
+  // Mistakes first: correct answers only on request (or when there are no mistakes).
+  const visible = showAll || wrong === 0 ? questions : questions.filter((q) => !q.isCorrect);
 
   return (
-    <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+    <div className="border-t border-rule">
       <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between gap-3 px-5 py-4 hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-colors"
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 py-4 text-left"
       >
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <div className="text-left">
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Per-question feedback</p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              {wrongCount === 0 ? "All correct — perfect score!" : `${wrongCount} wrong · with examiner explanations`}
-            </p>
-          </div>
-        </div>
-        {open ? <ChevronUp className="h-4 w-4 text-zinc-400" /> : <ChevronDown className="h-4 w-4 text-zinc-400" />}
+        <span className="min-w-0">
+          <span className="block font-display text-lg font-semibold text-ink">{r.perQuestion}</span>
+          <span className="block text-sm text-ink-soft">
+            {wrong === 0 ? r.allCorrect : wrong === 1 ? r.wrongCountOne : t("results.wrongCount", { n: wrong })}
+          </span>
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-ink">
+          {open ? r.hide : r.show}
+          {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </span>
       </button>
 
       {open && (
-        <div className="border-t border-zinc-100 dark:border-zinc-800/60 divide-y divide-zinc-100 dark:divide-zinc-800/60">
-          {all.map((q) => (
-            <div key={q.num} className="px-5 py-4">
-              <div className="flex items-start gap-3">
-                <div className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                  q.isCorrect ? "bg-green-100 text-green-600 dark:bg-green-950/50 dark:text-green-300" : "bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-300",
-                )}>
-                  {q.isCorrect ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+        <>
+        <ol className="divide-y divide-rule border-t border-rule">
+          {visible.map((q) => (
+            <li key={q.num} className="flex items-start gap-4 py-4">
+              <span className="w-8 shrink-0 font-display sm:w-10 text-lg font-semibold tabular-nums text-ink-soft">{q.num}</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {q.isCorrect
+                    ? <Check className="h-4 w-4 text-ink" aria-label={r.correctAnswer} />
+                    : <X className="h-4 w-4 text-pen" aria-hidden />}
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">
+                    {r.qType[q.type] ?? q.type}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Q{q.num}</span>
-                    <Badge variant="outline" className="text-[10px]">
-                      {QUESTION_TYPE_LABEL[q.type] ?? q.type}
-                    </Badge>
-                  </div>
-                  {q.context && (
-                    <p className="mt-1 text-xs italic text-zinc-500 dark:text-zinc-400 leading-relaxed">{q.context}</p>
+                {q.context && <p className="mt-1 text-sm italic leading-relaxed text-ink-soft">{q.context}</p>}
+                <p className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                  <span>
+                    <span className="text-ink-soft">{r.yourAnswer}: </span>
+                    <span className={cn("font-semibold", q.isCorrect ? "text-ink" : "text-pen", !q.isCorrect && q.userAnswer && "line-through decoration-1")}>
+                      {q.userAnswer || r.blank}
+                    </span>
+                  </span>
+                  {!q.isCorrect && (
+                    <span>
+                      <span className="text-ink-soft">{r.correctAnswer}: </span>
+                      <span className="font-semibold text-ink">{q.correctAnswer}</span>
+                    </span>
                   )}
-                  <div className="mt-2 grid sm:grid-cols-2 gap-2 text-xs">
-                    <div className="rounded-md bg-zinc-50 dark:bg-zinc-800/60 px-2.5 py-1.5">
-                      <span className="text-zinc-500 dark:text-zinc-400 mr-1">Your answer:</span>
-                      <span className={cn("font-semibold", q.isCorrect ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300")}>
-                        {q.userAnswer || "(blank)"}
-                      </span>
-                    </div>
-                    <div className="rounded-md bg-zinc-50 dark:bg-zinc-800/60 px-2.5 py-1.5">
-                      <span className="text-zinc-500 dark:text-zinc-400 mr-1">Correct:</span>
-                      <span className="font-semibold text-zinc-900 dark:text-zinc-100">{q.correctAnswer}</span>
-                    </div>
-                  </div>
-                  {!q.isCorrect && q.explanation && (
-                    <div className="mt-3 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50/60 dark:border-blue-900/50 dark:bg-blue-950/30 p-3">
-                      <Sparkles className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
-                      <p className="text-xs text-blue-900/90 dark:text-blue-100/90 leading-relaxed">{q.explanation}</p>
-                    </div>
-                  )}
-                </div>
+                </p>
+                {!q.isCorrect && q.explanation && (
+                  <p className="mt-2 border-l-2 border-pen pl-3 text-sm leading-relaxed text-ink">{q.explanation}</p>
+                )}
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
+        {wrong > 0 && wrong < questions.length && (
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-rule pt-4 text-sm text-ink-soft">
+            {!showAll && <span>{r.onlyWrong}</span>}
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className="font-medium text-ink underline decoration-rule decoration-2 underline-offset-4 hover:decoration-marker"
+            >
+              {showAll ? r.showWrong : t("results.showAll", { n: questions.length })}
+            </button>
+          </p>
+        )}
+        </>
       )}
     </div>
   );
 }
 
-function WritingTaskCard({ r, isPro }: {
-  r: { taskType: string; response: string; aiFeedback: (WritingFeedback | ReadingAggregate) | null; score: number | null };
-  isPro: boolean;
-}) {
+function WritingTask({ r, isPro }: { r: Response; isPro: boolean }) {
+  const { dict } = useI18n();
+  const res = dict.results;
   const fb = r.aiFeedback as WritingFeedback | null;
-  const label = r.taskType === "READING_INTO_WRITING" ? "Task 3 — Reading into Writing" : "Task 4 — Extended Writing";
+  const label = r.taskType === "READING_INTO_WRITING" ? res.task3 : res.task4;
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base sm:text-lg">{label}</CardTitle>
-          {r.score != null && (
-            <Badge variant={r.score >= 10 ? "success" : "warning"}>{r.score}/20</Badge>
-          )}
+    <article className="space-y-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h3 className="font-display text-xl font-semibold text-ink">{label}</h3>
+        {r.score != null && <span className="font-display text-2xl font-semibold tabular-nums text-ink">{r.score}/20</span>}
+      </div>
+
+      <div>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{res.yourText}</p>
+        <div className="max-h-56 overflow-y-auto whitespace-pre-wrap border-l-2 border-margin pl-4 text-[15px] leading-relaxed text-ink">
+          {r.response}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-2">Your response</h4>
-          <div className="rounded-lg bg-zinc-50 dark:bg-zinc-900/60 p-4 text-sm leading-relaxed border border-zinc-200/80 dark:border-zinc-800 max-h-48 overflow-y-auto whitespace-pre-wrap">
-            {r.response}
+      </div>
+
+      {fb && isPro ? (
+        <div className="space-y-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{res.criteriaScale}</p>
+          <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+            {WRITING_CRITERIA.map((key) => {
+              const area = fb[key];
+              if (!area) return null;
+              return <CriterionScore key={key} label={res.criterion[key]} score={area.score} max={4} comments={area.comments} />;
+            })}
           </div>
+          <Suggestions items={fb.suggestions ?? []} />
         </div>
-
-        {fb && isPro ? (
-          <div className="space-y-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">AI feedback · Trinity rating 0-4</h4>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {(["readingAndWriting", "taskFulfilment", "organisationAndStructure", "languageControl"] as const).map((key) => {
-                const area = fb[key];
-                if (!area) return null;
-                const labelMap: Record<string, string> = {
-                  readingAndWriting: "Reading & Writing",
-                  taskFulfilment: "Task Fulfilment",
-                  organisationAndStructure: "Organisation & Structure",
-                  languageControl: "Language Control",
-                };
-                return (
-                  <div key={key} className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 p-3">
-                    <div className="flex justify-between text-xs mb-1.5">
-                      <span className="font-semibold text-zinc-700 dark:text-zinc-200">{labelMap[key]}</span>
-                      <span className="font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{area.score}/4</span>
-                    </div>
-                    <Progress value={(area.score / 4) * 100} />
-                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">{area.comments}</p>
-                  </div>
-                );
-              })}
-            </div>
-
-            {fb.suggestions && fb.suggestions.length > 0 && (
-              <div className="rounded-lg border border-violet-200 bg-violet-50/60 dark:border-violet-900/50 dark:bg-violet-950/30 p-4">
-                <h4 className="text-xs font-bold uppercase tracking-wide text-violet-700 dark:text-violet-300 mb-2 flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5" /> Suggestions
-                </h4>
-                <ul className="space-y-1.5">
-                  {fb.suggestions.map((s, idx) => (
-                    <li key={idx} className="text-sm text-violet-900/90 dark:text-violet-100/90 flex items-start gap-2">
-                      <span className="text-violet-600 dark:text-violet-300 shrink-0">→</span> {s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : !isPro ? (
-          <UpgradeCard
-            title="Unlock detailed writing feedback"
-            body="Pro users see per-criteria scores (grammar, vocab, organisation, task fulfilment) and personalised suggestions."
-          />
-        ) : null}
-      </CardContent>
-    </Card>
-  );
-}
-
-function UpgradeCard({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50/60 dark:bg-zinc-900/40 p-6 text-center">
-      <Lock className="h-8 w-8 mx-auto mb-2 text-zinc-400" />
-      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</p>
-      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto">{body}</p>
-      <Link href="/pricing">
-        <Button size="sm" className="mt-3 gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
-          Upgrade to Pro
-        </Button>
-      </Link>
-    </div>
+      ) : null}
+    </article>
   );
 }

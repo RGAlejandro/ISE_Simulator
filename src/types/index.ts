@@ -109,8 +109,9 @@ export interface WrittenExamContent {
   level: ExamLevel;
   reading1: ReadingTask1;
   reading2: ReadingTask2;
-  readingIntoWriting: WritingTask;
-  extendedWriting: WritingTask;
+  /** Absent on reading-only papers (Practice → Reading). */
+  readingIntoWriting?: WritingTask;
+  extendedWriting?: WritingTask;
 }
 
 /**
@@ -184,11 +185,13 @@ export interface UserUsage {
   listeningCount: number;
   readingCount: number;
   writingCount: number;
+  translationCount: number;
   canTakeWritten: boolean;
   canTakeOral: boolean;
   canTakeListening: boolean;
   canTakeReading: boolean;
   canTakeWriting: boolean;
+  canTakeTranslation: boolean;
 }
 
 export interface VocabCard {

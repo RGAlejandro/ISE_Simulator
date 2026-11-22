@@ -8,37 +8,41 @@ datasource db {
 }
 
 model User {
-  id                String             @id @default(cuid())
-  clerkId           String             @unique
-  email             String             @unique
-  name              String?
-  plan              Plan               @default(FREE)
+  id                  String               @id @default(cuid())
+  clerkId             String               @unique
+  email               String               @unique
+  name                String?
+  plan                Plan                 @default(FREE)
   /**
    * Personal exam goal — drives the dashboard countdown + study plan.
    */
-  examDate          DateTime?          @db.Date
-  examLevel         ExamLevel?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  dailyUsage        DailyUsage[]
-  grammarSessions   GrammarSession[]
-  listeningSessions ListeningSession[]
-  oralExams         OralExam[]
-  paperSubmissions  PaperSubmission[]
-  savedWords        SavedWord[]
-  subscription      Subscription?
-  vocabularyLists   VocabularyList[]
-  writtenExams      WrittenExam[]
-  gamification      GamificationStats?
-  weeklyXp          WeeklyXp[]
-  readingTexts      ReadingText[]
-  readingSessions   ReadingSession[]
-  writingPractices  WritingPractice[]
-  reviewLogs        ReviewLog[]
-  ownedOrgs         Organization[]     @relation("OrgOwner")
-  orgMemberships    OrgMember[]
-  assignmentsMade   Assignment[]       @relation("AssignmentCreator")
-  teamLessons       TeamLesson[]
+  examDate            DateTime?            @db.Date
+  examLevel           ExamLevel?
+  /// Which Trinity ISE module(s) the learner still has to pass, and the band they aim for.
+  examModules         ExamModules          @default(BOTH)
+  targetBand          TargetBand           @default(PASS)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  dailyUsage          DailyUsage[]
+  grammarSessions     GrammarSession[]
+  translationSessions TranslationSession[]
+  listeningSessions   ListeningSession[]
+  oralExams           OralExam[]
+  paperSubmissions    PaperSubmission[]
+  savedWords          SavedWord[]
+  subscription        Subscription?
+  vocabularyLists     VocabularyList[]
+  writtenExams        WrittenExam[]
+  gamification        GamificationStats?
+  weeklyXp            WeeklyXp[]
+  readingTexts        ReadingText[]
+  readingSessions     ReadingSession[]
+  writingPractices    WritingPractice[]
+  reviewLogs          ReviewLog[]
+  ownedOrgs           Organization[]       @relation("OrgOwner")
+  orgMemberships      OrgMember[]
+  assignmentsMade     Assignment[]         @relation("AssignmentCreator")
+  teamLessons         TeamLesson[]
 
   @@index([clerkId])
 }
@@ -106,6 +110,8 @@ model WrittenExam {
   id               String            @id @default(cuid())
   userId           String
   level            ExamLevel
+  /// FULL = the whole Reading & Writing paper; READING = Tasks 1 and 2 only (Practice → Reading).
+  mode             WrittenExamMode   @default(FULL)
   content          Json
   status           ExamStatus        @default(IN_PROGRESS)
   score            Float?
@@ -233,6 +239,27 @@ model ListeningSession {
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+/// Translation drill: sentences in the learner's language to write in English, pitched at an ISE level.
+model TranslationSession {
+  id          String    @id @default(cuid())
+  userId      String
+  level       ExamLevel
+  /// Language of the source sentences ("es" | "fr").
+  sourceLang  String    @default("es")
+  /// TranslationItem[]: { id, source, reference, structure }
+  items       Json
+  /// Record<itemId, TranslationResult>
+  answers     Json      @default("{}")
+  /// 0–100 once every sentence is checked.
+  score       Int?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model GrammarSession {
@@ -522,12 +549,29 @@ enum SubscriptionStatus {
   CANCELED
 }
 
+enum WrittenExamMode {
+  FULL
+  READING
+}
+
 enum ExamLevel {
   ISE_FOUNDATION
   ISE_I
   ISE_II
   ISE_III
   ISE_IV
+}
+
+enum ExamModules {
+  BOTH
+  READING_WRITING
+  SPEAKING_LISTENING
+}
+
+enum TargetBand {
+  PASS
+  MERIT
+  DISTINCTION
 }
 
 enum ExamStatus {
@@ -565,9 +609,13 @@ enum Role {
 model Organization {
   id          String       @id @default(cuid())
   name        String
-  /** Target level the cohort is preparing for (drives every member's Readiness in the panel). */
+  /**
+   * Target level the cohort is preparing for (drives every member's Readiness in the panel).
+   */
   level       ExamLevel
-  /** Shareable invite code used in /teams/join/[code]. */
+  /**
+   * Shareable invite code used in /teams/join/[code].
+   */
   joinCode    String       @unique
   ownerId     String
   createdAt   DateTime     @default(now())
@@ -608,7 +656,9 @@ enum AssignmentKind {
   REVIEW
 }
 
-/** Homework for a team. Completion is derived from members' activity between createdAt and dueAt. */
+/**
+ * Homework for a team. Completion is derived from members' activity between createdAt and dueAt.
+ */
 model Assignment {
   id          String         @id @default(cuid())
   orgId       String
@@ -623,12 +673,16 @@ model Assignment {
   @@index([orgId, dueAt])
 }
 
-/** AI mini-lesson generated for a team from its most common weaknesses (cached so it isn't regenerated per view). */
+/**
+ * AI mini-lesson generated for a team from its most common weaknesses (cached so it isn't regenerated per view).
+ */
 model TeamLesson {
   id          String       @id @default(cuid())
   orgId       String
   createdById String
-  /** The weaknesses the lesson targets (criteria + error tags), as sent to the model. */
+  /**
+   * The weaknesses the lesson targets (criteria + error tags), as sent to the model.
+   */
   focus       Json
   content     Json
   createdAt   DateTime     @default(now())
@@ -637,4 +691,3 @@ model TeamLesson {
 
   @@index([orgId, createdAt])
 }
-

@@ -16,11 +16,10 @@ import { useI18n } from "@/components/i18n/language-provider";
 import { gradeAnswers, isAnswerCorrect, locatePhrase, normalizeWord, splitSentences } from "@/lib/reading";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft, ArrowRight, Bookmark, BookmarkCheck, CheckCircle2, Flame, Highlighter,
-  Loader2, MousePointerClick, Square, Volume2, XCircle, Zap, BookOpen, RotateCcw,
+  ArrowLeft, ArrowRight, Bookmark, BookmarkCheck, CheckCircle2, Highlighter,
+  Loader2, MousePointerClick, Square, Volume2, XCircle, BookOpen, RotateCcw,
 } from "lucide-react";
 import type { CefrBand } from "@/lib/prompts/vocabulary";
-import type { AwardResult } from "@/lib/gamification-server";
 import type { ReadingAnswer, ReadingContent, ReadingLookupData, VocabularyListData } from "@/types";
 
 const CEFR: CefrBand[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -62,7 +61,6 @@ export function ReadingSessionClient({ sessionId, title, level, topic, content, 
 
   const [phase, setPhase] = useState<Phase>(initialResult ? "results" : "read");
   const [result, setResult] = useState(initialResult);
-  const [award, setAward] = useState<AwardResult | null>(null);
   const [highlight, setHighlight] = useState(true);
   const [showTextInQuiz, setShowTextInQuiz] = useState(false);
 
@@ -315,7 +313,6 @@ export function ReadingSessionClient({ sessionId, title, level, topic, content, 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setResult({ answers, score: data.score, total: data.total });
-      setAward(data.award ?? null);
     } catch {
       show(r.saveError, "error");
       setResult({ answers, score: gradeAnswers(content.questions, answers), total: content.questions.length });
@@ -520,35 +517,7 @@ export function ReadingSessionClient({ sessionId, title, level, topic, content, 
                 <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{result.score}/{result.total}</p>
                 <p className="text-xs text-zinc-500">{r.score}</p>
               </div>
-              {award && (
-                <>
-                  <div className="rounded-xl bg-sky-50 dark:bg-sky-950/40 px-5 py-3 min-w-[6.5rem]">
-                    <p className="text-2xl font-bold text-sky-600 dark:text-sky-400 flex items-center justify-center gap-1">
-                      <Zap className="h-5 w-5" />+{award.xpGained}
-                    </p>
-                    <p className="text-xs text-zinc-500">{r.xpEarned}</p>
-                  </div>
-                  <div className="rounded-xl bg-orange-50 dark:bg-orange-950/40 px-5 py-3 min-w-[6.5rem]">
-                    <p className="text-2xl font-bold text-orange-500 flex items-center justify-center gap-1">
-                      <Flame className="h-5 w-5" />{award.currentStreak}
-                    </p>
-                    <p className="text-xs text-zinc-500">{r.streak}</p>
-                  </div>
-                </>
-              )}
             </div>
-            {award?.leveledUp && (
-              <p className="text-sm font-semibold text-amber-600">⭐ {t("vocab.reading.levelUp", { n: award.level })}</p>
-            )}
-            {award && award.newAchievements.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-2">
-                {award.newAchievements.map((a) => (
-                  <span key={a.id} className="rounded-full bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 px-3 py-1 text-xs font-medium text-amber-800 dark:text-amber-200">
-                    {a.emoji} {a.name}
-                  </span>
-                ))}
-              </div>
-            )}
           </section>
 
           <section className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-6 shadow-sm">

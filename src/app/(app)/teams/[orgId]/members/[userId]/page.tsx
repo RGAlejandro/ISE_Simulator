@@ -19,7 +19,7 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ org
   if (!isTeacherRole(actor?.role) || !org) redirect("/teams");
   if (!target || target.role !== "STUDENT") redirect(`/teams/${orgId}`);
 
-  const { report } = await getReadiness(userId, { level: org.level });
+  const { report } = await getReadiness(userId, { level: org.level, useGoal: false });
   if (!report) redirect(`/teams/${orgId}`);
 
   return (

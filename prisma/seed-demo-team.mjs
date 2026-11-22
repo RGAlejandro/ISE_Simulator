@@ -9,8 +9,12 @@
  * Demo users have clerkId "demo_*" and @demo.invalid emails: they can't sign
  * in and are removed in cascade. The owner is the first ADMIN user (or the
  * email given with --owner=<email>). Deterministic (seeded PRNG).
+ *
+ * Lucía also gets the showcase from demo-showcase.json: real, fully marked
+ * attempts (exams, Writing Lab texts with a rewrite, live exam…) to open in the demo.
  */
 import { PrismaClient } from "@prisma/client";
+import { importShowcase } from "./demo-showcase.mjs";
 
 const prisma = new PrismaClient();
 const JOIN_CODE = "ACADEMY3";
@@ -62,6 +66,14 @@ const STUDENTS = [
 
 const SUBJECTS = ["Independence", "Ambition", "Society and living standards", "Personal values and ideals", "The world of work", "Education"];
 const GENRES = ["essay", "article", "review", "report", "email"];
+// Realistic titles for the synthetic texts, derived without the PRNG so the cohort's numbers stay identical.
+const TITLE = {
+  essay: (t) => `${t}: a blessing or a burden?`,
+  article: (t) => `What nobody tells you about ${t.toLowerCase()}`,
+  review: (t) => `Review: a new podcast on ${t.toLowerCase()}`,
+  report: (t) => `Report on ${t.toLowerCase()} in our company`,
+  email: (t) => `Email to the editor about ${t.toLowerCase()}`,
+};
 
 function writingFeedback(mean04, errors, riw) {
   const crit = (offset) => ({ score: clamp(Math.round(mean04 + offset + noise(0.4)), 0, 4), comment: "Demo cohort feedback." });
@@ -105,7 +117,7 @@ async function main() {
   if (!owner) throw new Error("No owner found: pass --owner=<email> of an existing user");
 
   const org = await prisma.organization.create({
-    data: { name: "Demo Academy · ISE III", level: LEVEL, joinCode: JOIN_CODE, ownerId: owner.id, members: { create: { userId: owner.id, role: "OWNER" } } },
+    data: { id: "demo-academy", name: "Demo Academy · ISE III", level: LEVEL, joinCode: JOIN_CODE, ownerId: owner.id, members: { create: { userId: owner.id, role: "OWNER" } } },
   });
 
   let attempts = 0;
@@ -113,6 +125,7 @@ async function main() {
     const slug = s.name.toLowerCase().normalize("NFD").replace(/[^a-z ]/g, "").replace(/ /g, ".");
     const user = await prisma.user.create({
       data: {
+        id: `demo-${slug.replace(/\./g, "-")}`, // stable ids: bookmarked demo URLs survive re-seeding
         clerkId: `demo_${slug}`,
         email: `${slug}@demo.invalid`,
         name: s.name,
@@ -137,7 +150,7 @@ async function main() {
         await prisma.writingPractice.create({
           data: {
             userId: user.id, level: LEVEL, taskType: riw ? "READING_INTO_WRITING" : "EXTENDED_WRITING",
-            genre: pick(GENRES), topic: pick(SUBJECTS), task: { title: "Demo task" }, createdAt: date,
+            ...(() => { const genre = pick(GENRES); const topic = pick(SUBJECTS); return { genre, topic, task: { title: TITLE[genre](topic) } }; })(), createdAt: date,
             drafts: { create: { version: 1, text: "Demo cohort text.", wordCount: 210 + Math.floor(rand() * 40), feedback: writingFeedback(mean, s.errors, riw), score: mean, createdAt: date } },
           },
         });
@@ -217,6 +230,10 @@ async function main() {
       { orgId: org.id, createdById: owner.id, kind: "LISTENING", title: "Listening mock (ISE III)", createdAt: new Date(now.getTime() - 16 * DAY), dueAt: endOfDay(-8) },
     ],
   });
+
+  const lucia = await prisma.user.findUnique({ where: { clerkId: "demo_lucia.martin" } });
+  const showcase = lucia ? await importShowcase(prisma, lucia.id, now.getTime()) : 0;
+  if (showcase) console.log(`Showcase restored for Lucía: ${showcase} real attempts.`);
 
   console.log(`Demo cohort ready: "${org.name}" — ${STUDENTS.length} students, ${attempts} marked attempts, owner ${owner.email.replace(/^[^@]{0,3}[^@]*/, "***")}`);
   console.log(`Panel: /teams/${org.id}   Invite: /teams/join/${JOIN_CODE}`);

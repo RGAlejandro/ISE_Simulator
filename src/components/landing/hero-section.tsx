@@ -24,6 +24,7 @@ function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
 type Phase = "loading" | "exam" | "feedback";
 
 function LoadingPhase() {
+  const t = useT();
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -35,7 +36,7 @@ function LoadingPhase() {
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           className="h-5 w-5 rounded-full border-2 border-blue-500 border-t-transparent flex-shrink-0"
         />
-        <span className="text-sm text-zinc-500 dark:text-zinc-400">Generating your ISE II exam...</span>
+        <span className="text-sm text-zinc-500 dark:text-zinc-400">{t("lp.mock.generatingExam")}</span>
       </div>
       {[80, 55, 90, 45, 70].map((w, i) => (
         <motion.div
@@ -89,6 +90,7 @@ function ExamPhase() {
 }
 
 function FeedbackPhase() {
+  const t = useT();
   const scores = [
     { label: "Grammar", score: 8 },
     { label: "Vocabulary", score: 9 },
@@ -103,8 +105,8 @@ function FeedbackPhase() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-zinc-500">Extended Writing — AI Feedback</p>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Overall Score</p>
+          <p className="text-xs text-zinc-500">{t("lp.mock.feedbackTitle")}</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t("lp.mock.overall")}</p>
         </div>
         <div className="text-right">
           <span className="text-3xl font-bold text-blue-600">8.0</span>
@@ -144,6 +146,7 @@ function FeedbackPhase() {
 }
 
 function DemoWindow() {
+  const t = useT();
   const [phase, setPhase] = useState<Phase>("loading");
 
   useEffect(() => {
@@ -202,7 +205,7 @@ function DemoWindow() {
           ))}
         </div>
         <span className="text-[10px] text-zinc-400">
-          {phase === "loading" ? "Generating..." : phase === "exam" ? "Answering..." : "Results ready"}
+          {t(phase === "loading" ? "lp.mock.generating" : phase === "exam" ? "lp.mock.answering" : "lp.mock.resultsReady")}
         </span>
       </div>
     </div>
@@ -303,7 +306,7 @@ export function HeroSection() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="pt-1 text-xs text-zinc-500 dark:text-zinc-400"
             >
-              Built by an ISE III candidate, for ISE candidates. Marked against Trinity&apos;s official criteria.
+              {t("lp.origin")}
             </motion.p>
           </div>
 
@@ -333,8 +336,8 @@ export function HeroSection() {
                 <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-none">Instant results</div>
-                <div className="text-xs text-zinc-400 mt-0.5">AI evaluates in seconds</div>
+                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-none">{t("lp.badgeResults")}</div>
+                <div className="text-xs text-zinc-400 mt-0.5">{t("lp.badgeResultsSub")}</div>
               </div>
             </motion.div>
 
@@ -349,8 +352,8 @@ export function HeroSection() {
                 <Mic className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-none">Real voice exams</div>
-                <div className="text-xs text-zinc-400 mt-0.5">Speak to the AI examiner</div>
+                <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-none">{t("lp.badgeVoice")}</div>
+                <div className="text-xs text-zinc-400 mt-0.5">{t("lp.badgeVoiceSub")}</div>
               </div>
             </motion.div>
 
@@ -367,14 +370,14 @@ export function HeroSection() {
           className="mt-12 sm:mt-16 lg:mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-zinc-200 dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm"
         >
           {[
-            { to: 5, suffix: "", label: "ISE Levels", sub: "Foundation to ISE IV" },
-            { to: 4, suffix: "", label: "Practice Modules", sub: "Written · Oral · Listening · Practice" },
-            { to: 100, suffix: "%", label: "AI Content", sub: "Unique every session" },
-            { to: 30, suffix: "s", label: "Feedback Time", sub: "Instant AI evaluation" },
+            { to: 5, suffix: "", label: t("lp.stats.levelsL"), sub: t("lp.stats.levelsS") },
+            { to: 9, suffix: "", label: t("lp.stats.modulesL"), sub: t("lp.stats.modulesS") },
+            { to: 1, suffix: "", prefix: "<", label: t("lp.stats.liveL"), sub: t("lp.stats.liveS") },
+            { to: 4, suffix: "", label: t("lp.stats.skillsL"), sub: t("lp.stats.skillsS") },
           ].map((item, i) => (
             <div key={i} className="bg-white dark:bg-zinc-900 px-3 sm:px-6 py-4 sm:py-6 text-center">
               <div className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-50 tabular-nums">
-                <CountUp to={item.to} suffix={item.suffix} />
+                {"prefix" in item ? item.prefix : ""}<CountUp to={item.to} suffix={item.suffix} />
               </div>
               <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mt-1">{item.label}</div>
               <div className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{item.sub}</div>

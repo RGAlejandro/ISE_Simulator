@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toaster";
 import { useI18n } from "@/components/i18n/language-provider";
 import { FeedbackView, TaskCard, BAND_STYLES } from "@/components/writing/feedback-view";
 import { SourceTexts } from "@/components/writing/source-texts";
@@ -31,6 +30,8 @@ interface Props {
   task: WritingTaskContent;
   initialDrafts: WritingDraftData[];
   initialMode: Mode;
+  /** Admin viewing a learner's text: no rewriting, back link to the learner profile. */
+  readOnly?: { ownerName: string; backHref: string };
 }
 
 const MAX_PHOTOS = 3;
@@ -41,11 +42,10 @@ function formatClock(totalSeconds: number): string {
 }
 
 export function WritingWorkspaceClient({
-  practiceId, levelLabel, cefr, taskType, genre, topic, task, initialDrafts, initialMode,
+  practiceId, levelLabel, cefr, taskType, genre, topic, task, initialDrafts, initialMode, readOnly,
 }: Props) {
   const { dict, t, locale } = useI18n();
   const w = dict.writing;
-  const { show } = useToast();
 
   const [drafts, setDrafts] = useState(initialDrafts);
   const latest = drafts[drafts.length - 1] ?? null;
@@ -209,7 +209,6 @@ export function WritingWorkspaceClient({
       photos.forEach((p) => URL.revokeObjectURL(p.url));
       setPhotos([]);
       setIllegible(null);
-      if (data.award?.xpGained) show(t("writing.xpEarned", { n: data.award.xpGained }), "success");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setError(err instanceof Error && err.message ? err.message : w.markError);
@@ -237,11 +236,14 @@ export function WritingWorkspaceClient({
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2 min-w-0">
-            <Link href="/writing">
+            <Link href={readOnly?.backHref ?? "/writing"}>
               <Button variant="ghost" size="sm" className="gap-1 text-zinc-500 -ml-2">
-                <ArrowLeft className="h-4 w-4" /> {w.backToLab}
+                <ArrowLeft className="h-4 w-4" /> {readOnly ? t("adminProfile.backToProfile", { name: readOnly.ownerName }) : w.backToLab}
               </Button>
             </Link>
+            {readOnly && (
+              <p className="font-hand text-xl text-pen">{t("adminProfile.banner", { name: readOnly.ownerName })}</p>
+            )}
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="bg-blue-600 text-white">{levelLabel}</Badge>
               <Badge variant="outline">{taskLabel}</Badge>
@@ -252,7 +254,7 @@ export function WritingWorkspaceClient({
             </h1>
           </div>
 
-          {phase === "write" ? (
+          {readOnly ? null : phase === "write" ? (
             <div className="inline-flex shrink-0 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1">
               {(["exam", "learn"] as Mode[]).map((m) => (
                 <button
@@ -313,7 +315,7 @@ export function WritingWorkspaceClient({
 
             <FeedbackView draft={viewed} previous={previousOfViewed} taskType={taskType} task={task} cefr={cefr} />
 
-            <div className="rounded-2xl border border-dashed border-blue-300 dark:border-blue-800 bg-white/70 dark:bg-zinc-900/70 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            {!readOnly && <div className="rounded-2xl border border-dashed border-blue-300 dark:border-blue-800 bg-white/70 dark:bg-zinc-900/70 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
               <PenLine className="h-6 w-6 shrink-0 text-blue-600" />
               <p className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
                 {canRewrite ? w.rewriteHint : t("writing.maxDrafts", { n: MAX_DRAFTS })}
@@ -325,7 +327,7 @@ export function WritingWorkspaceClient({
               ) : (
                 <Link href="/writing"><Button variant="outline" className="gap-1.5 shrink-0"><Plus className="h-4 w-4" /> {w.newTask}</Button></Link>
               )}
-            </div>
+            </div>}
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">

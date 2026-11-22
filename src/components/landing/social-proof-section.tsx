@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { useT } from "@/components/i18n/language-provider";
 
 // Product facts only. No testimonials or usage figures until there are real ones to show.
+// `label` is a key of lp.facts in the dictionaries.
 const FACTS = [
-  { to: 5, label: "ISE levels, from Foundation (A2) to ISE IV (C2)" },
-  { to: 4, label: "skills marked against Trinity's official criteria" },
-  { to: 3, label: "languages: English, Spanish and French" },
+  { to: 5, label: "levels" },
+  { to: 4, label: "skills" },
+  { to: 3, label: "langs" },
 ];
 
 function Fact({ to, label, run }: { to: number; label: string; run: boolean }) {
@@ -27,6 +29,7 @@ function Fact({ to, label, run }: { to: number; label: string; run: boolean }) {
 }
 
 export function SocialProofSection() {
+  const t = useT();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   return (
@@ -34,10 +37,10 @@ export function SocialProofSection() {
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.h2 initial={{ opacity: 0, y: 16 }} animate={inView ? { opacity: 1, y: 0 } : {}}
           className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-center text-zinc-900 dark:text-zinc-50 mb-10">
-          Built around the real exam
+          {t("lp.facts.title")}
         </motion.h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          {FACTS.map((f) => <Fact key={f.label} {...f} run={inView} />)}
+          {FACTS.map((f) => <Fact key={f.label} to={f.to} label={t(`lp.facts.${f.label}`)} run={inView} />)}
         </div>
       </div>
     </section>

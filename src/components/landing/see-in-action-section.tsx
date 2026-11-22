@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/components/i18n/language-provider";
+
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, Volume2, BookMarked, BookOpen } from "lucide-react";
@@ -41,6 +43,7 @@ function OralDemo() {
 }
 
 function ListeningDemo() {
+  const t = useT();
   const words = "Renewable energy has become cheaper than fossil fuels in most markets".split(" ");
   const [active, setActive] = useState(0);
   useEffect(() => {
@@ -50,7 +53,7 @@ function ListeningDemo() {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-[11px] text-zinc-400">
-        <Volume2 className="h-4 w-4 text-purple-500" /> AI reading aloud · follow along
+        <Volume2 className="h-4 w-4 text-purple-500" /> {t("lp.mock.followAlong")}
       </div>
       <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
         {words.map((w, i) => (
@@ -108,6 +111,7 @@ const RENDER: Record<string, React.ReactNode> = {
 };
 
 export function SeeInActionSection() {
+  const t = useT();
   const [i, setI] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setI((v) => (v + 1) % DEMOS.length), 5000);
@@ -121,9 +125,9 @@ export function SeeInActionSection() {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="text-center mb-10">
           <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            See it in action
+            {t("lp.see.title")}
           </h2>
-          <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">Real modules, running live. No screenshots.</p>
+          <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">{t("lp.see.subtitle")}</p>
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-2 mb-6">
@@ -134,7 +138,7 @@ export function SeeInActionSection() {
                 className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-all ${
                   i === idx ? "border-brand bg-brand/5 text-brand"
                   : "border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-zinc-300"}`}>
-                <Icon className={`h-4 w-4 ${i === idx ? d.accent : ""}`} /> {d.label}
+                <Icon className={`h-4 w-4 ${i === idx ? d.accent : ""}`} /> {t(`lp.see.${d.id}`)}
               </button>
             );
           })}

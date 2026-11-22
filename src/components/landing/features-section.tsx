@@ -162,6 +162,7 @@ function OralPreview() {
 }
 
 function ListeningPreview() {
+  const t = useT();
   return (
     <motion.div
       key="listening"
@@ -200,7 +201,7 @@ function ListeningPreview() {
               />
             ))}
           </div>
-          <span className="text-[10px] text-zinc-400 ml-auto">AI reading aloud...</span>
+          <span className="text-[10px] text-zinc-400 ml-auto">{t("lp.mock.readingAloud")}</span>
         </div>
       </div>
       {/* Notes area */}

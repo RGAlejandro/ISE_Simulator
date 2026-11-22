@@ -8,7 +8,7 @@ export const TUTOR_DATA_KEYS = ["readiness", "attempts", "writingErrors", "vocab
 export type TutorDataKey = (typeof TUTOR_DATA_KEYS)[number];
 
 export const PRACTICE_MODULES = [
-  "written", "oral", "live", "listening", "writing", "reading", "grammar", "review", "vocabulary",
+  "written", "oral", "live", "listening", "writing", "reading", "grammar", "translation", "review", "vocabulary",
 ] as const;
 export type PracticeModule = (typeof PRACTICE_MODULES)[number];
 
@@ -17,8 +17,10 @@ export type CefrLevel = (typeof CEFR_LEVELS)[number];
 
 /** Words the tutor may propose in one list. */
 export const MAX_TUTOR_LIST_WORDS = 40;
-/** Words the bulk-save endpoint accepts in one request. */
-export const MAX_BULK_WORDS = 60;
+/** Words read from one photo (a full page of vocabulary). */
+export const MAX_PHOTO_LIST_WORDS = 60;
+/** Words the bulk-save endpoint accepts in one request (several photos merged into one list). */
+export const MAX_BULK_WORDS = 150;
 export const MAX_LIST_NAME = 60;
 const MAX_REPLY_CHARS = 4000;
 const MAX_ACTIONS = 3;
@@ -32,9 +34,21 @@ export interface TutorWord {
   level: CefrLevel;
 }
 
+export const GOAL_MODULES = ["BOTH", "READING_WRITING", "SPEAKING_LISTENING"] as const;
+export const GOAL_TARGETS = ["PASS", "MERIT", "DISTINCTION"] as const;
+const GOAL_LEVELS = ["ISE_FOUNDATION", "ISE_I", "ISE_II", "ISE_III", "ISE_IV"] as const;
+
+export interface GoalChange {
+  examModules?: (typeof GOAL_MODULES)[number];
+  targetBand?: (typeof GOAL_TARGETS)[number];
+  examLevel?: (typeof GOAL_LEVELS)[number];
+  examDate?: string;
+}
+
 export type TutorAction =
   | { type: "create_vocab_list"; name: string; words: TutorWord[] }
-  | { type: "practice"; module: PracticeModule; label: string; href: string };
+  | { type: "practice"; module: PracticeModule; label: string; href: string }
+  | ({ type: "set_goal" } & GoalChange);
 
 export interface TutorResponse {
   reply: string;
@@ -85,16 +99,17 @@ export function sanitizeWords(raw: unknown, max: number): TutorWord[] {
 /** Map a practice module to an in-app route. The AI never chooses URLs. */
 export function practiceHref(module: PracticeModule, params?: { writingType?: string }): string {
   switch (module) {
-    case "written": return "/practice";
-    case "listening": return "/practice";
+    case "written": return "/practice?start=written";
+    case "listening": return "/practice?start=listening";
     case "oral": return "/exam/oral/setup";
     case "live": return "/exam/oral/setup?mode=live";
     case "writing": {
       const t = params?.writingType;
       return t === "READING_INTO_WRITING" || t === "EXTENDED_WRITING" ? `/writing?type=${t}` : "/writing";
     }
-    case "reading": return "/vocabulary/reading";
+    case "reading": return "/practice?start=reading";
     case "grammar": return "/grammar";
+    case "translation": return "/translation";
     case "review": return "/vocabulary/review";
     case "vocabulary": return "/vocabulary";
   }
@@ -107,6 +122,14 @@ function sanitizeAction(raw: unknown): TutorAction | null {
     const words = sanitizeWords(a.words, MAX_TUTOR_LIST_WORDS);
     if (words.length === 0) return null;
     return { type: "create_vocab_list", name: str(a.name, MAX_LIST_NAME) || "My word list", words };
+  }
+  if (a.type === "set_goal") {
+    const goal: GoalChange = {};
+    if ((GOAL_MODULES as readonly unknown[]).includes(a.examModules)) goal.examModules = a.examModules as GoalChange["examModules"];
+    if ((GOAL_TARGETS as readonly unknown[]).includes(a.targetBand)) goal.targetBand = a.targetBand as GoalChange["targetBand"];
+    if ((GOAL_LEVELS as readonly unknown[]).includes(a.examLevel)) goal.examLevel = a.examLevel as GoalChange["examLevel"];
+    if (typeof a.examDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(a.examDate)) goal.examDate = a.examDate;
+    return Object.keys(goal).length > 0 ? { type: "set_goal", ...goal } : null;
   }
   if (a.type === "practice") {
     const mod = a.module as PracticeModule;
@@ -126,6 +149,7 @@ export function sanitizeTutorResponse(raw: unknown): TutorResponse {
 
   const actions: TutorAction[] = [];
   let hasList = false;
+  let hasGoal = false;
   let practices = 0;
   const seenHrefs = new Set<string>();
   for (const item of Array.isArray(obj.actions) ? obj.actions : []) {
@@ -134,6 +158,9 @@ export function sanitizeTutorResponse(raw: unknown): TutorResponse {
     if (action.type === "create_vocab_list") {
       if (hasList) continue; // one list per answer keeps the confirmation step simple
       hasList = true;
+    } else if (action.type === "set_goal") {
+      if (hasGoal) continue;
+      hasGoal = true;
     } else {
       if (practices >= MAX_PRACTICE_ACTIONS || seenHrefs.has(action.href)) continue;
       practices++;

@@ -61,7 +61,16 @@ export interface SkillEstimate {
   lastAt: string | null;
 }
 
-export type ActionReason = "noEvidence" | "belowPass" | "lowConfidence" | "nextBand";
+export type ActionReason = "noEvidence" | "belowPass" | "belowTarget" | "lowConfidence" | "nextBand";
+
+/** Trinity ISE modules are passed separately; a learner may only have one left. */
+export type ExamModulesValue = "BOTH" | "READING_WRITING" | "SPEAKING_LISTENING";
+export type TargetBandValue = "PASS" | "MERIT" | "DISTINCTION";
+export const MODULE_SKILLS: Record<ExamModulesValue, Skill[]> = {
+  BOTH: ["reading", "writing", "speaking", "listening"],
+  READING_WRITING: ["reading", "writing"],
+  SPEAKING_LISTENING: ["speaking", "listening"],
+};
 
 export interface ReadinessAction {
   skill: Skill;
@@ -91,6 +100,8 @@ export interface ReadinessReport {
   /** Ready now, or projected to be ready (before the exam, when there is one). */
   onTrack: boolean;
   actions: ReadinessAction[];
+  /** What the probabilities are about: which module(s), and the band aimed for. */
+  focus: { modules: ExamModulesValue; target: TargetBandValue };
 }
 
 // ─── constants (documented on the methodology panel) ────────────────────────
@@ -99,6 +110,8 @@ export const PASS = 50;
 export const MERIT = 65;
 export const DISTINCTION = 80;
 export const READY_LINE = 0.8;
+/** Band-scale score each target band requires. */
+export const TARGET_SCORE: Record<TargetBandValue, number> = { PASS: 50, MERIT: 65, DISTINCTION: 80 };
 
 const PRIOR_MEAN = 45;
 const PRIOR_WEIGHT = 1;
@@ -159,11 +172,11 @@ function confidenceFor(evidence: number): Confidence {
 }
 
 /** Estimate one skill from the observations available at `asOf`. */
-export function estimateSkill(skill: Skill, all: Observation[], asOf: Date): SkillEstimate {
+export function estimateSkill(skill: Skill, all: Observation[], asOf: Date, threshold = PASS): SkillEstimate {
   const obs = all.filter((o) => o.skill === skill && o.at <= asOf);
   if (obs.length === 0) {
     const sd = Math.round(Math.hypot(DEFAULT_OBS_SD / Math.sqrt(PRIOR_WEIGHT), EXAM_DAY_SD) * 10) / 10;
-    return { skill, mean: PRIOR_MEAN, sd, pPass: normalCdf((PRIOR_MEAN - PASS) / sd), band: bandFor(PRIOR_MEAN), confidence: "none", count: 0, lastAt: null };
+    return { skill, mean: PRIOR_MEAN, sd, pPass: normalCdf((PRIOR_MEAN - threshold) / sd), band: bandFor(PRIOR_MEAN), confidence: "none", count: 0, lastAt: null };
   }
   const latest = obs.reduce((m, o) => (o.at > m ? o.at : m), obs[0].at);
   // Recency is relative to the latest attempt: older attempts count less, but
@@ -185,7 +198,7 @@ export function estimateSkill(skill: Skill, all: Observation[], asOf: Date): Ski
     skill,
     mean: Math.round(mean * 10) / 10,
     sd: Math.round(sd * 10) / 10,
-    pPass: normalCdf((mean - PASS) / sd),
+    pPass: normalCdf((mean - threshold) / sd),
     band: bandFor(mean),
     // Old evidence is still evidence, but we're less sure it describes you today.
     confidence: confidenceFor(evidence * 0.5 ** (staleDays / 60)),
@@ -217,8 +230,8 @@ export function jointPassProbability(zs: number[], rho = SKILL_CORRELATION): num
   return Math.min(1, Math.max(0, (sum * h) / 3));
 }
 
-function overallFrom(skills: SkillEstimate[]) {
-  const pPass = jointPassProbability(skills.map((s) => (s.mean - PASS) / s.sd));
+function overallFrom(skills: SkillEstimate[], threshold = PASS) {
+  const pPass = jointPassProbability(skills.map((s) => (s.mean - threshold) / s.sd));
   const lowest = skills.reduce((m, s) => (s.mean < m.mean ? s : m), skills[0]);
   const confidence = skills.reduce<Confidence>((c, s) => {
     const order: Confidence[] = ["none", "low", "medium", "high"];
@@ -258,19 +271,23 @@ function aggregateCriteria(criteria: CriterionObservation[]) {
 export function computeReadiness(
   observations: Observation[],
   criteria: CriterionObservation[],
-  opts: { now?: Date; examDate?: Date | null; weeks?: number } = {},
+  opts: { now?: Date; examDate?: Date | null; weeks?: number; modules?: ExamModulesValue; target?: TargetBandValue } = {},
 ): ReadinessReport {
   const now = opts.now ?? new Date();
-  const skills = SKILLS.map((s) => estimateSkill(s, observations, now));
-  const overall = overallFrom(skills);
+  const modules = opts.modules ?? "BOTH";
+  const target = opts.target ?? "PASS";
+  const focusSkills = MODULE_SKILLS[modules];
+  const threshold = TARGET_SCORE[target];
+  const skills = focusSkills.map((s) => estimateSkill(s, observations, now, threshold));
+  const overall = overallFrom(skills, threshold);
 
   // Weekly trajectory (only weeks where at least one observation existed).
   const weeks = opts.weeks ?? 8;
   const trajectory: ReadinessReport["trajectory"] = [];
   for (let w = weeks; w >= 0; w--) {
     const at = new Date(now.getTime() - w * 7 * DAY_MS);
-    if (!observations.some((o) => o.at <= at)) continue;
-    const p = overallFrom(SKILLS.map((s) => estimateSkill(s, observations, at))).pPass;
+    if (!observations.some((o) => o.at <= at && focusSkills.includes(o.skill))) continue;
+    const p = overallFrom(focusSkills.map((s) => estimateSkill(s, observations, at, threshold)), threshold).pPass;
     trajectory.push({ at: at.toISOString().slice(0, 10), pPass: Math.round(p * 1000) / 1000 });
   }
 
@@ -288,15 +305,15 @@ export function computeReadiness(
       ? Math.round((examDate.getTime() - (readyNow ? now.getTime() : new Date(readyBy!).getTime())) / DAY_MS)
       : null;
 
-  const past = observations.filter((o) => o.at <= now);
-  const allCriteria = aggregateCriteria(criteria.filter((c) => c.at <= now));
+  const past = observations.filter((o) => o.at <= now && focusSkills.includes(o.skill));
+  const allCriteria = aggregateCriteria(criteria.filter((c) => c.at <= now && focusSkills.includes(c.skill)));
 
   // Actions: the skills holding the probability down, most urgent first.
   const actions: ReadinessAction[] = [...skills]
     .sort((a, b) => a.pPass - b.pPass)
     .map((s): ReadinessAction => ({
       skill: s.skill,
-      reason: s.count === 0 ? "noEvidence" : s.mean < PASS ? "belowPass" : s.confidence === "low" ? "lowConfidence" : "nextBand",
+      reason: s.count === 0 ? "noEvidence" : s.mean < PASS ? "belowPass" : s.mean < threshold ? "belowTarget" : s.confidence === "low" ? "lowConfidence" : "nextBand",
     }))
     .slice(0, 3);
 
@@ -320,5 +337,6 @@ export function computeReadiness(
     },
     onTrack: readyNow || (readyBy !== null && (marginDays === null || marginDays >= 0)),
     actions,
+    focus: { modules, target },
   };
 }

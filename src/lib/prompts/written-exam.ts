@@ -373,8 +373,11 @@ interface Reading2Result {
 export function getQuestionsPrompt(
   level: ExamLevel,
   reading1: Reading1Result,
-  reading2: Reading2Result
+  reading2: Reading2Result,
+  /** Practice → Reading: Tasks 1 and 2 only, no writing prompts. */
+  opts?: { readingOnly?: boolean },
 ): string {
+  const readingOnly = opts?.readingOnly ?? false;
   const spec = levelSpecs[level];
   const riwType = spec.writingTypes.riw[Math.floor(Math.random() * spec.writingTypes.riw.length)];
   const ewType = spec.writingTypes.ew[Math.floor(Math.random() * spec.writingTypes.ew.length)];
@@ -387,7 +390,7 @@ export function getQuestionsPrompt(
     .join("\n\n");
 
   return `You are an ISE exam question writer for Trinity College London ISE ${level.replace("ISE_", "")} (CEFR ${spec.cefr}).
-Using the reading texts below, generate all exam questions and writing task prompts. Return ONLY valid JSON.
+Using the reading texts below, generate all exam questions${readingOnly ? "" : " and writing task prompts"}. Return ONLY valid JSON.
 
 ═══ READING 1: ${reading1.title} ═══
 ${paragraphsText}
@@ -407,11 +410,11 @@ READING 2 QUESTIONS:
 5. Statement Selection (Q21-25): 8 statements (A-H) about all four texts. Exactly 5 TRUE + 3 FALSE. Cover all texts.
 6. Gap Fill — Notes style (Q26-30): 5 sentences with _______ gaps forming structured notes. Include notesTitle and a sectionHeading per question (use 2-3 section groups). Answers = 1-3 words verbatim from texts A-D.
 
-WRITING TASKS:
+${readingOnly ? "" : `WRITING TASKS:
 7. Task 3 (Reading into Writing): A ${riwType} prompt (${spec.writingWordLimit.riw.min}-${spec.writingWordLimit.riw.max} words) asking the candidate to synthesise ideas from texts A-D ONLY. Include 3 bullet points. The prompt MUST instruct the candidate to use the texts.
 8. Task 4 (Extended Writing): A COMPLETELY INDEPENDENT ${ewType} prompt (${spec.writingWordLimit.ew.min}-${spec.writingWordLimit.ew.max} words) on a topic related to the general theme. NEVER mention texts, readings, or any previous task. The candidate writes entirely from their own knowledge. Include 3 bullet points.
 
-Return exactly this JSON:
+`}Return exactly this JSON:
 {
   "reading1Questions": {
     "paragraphMatching": {
@@ -494,7 +497,7 @@ Return exactly this JSON:
         {"id": "r2_gf5", "sentence": "..._______...", "correctAnswer": "string", "sectionHeading": "string"}
       ]
     }
-  },
+  }${readingOnly ? "" : `,
   "readingIntoWriting": {
     "title": "string",
     "writingType": "${riwType}",
@@ -508,9 +511,9 @@ Return exactly this JSON:
     "prompt": "INDEPENDENT writing prompt — NO reference to any texts, readings, or previous tasks",
     "wordLimit": {"min": ${spec.writingWordLimit.ew.min}, "max": ${spec.writingWordLimit.ew.max}},
     "bulletPoints": ["string", "string", "string"]
-  }
+  }`}
 }
-Rules: Return ONLY valid JSON. Paragraph matching options = noun phrases only (no full sentences). Exactly 6 options (A-F). Exactly 8 statements (A-H) per selection set. All gap-fill answers must be verbatim from the texts. Close all JSON arrays and objects correctly. CRITICAL: Task 4 (extendedWriting) prompt must NEVER mention texts A-D, readings, or any other task — it is always a standalone writing task from the candidate's own knowledge.`;
+Rules: Return ONLY valid JSON. Paragraph matching options = noun phrases only (no full sentences). Exactly 6 options (A-F). Exactly 8 statements (A-H) per selection set. All gap-fill answers must be verbatim from the texts. Close all JSON arrays and objects correctly.${readingOnly ? "" : " CRITICAL: Task 4 (extendedWriting) prompt must NEVER mention texts A-D, readings, or any other task — it is always a standalone writing task from the candidate's own knowledge."}`;
 }
 
 /** @deprecated Use getReadingTextsPrompt + getQuestionsPrompt instead */

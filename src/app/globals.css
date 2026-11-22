@@ -26,6 +26,10 @@
   --stamp-pass: #1f5fb8;
   --stamp-merit: #1e2a4a;
   --stamp-distinction: #8a6400;
+  /* Practice categories (one hue per ISE module) */
+  --cat-rw: #2f6fdb;
+  --cat-sl: #d9485f;
+  --cat-lang: #1f9d6b;
 }
 
 @theme inline {
@@ -71,6 +75,9 @@
   --stamp-pass: #8fb4f5;
   --stamp-merit: #d9def0;
   --stamp-distinction: #e6c35c;
+  --cat-rw: #7aa7ff;
+  --cat-sl: #f58a9b;
+  --cat-lang: #5fd3a1;
 }
 
 body {
@@ -92,6 +99,24 @@ body {
   background-repeat: no-repeat;
   padding: 0 0.06em;
 }
+
+/* Practice index: each ISE module gets one hue, used as a soft tint, border and icon chip. */
+.cat-rw { --cat: var(--cat-rw); }
+.cat-sl { --cat: var(--cat-sl); }
+.cat-lang { --cat: var(--cat-lang); }
+.cat-tile {
+  border: 1.5px solid color-mix(in srgb, var(--cat) 30%, transparent);
+  background-color: color-mix(in srgb, var(--cat) 7%, var(--paper));
+  transition: border-color 150ms, background-color 150ms, box-shadow 150ms;
+}
+.cat-tile:not([data-disabled="true"]):hover,
+.cat-tile:focus-within {
+  border-color: color-mix(in srgb, var(--cat) 75%, transparent);
+  background-color: color-mix(in srgb, var(--cat) 12%, var(--paper));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--cat) 35%, transparent);
+}
+.cat-chip { color: var(--cat); background-color: color-mix(in srgb, var(--cat) 16%, transparent); }
+.cat-dot { background-color: var(--cat); }
 
 /* Warm ruled-paper texture for hero/section backgrounds */
 .paper-bg {

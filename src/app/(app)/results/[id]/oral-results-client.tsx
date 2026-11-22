@@ -1,38 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Trophy, ArrowLeft, Lock, Mic, Radio } from "lucide-react";
-import Link from "next/link";
 import type { OralTaskType } from "@/types";
 import type { LiveMetrics } from "@/lib/live-metrics";
 import { CoachHud } from "@/components/exam/live/coach-hud";
 import { useI18n } from "@/components/i18n/language-provider";
+import { NotebookHeader, NotebookPage, Section } from "@/components/notebook/notebook";
+import {
+  BackLink, CriterionScore, LockedNote, NextSteps, ScoreTitle, Suggestions, useResultEyebrow,
+} from "@/components/results/results-parts";
 
-const TASK_LABELS: Record<OralTaskType, string> = {
-  TOPIC: "Topic Task",
-  COLLABORATIVE: "Collaborative Task",
-  CONVERSATION: "Conversation Task",
-  LISTENING: "Listening Task",
-};
-
-// Trinity ISE Speaking & Listening 4-criterion rating scale (applies to spoken tasks).
-const SPOKEN_SKILL_KEYS = [
-  "communicativeEffectiveness",
-  "interactiveListening",
-  "languageControl",
-  "delivery",
-] as const;
-
-const SKILL_LABELS: Record<string, string> = {
-  communicativeEffectiveness: "Communicative Effectiveness",
-  interactiveListening: "Interactive Listening",
-  languageControl: "Language Control",
-  delivery: "Delivery",
-  listening: "Independent Listening",
-};
+// Trinity ISE Speaking & Listening: four criteria on the spoken tasks, one on independent listening.
+const SPOKEN_SKILL_KEYS = ["communicativeEffectiveness", "interactiveListening", "languageControl", "delivery"] as const;
+type CriterionKey = (typeof SPOKEN_SKILL_KEYS)[number] | "listening";
 
 interface OralResultsClientProps {
   exam: {
@@ -55,225 +34,126 @@ interface OralResultsClientProps {
   isPro: boolean;
   /** Present for Live Examiner sessions: delivery metrics measured during the session. */
   liveMetrics?: LiveMetrics | null;
+  /** An admin viewing a learner's result: no "what next" actions. */
+  readOnly?: boolean;
 }
 
-export function OralResultsClient({ exam, feedback, exchanges, isPro, liveMetrics }: OralResultsClientProps) {
+export function OralResultsClient({ exam, feedback, exchanges, isPro, liveMetrics, readOnly = false }: OralResultsClientProps) {
   const { dict } = useI18n();
-  const getBand = (score: number | null) => {
-    if (score === null) return "N/A";
-    if (score >= 80) return "Distinction";
-    if (score >= 65) return "Merit";
-    if (score >= 50) return "Pass";
-    return "Fail";
-  };
-
-  const band = getBand(exam.overallScore);
-  const bandColor =
-    band === "Distinction" ? "text-purple-600" :
-    band === "Merit" ? "text-blue-600" :
-    band === "Pass" ? "text-green-600" :
-    "text-red-600";
+  const r = dict.results;
+  const eyebrow = useResultEyebrow(exam.level, liveMetrics ? r.liveOral : r.oral, exam.createdAt);
+  let n = 0;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Link href="/dashboard">
-        <Button variant="ghost" className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-1" /> Back to Dashboard
-        </Button>
-      </Link>
+    <div className="flex-1 bg-paper">
+      <NotebookPage className="pb-16">
+        {!readOnly && <BackLink />}
+        <NotebookHeader eyebrow={eyebrow} title={<ScoreTitle score={exam.overallScore} />} subtitle={r.subtitleOral} />
 
-      {/* Overall Score */}
-      <Card className="mb-8">
-        <CardContent className="flex flex-col items-center py-10">
-          <div className="flex items-center gap-2 mb-4">
-            <Mic className={`h-12 w-12 ${bandColor}`} />
-            <Trophy className={`h-12 w-12 ${bandColor}`} />
-          </div>
-          <h1 className="text-4xl font-display font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            {exam.overallScore != null ? `${exam.overallScore}%` : "Pending"}
-          </h1>
-          <Badge
-            variant={band === "Fail" ? "warning" : "success"}
-            className="mt-2 text-base px-4 py-1"
-          >
-            {band}
-          </Badge>
-          <p className="mt-2 text-sm text-zinc-500">
-            Oral Exam • {exam.level.replace("_", " ")} • {new Date(exam.createdAt).toLocaleDateString()}
-          </p>
-        </CardContent>
-      </Card>
-
-      {liveMetrics && liveMetrics.candidateWords > 0 && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-display text-xl">
-              <Radio className="h-5 w-5 text-rose-600" />
-              {dict.live.reportTitle}
-            </CardTitle>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{dict.live.reportSubtitle}</p>
-          </CardHeader>
-          <CardContent>
+        {liveMetrics && liveMetrics.candidateWords > 0 && (
+          <Section n={++n} title={dict.live.reportTitle}>
+            <p className="-mt-3 mb-5 max-w-2xl text-sm text-ink-soft">{dict.live.reportSubtitle}</p>
             <CoachHud metrics={liveMetrics} showNudges={false} />
-          </CardContent>
-        </Card>
+          </Section>
+        )}
+
+        <Section n={++n} title={r.byTask}>
+          <div className="divide-y divide-rule">
+            {feedback.map((f) => (
+              <OralTask
+                key={f.taskType}
+                f={f}
+                isPro={isPro}
+                exchanges={exchanges.filter((e) => e.taskType === f.taskType)}
+              />
+            ))}
+          </div>
+        </Section>
+
+        {!readOnly && <NextSteps n={++n} />}
+      </NotebookPage>
+    </div>
+  );
+}
+
+function OralTask({ f, isPro, exchanges }: {
+  f: OralResultsClientProps["feedback"][number];
+  isPro: boolean;
+  exchanges: OralResultsClientProps["exchanges"];
+}) {
+  const { dict, t } = useI18n();
+  const r = dict.results;
+  const fb = f.feedback as Record<string, { score: number; comments: string }> & { suggestions?: string[]; summary?: string };
+  const label = r.task[f.taskType as OralTaskType] ?? f.taskType;
+
+  // Trinity: the Listening task is scored 0–5 on one criterion; spoken tasks 0–20 (four criteria × 5).
+  const isListening = f.taskType === "LISTENING";
+  const maxScore = isListening ? 5 : 20;
+  const keys: readonly CriterionKey[] = isListening ? ["listening"] : SPOKEN_SKILL_KEYS;
+  const score = f.score != null ? `${f.score}/${maxScore}` : "—";
+
+  return (
+    <article className="space-y-5 py-8 first:pt-0">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h3 className="font-display text-xl font-semibold text-ink">{label}</h3>
+        <span className="font-display text-2xl font-semibold tabular-nums text-ink">{score}</span>
+      </div>
+
+      {!isPro ? (
+        <LockedNote title={r.lockedOralTitle} body={r.lockedOralBody} />
+      ) : (
+        <>
+          {fb.summary && (
+            <div className="max-w-3xl border-l-2 border-ink pl-4">
+              <p className="font-display text-base font-semibold text-ink">{t("results.whyScore", { score: f.score ?? "—", max: maxScore })}</p>
+              <p className="mt-1 text-[15px] leading-relaxed text-ink">{fb.summary}</p>
+            </div>
+          )}
+
+          <div className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+            {keys.map((key) => {
+              const area = fb[key];
+              if (!area || typeof area !== "object") return null;
+              return <CriterionScore key={key} label={r.criterion[key]} score={area.score} max={5} comments={area.comments} />;
+            })}
+          </div>
+
+          <Suggestions items={fb.suggestions ?? []} />
+
+          {exchanges.length > 0 && <Transcript exchanges={exchanges} />}
+        </>
       )}
+    </article>
+  );
+}
 
-      {/* Task-by-task feedback */}
-      <h2 className="text-xl font-display font-semibold tracking-tight mb-4 text-zinc-900 dark:text-zinc-50">
-        Performance by Task
-      </h2>
-      <div className="space-y-6">
-        {feedback.map((f) => {
-          const fb = f.feedback as Record<string, { score: number; comments: string }> & {
-            suggestions?: string[];
-            summary?: string;
-          };
-          const taskLabel = TASK_LABELS[f.taskType as OralTaskType] || f.taskType;
-
-          // Trinity: Listening task is scored 0-5 on a single criterion; spoken tasks 0-20 (sum of 4).
-          const isListening = f.taskType === "LISTENING";
-          const maxScore = isListening ? 5 : 20;
-          const passThreshold = isListening ? 3 : 10;
-          const distinctionThreshold = isListening ? 5 : 17;
-          const skillKeys: readonly string[] = isListening
-            ? ["listening"]
-            : SPOKEN_SKILL_KEYS;
-
+function Transcript({ exchanges }: { exchanges: OralResultsClientProps["exchanges"] }) {
+  const { dict, t } = useI18n();
+  const r = dict.results;
+  return (
+    <details className="group">
+      <summary className="cursor-pointer text-sm font-medium text-ink underline decoration-rule decoration-2 underline-offset-4 hover:decoration-marker">
+        {r.transcript}
+      </summary>
+      <div className="mt-3 max-h-80 space-y-3 overflow-y-auto border-l-2 border-margin pl-4 text-sm leading-relaxed sm:max-h-[28rem]">
+        {exchanges.map((e, i) => {
+          // Listening turns store the passage as JSON; show a short preview instead.
+          let content = e.content;
+          try {
+            const parsed = JSON.parse(e.content);
+            if (parsed.listeningText) content = t("results.listeningPassage", { text: String(parsed.listeningText).slice(0, 100) });
+          } catch {
+            // Plain text turn.
+          }
+          const examiner = e.role === "EXAMINER";
           return (
-            <Card key={f.taskType}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{taskLabel}</CardTitle>
-                  {f.score != null && (
-                    <Badge variant={f.score >= distinctionThreshold ? "success" : f.score >= passThreshold ? "default" : "warning"}>
-                      {f.score}/{maxScore}
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {isPro ? (
-                  <div className="space-y-6">
-                    {/* Why this score — plain-language summary */}
-                    {fb.summary && (
-                      <div className="rounded-xl border-l-4 border-brand bg-brand/5 dark:bg-brand/10 p-4">
-                        <h4 className="text-sm font-display font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
-                          Why you got {f.score}/{maxScore}
-                        </h4>
-                        <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-                          {fb.summary}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Skill scores — Trinity 4-criterion rating scale */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                      {skillKeys.map((key) => {
-                        const area = fb[key];
-                        if (!area || typeof area !== "object") return null;
-                        return (
-                          <div key={key}>
-                            <div className="flex justify-between text-sm mb-1.5">
-                              <span className="font-medium text-zinc-900 dark:text-zinc-100">{SKILL_LABELS[key] ?? key}</span>
-                              <span className="font-semibold">{area.score}/5</span>
-                            </div>
-                            <Progress value={(area.score / 5) * 100} />
-                            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{area.comments}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Suggestions */}
-                    {fb.suggestions && fb.suggestions.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-zinc-500 mb-2">Suggestions</h4>
-                        <ul className="space-y-1">
-                          {fb.suggestions.map((s: string, idx: number) => (
-                            <li
-                              key={idx}
-                              className="text-sm text-zinc-600 dark:text-zinc-400 flex items-start gap-2"
-                            >
-                              <span className="text-blue-600 shrink-0">💡</span> {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Transcript */}
-                    <details className="mt-2">
-                      <summary className="text-sm font-medium text-zinc-500 cursor-pointer hover:text-zinc-700">
-                        View Transcript
-                      </summary>
-                      <div className="mt-2 rounded-lg bg-zinc-50 dark:bg-zinc-900 p-4 text-sm leading-relaxed border max-h-80 sm:max-h-[28rem] overflow-y-auto space-y-3">
-                        {exchanges
-                          .filter((e) => e.taskType === f.taskType)
-                          .map((e, i) => {
-                            // Skip JSON-encoded listening data
-                            let content = e.content;
-                            try {
-                              const parsed = JSON.parse(e.content);
-                              if (parsed.listeningText) {
-                                content = `[Listening passage: ${parsed.listeningText.slice(0, 100)}...]`;
-                              }
-                            } catch {
-                              // Not JSON, use as-is
-                            }
-
-                            return (
-                              <div key={i}>
-                                <strong
-                                  className={
-                                    e.role === "EXAMINER"
-                                      ? "text-blue-700 dark:text-blue-300"
-                                      : "text-zinc-500 dark:text-zinc-400"
-                                  }
-                                >
-                                  {e.role === "EXAMINER" ? "Examiner" : "You"}
-                                </strong>
-                                <p className={
-                                  e.role === "EXAMINER"
-                                    ? "text-blue-700/90 dark:text-blue-300/90"
-                                    : "text-zinc-900 dark:text-zinc-100"
-                                }>
-                                  {content}
-                                </p>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </details>
-                  </div>
-                ) : (
-                  <div className="rounded-lg bg-zinc-100 dark:bg-zinc-900 p-6 text-center border-dashed border-2 border-zinc-300 dark:border-zinc-700">
-                    <Lock className="h-8 w-8 mx-auto mb-2 text-zinc-400" />
-                    <p className="text-sm text-zinc-500 mb-1">
-                      Score: {f.score != null ? `${f.score}/${maxScore}` : "N/A"}
-                    </p>
-                    <p className="text-sm text-zinc-500 mb-3">
-                      Detailed feedback and transcript available for Pro users
-                    </p>
-                    <Link href="/pricing">
-                      <Button size="sm">Upgrade to Pro</Button>
-                    </Link>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <div key={i}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{examiner ? r.examiner : r.you}</p>
+              <p className={examiner ? "text-ink-soft" : "text-ink"}>{content}</p>
+            </div>
           );
         })}
       </div>
-
-      {/* Actions */}
-      <div className="mt-8 flex justify-center gap-4">
-        <Link href="/dashboard">
-          <Button variant="outline" size="lg">
-            Take Another Exam
-          </Button>
-        </Link>
-      </div>
-    </div>
+    </details>
   );
 }

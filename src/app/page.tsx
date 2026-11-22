@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { HeroSection } from "@/components/landing/hero-section";
 import { FeaturesSection } from "@/components/landing/features-section";
+import { NewsSection } from "@/components/landing/news-section";
 import { ReadinessScoreSection } from "@/components/landing/readiness-score-section";
 import { SeeInActionSection } from "@/components/landing/see-in-action-section";
 import { ComparisonSection } from "@/components/landing/comparison-section";
@@ -18,6 +19,7 @@ export default function Home() {
       <main className="flex-1 paper-bg">
         <HeroSection />
         <FeaturesSection />
+        <NewsSection />
         <ReadinessScoreSection />
         <SeeInActionSection />
         <ComparisonSection />

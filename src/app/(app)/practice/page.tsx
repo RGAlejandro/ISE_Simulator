@@ -1,8 +1,11 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser, getDailyUsage } from "@/lib/user";
-import { PracticeClient } from "./practice-client";
+import { getCurrentUser, getDailyUsage, isProUser } from "@/lib/user";
+import { PracticeClient, type SetupKind } from "./practice-client";
 
-export default async function PracticePage() {
+const START: SetupKind[] = ["written", "listening", "reading"];
+
+export default async function PracticePage({ searchParams }: { searchParams: Promise<{ start?: string }> }) {
+  const { start } = await searchParams;
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
 
@@ -10,15 +13,11 @@ export default async function PracticePage() {
 
   return (
     <PracticeClient
-      isPro={user.plan === "PRO" || user.plan === "ADMIN"}
-      writtenCount={usage.writtenCount}
-      oralCount={usage.oralCount}
-      listeningCount={usage.listeningCount}
-      readingCount={usage.readingCount}
-      writingCount={usage.writingCount}
-      canTakeWritten={usage.canTakeWritten}
-      canTakeOral={usage.canTakeOral}
-      canTakeListening={usage.canTakeListening}
+      isPro={isProUser(user)}
+      usage={usage}
+      examModules={user.examModules}
+      examLevel={user.examLevel}
+      autoStart={START.includes(start as SetupKind) ? (start as SetupKind) : null}
     />
   );
 }

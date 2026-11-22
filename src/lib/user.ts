@@ -64,9 +64,11 @@ export async function getDailyUsage(userId: string): Promise<UserUsage> {
     include: { subscription: true },
   });
 
-  const usage = await prisma.dailyUsage.findUnique({
-    where: { userId_date: { userId, date: today } },
-  });
+  const [usage, translationCount] = await Promise.all([
+    prisma.dailyUsage.findUnique({ where: { userId_date: { userId, date: today } } }),
+    // Translation rounds are counted from their own sessions (no DailyUsage column).
+    prisma.translationSession.count({ where: { userId, createdAt: { gte: today } } }),
+  ]);
 
   const isPro = isProUser(user);
   const writtenCount = usage?.writtenCount ?? 0;
@@ -81,11 +83,13 @@ export async function getDailyUsage(userId: string): Promise<UserUsage> {
     listeningCount,
     readingCount,
     writingCount,
+    translationCount,
     canTakeWritten: isPro || writtenCount < FREE_DAILY_LIMIT.written,
     canTakeOral: isPro || oralCount < FREE_DAILY_LIMIT.oral,
     canTakeListening: isPro || listeningCount < FREE_DAILY_LIMIT.listening,
     canTakeReading: isPro || readingCount < FREE_DAILY_LIMIT.reading,
     canTakeWriting: isPro || writingCount < FREE_DAILY_LIMIT.writing,
+    canTakeTranslation: isPro || translationCount < FREE_DAILY_LIMIT.translation,
   };
 }
 

@@ -13,7 +13,7 @@ import type { ExamLevel, WritingEvaluation } from "@/types";
 export interface TutorSnapshot {
   today: string;
   firstName: string | null;
-  goal: { level: ExamLevel | null; examDate: string | null; daysLeft: number | null; phase: PlanPhase | null };
+  goal: { level: ExamLevel | null; examDate: string | null; daysLeft: number | null; phase: PlanPhase | null; modulesToPass: string; targetBand: string };
   readiness: null | {
     level: ExamLevel;
     passChancePercent: number;
@@ -48,7 +48,7 @@ const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…`
 export async function buildTutorSnapshot(userId: string, now = new Date()): Promise<TutorSnapshot> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { name: true, examLevel: true, examDate: true },
+    select: { name: true, examLevel: true, examDate: true, examModules: true, targetBand: true },
   });
 
   const [{ level, report }, drafts, lists, saved, due, notStarted, learned, struggling, known] = await Promise.all([
@@ -85,6 +85,7 @@ export async function buildTutorSnapshot(userId: string, now = new Date()): Prom
 
   const recentAttempts = level
     ? (await loadReadinessEvidence(userId, level)).observations
+        .filter((o) => !report || report.skills.some((s) => s.skill === o.skill))
         .slice()
         .sort((a, b) => b.at.getTime() - a.at.getTime())
         .slice(0, 12)
@@ -106,6 +107,8 @@ export async function buildTutorSnapshot(userId: string, now = new Date()): Prom
       examDate: isoDay(user?.examDate),
       daysLeft: days,
       phase: days === null ? null : phaseFor(days),
+      modulesToPass: user?.examModules ?? "BOTH",
+      targetBand: user?.targetBand ?? "PASS",
     },
     readiness: report && level
       ? {

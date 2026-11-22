@@ -22,5 +22,5 @@ export default async function WrittenExamPage({ params }: PageProps) {
 
   const content = exam.content as unknown as WrittenExamContent;
 
-  return <WrittenExamClient examId={exam.id} content={content} level={exam.level} />;
+  return <WrittenExamClient examId={exam.id} content={content} level={exam.level} mode={exam.mode} />;
 }

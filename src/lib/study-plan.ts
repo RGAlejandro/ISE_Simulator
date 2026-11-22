@@ -57,9 +57,9 @@ const TARGETS: Record<PlanPhase, Record<PlanTargetKey, number>> = {
 const HREFS: Record<PlanTargetKey, string> = {
   writing: "/writing",
   review: "/vocabulary/review",
-  reading: "/vocabulary/reading",
-  oral: "/practice",
-  mock: "/practice",
+  reading: "/practice?start=reading",
+  oral: "/exam/oral/setup",
+  mock: "/practice?start=written",
 };
 
 export function weeklyTargets(phase: PlanPhase, stats: WeekStats): PlanTarget[] {

@@ -69,6 +69,7 @@ export const FREE_DAILY_LIMIT = {
   listening: 3,
   reading: 2,
   writing: 1,
+  translation: 1,
 };
 
 /** Daily cap on small AI helpers (handwriting transcription, sentence checks). */

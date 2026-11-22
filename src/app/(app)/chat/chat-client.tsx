@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/components/i18n/language-provider";
 import { RichText } from "@/components/chat/rich-text";
-import { PracticeAction, UsedDataChips, VocabListAction } from "@/components/chat/tutor-actions";
+import { PracticeAction, SetGoalAction, UsedDataChips, VocabListGroup } from "@/components/chat/tutor-actions";
 import { downscaleImage } from "@/lib/image-resize";
 import type { TutorAction, TutorDataKey } from "@/lib/tutor";
 
@@ -114,7 +114,9 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
       }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setMessages((prev) => [...prev, { role: "assistant", content: typeof data.error === "string" ? data.error : c.errors.generic }]);
+        // Server faults get the translated generic message; 4xx explain themselves (limits, photo size).
+        const content = res.status < 500 && typeof data.error === "string" ? data.error : c.errors.generic;
+        setMessages((prev) => [...prev, { role: "assistant", content }]);
         return;
       }
       setMessages((prev) => [
@@ -164,7 +166,7 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
   }
 
   return (
-    <div className="flex flex-col paper-bg" style={{ minHeight: "calc(100dvh - 4rem)" }}>
+    <div className="flex flex-col bg-paper" style={{ minHeight: "calc(100dvh - 4rem)" }}>
       {/* Header */}
       <div className="border-b border-zinc-200/80 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/40 backdrop-blur">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 py-4 flex items-center gap-3">
@@ -219,30 +221,24 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
               {isPro ? c.heroPro.body : c.heroFree.body}
             </p>
 
-            <div className="mt-8 grid w-full grid-cols-1 sm:grid-cols-2 gap-3">
+            <ol className="mt-8 w-full divide-y divide-rule border-y border-rule text-left">
               {(isPro ? proSuggestions : freeSuggestions).map((s, i) => (
-                <motion.button
-                  key={s.title}
-                  initial={{ y: 16, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 + i * 0.07 }}
-                  whileHover={{ y: -3 }}
-                  onClick={() => pickSuggestion(s)}
-                  className={cn(
-                    "group flex items-start gap-3 rounded-xl border bg-white/70 dark:bg-zinc-900/60 backdrop-blur px-4 py-3 text-left transition-colors hover:border-brand dark:hover:border-brand",
-                    startWithPhotos && "photos" in s && s.photos ? "border-brand ring-2 ring-brand/20" : "border-zinc-200 dark:border-zinc-700",
-                  )}
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand dark:bg-brand/15">
-                    <s.icon className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{s.title}</p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-snug line-clamp-2">{s.prompt}</p>
-                  </div>
-                </motion.button>
+                <li key={s.title}>
+                  <button
+                    type="button"
+                    onClick={() => pickSuggestion(s)}
+                    className="group flex w-full items-start gap-4 py-3.5 text-left"
+                  >
+                    <span className="w-5 shrink-0 pt-0.5 font-display text-lg font-semibold text-ink-soft/60 tabular-nums">{i + 1}</span>
+                    <s.icon className={cn("mt-1 h-4 w-4 shrink-0 text-ink-soft", startWithPhotos && "photos" in s && s.photos === true && "text-pen")} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-medium text-ink group-hover:underline decoration-marker decoration-4 underline-offset-2">{s.title}</span>
+                      <span className="block text-sm text-ink-soft leading-snug">{s.prompt}</span>
+                    </span>
+                  </button>
+                </li>
               ))}
-            </div>
+            </ol>
 
             {!isPro && (
               <Link
@@ -286,9 +282,10 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
                       {m.content && <Bubble role="assistant"><RichText text={m.content} /></Bubble>}
                       {(m.actions?.length || m.usedData?.length) ? (
                         <div className="ml-9.5 space-y-2.5">
-                          {m.actions?.map((a, ai) =>
-                            a.type === "create_vocab_list" ? <VocabListAction key={ai} action={a} /> : null,
+                          {m.actions?.some((a) => a.type === "create_vocab_list") && (
+                            <VocabListGroup actions={m.actions.filter((a) => a.type === "create_vocab_list")} />
                           )}
+                          {m.actions?.map((a, ai) => (a.type === "set_goal" ? <SetGoalAction key={ai} action={a} /> : null))}
                           {m.actions?.some((a) => a.type === "practice") && (
                             <div className="flex flex-wrap gap-2">
                               {m.actions.map((a, ai) => (a.type === "practice" ? <PracticeAction key={ai} action={a} /> : null))}

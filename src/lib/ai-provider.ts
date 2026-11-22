@@ -91,7 +91,7 @@ function isRetryableError(msg: string): boolean {
     msg.includes("404") ||
     msg.includes("No endpoints found") ||
     msg.includes("json_validate_failed") ||
-    msg.includes("Failed to generate JSON")
+    msg.includes("Failed to generate")
   );
 }
 

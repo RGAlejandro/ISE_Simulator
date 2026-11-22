@@ -1,82 +1,83 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { NotebookHeader, NotebookPage, Section } from "@/components/notebook/notebook";
 import { useI18n } from "@/components/i18n/language-provider";
 import { ClassErrors, ClassSkills, CriteriaHeatmap, KpiRow, ReadinessHistogram } from "@/components/teams/team-charts";
 import { AssignmentsPanel, InviteCard, LessonPanel, MembersTable } from "@/components/teams/team-panels";
 import type { TeamDashboard } from "@/lib/teams-server";
 
-function Card({ title, subtitle, children, className }: { title: string; subtitle?: string; children: React.ReactNode; className?: string }) {
-  return (
-    <section className={`min-w-0 rounded-3xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 ${className ?? ""}`}>
-      <h2 className="font-display text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{title}</h2>
-      {subtitle && <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{subtitle}</p>}
-      <div className="mt-4">{children}</div>
-    </section>
-  );
-}
-
-export function TeamPanelClient({ data }: { data: TeamDashboard }) {
+export function TeamPanelClient({ data, isAdmin = false }: { data: TeamDashboard; isAdmin?: boolean }) {
   const { dict, t } = useI18n();
   const tm = dict.teams;
   const { org } = data;
 
   return (
-    <div className="paper-bg min-h-[calc(100dvh-4rem)]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6">
-        <header className="space-y-3">
-          <Link href="/teams" className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
-            <ArrowLeft className="h-3.5 w-3.5" /> {tm.back}
-          </Link>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="space-y-1">
-              <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{org.name}</h1>
-              <p className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                <Users className="h-4 w-4" />
-                {org.levelLabel} · {data.teachers.map((x) => x.name).join(", ")}
-              </p>
+    <div className="flex-1 bg-paper">
+      <NotebookPage className="pb-16">
+        <NotebookHeader
+          eyebrow={
+            <Link href="/teams" className="inline-flex items-center gap-1.5 hover:text-ink">
+              <ArrowLeft className="h-3.5 w-3.5" /> {tm.back}
+            </Link>
+          }
+          title={org.name}
+          subtitle={`${org.levelLabel} · ${data.teachers.map((x) => x.name).join(", ")}`}
+        />
+
+        <Section n={1} title={tm.histTitle}>
+          <KpiRow kpis={data.kpis} />
+          <div className="mt-8 grid gap-10 lg:grid-cols-2">
+            <div>
+              <p className="mb-3 text-sm text-ink-soft">{t("teams.histSubtitle", { level: org.levelLabel })}</p>
+              <ReadinessHistogram bins={data.histogram} />
+            </div>
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{tm.skillsTitle}</p>
+              <p className="mb-3 text-sm text-ink-soft">{tm.skillsSubtitle}</p>
+              <ClassSkills skills={data.classSkills} />
             </div>
           </div>
-        </header>
+        </Section>
 
-        <KpiRow kpis={data.kpis} />
+        <Section n={2} title={tm.tableTitle}>
+          <MembersTable orgId={org.id} members={data.members} isAdmin={isAdmin} />
+        </Section>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card title={tm.histTitle} subtitle={t("teams.histSubtitle", { level: org.levelLabel })}>
-            <ReadinessHistogram bins={data.histogram} />
-          </Card>
-          <Card title={tm.skillsTitle} subtitle={tm.skillsSubtitle}>
-            <ClassSkills skills={data.classSkills} />
-          </Card>
-        </div>
+        <Section n={3} title={tm.heatTitle}>
+          <p className="-mt-3 mb-4 max-w-2xl text-sm text-ink-soft">{tm.heatSubtitle}</p>
+          {data.members.length ? <CriteriaHeatmap members={data.members} /> : <p className="text-sm text-ink-soft">{tm.noStudents}</p>}
+        </Section>
 
-        <Card title={tm.tableTitle}>
-          <MembersTable orgId={org.id} members={data.members} />
-        </Card>
+        <Section n={4} title={tm.errorsTitle}>
+          <div className="grid gap-10 lg:grid-cols-5">
+            <div className="lg:col-span-2">
+              <p className="mb-4 text-sm text-ink-soft">{tm.errorsSubtitle}</p>
+              <ClassErrors errors={data.classErrors} students={data.kpis.students} />
+            </div>
+            <div className="lg:col-span-3">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{tm.lessonTitle}</p>
+              <p className="mb-4 text-sm text-ink-soft">{tm.lessonSubtitle}</p>
+              <LessonPanel orgId={org.id} lesson={data.lesson} />
+            </div>
+          </div>
+        </Section>
 
-        <Card title={tm.heatTitle} subtitle={tm.heatSubtitle}>
-          {data.members.length ? <CriteriaHeatmap members={data.members} /> : <p className="text-sm text-zinc-500">{tm.noStudents}</p>}
-        </Card>
-
-        <div className="grid gap-6 lg:grid-cols-5">
-          <Card title={tm.errorsTitle} subtitle={tm.errorsSubtitle} className="lg:col-span-2">
-            <ClassErrors errors={data.classErrors} students={data.kpis.students} />
-          </Card>
-          <Card title={tm.lessonTitle} subtitle={tm.lessonSubtitle} className="lg:col-span-3">
-            <LessonPanel orgId={org.id} lesson={data.lesson} />
-          </Card>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-5">
-          <Card title={tm.assignTitle} subtitle={tm.assignSubtitle} className="lg:col-span-3">
-            <AssignmentsPanel orgId={org.id} assignments={data.assignments} />
-          </Card>
-          <Card title={tm.inviteTitle} subtitle={tm.inviteBody} className="lg:col-span-2">
-            <InviteCard joinCode={org.joinCode} />
-          </Card>
-        </div>
-      </div>
+        <Section n={5} title={tm.assignTitle}>
+          <div className="grid gap-10 lg:grid-cols-5">
+            <div className="lg:col-span-3">
+              <p className="mb-4 text-sm text-ink-soft">{tm.assignSubtitle}</p>
+              <AssignmentsPanel orgId={org.id} assignments={data.assignments} />
+            </div>
+            <div className="lg:col-span-2">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{tm.inviteTitle}</p>
+              <p className="mb-4 text-sm text-ink-soft">{tm.inviteBody}</p>
+              <InviteCard joinCode={org.joinCode} />
+            </div>
+          </div>
+        </Section>
+      </NotebookPage>
     </div>
   );
 }

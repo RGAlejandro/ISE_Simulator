@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ArrowUpDown, Crown, ShieldCheck, User as UserIcon, Loader2 } from "lucide-react";
@@ -174,7 +176,9 @@ export function UsersClient({ users, currentUserId }: Props) {
                           </div>
                           <div className="min-w-0">
                             <div className="font-medium text-zinc-900 dark:text-zinc-100 truncate flex items-center gap-2">
-                              {u.name || u.email.split("@")[0]}
+                              <Link href={`/admin/users/${u.id}`} className="truncate hover:underline decoration-marker decoration-4 underline-offset-2">
+                                {u.name || u.email.split("@")[0]}
+                              </Link>
                               {isMe && <span className="text-[10px] uppercase tracking-wide text-blue-600 dark:text-blue-400">You</span>}
                             </div>
                             <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{u.email}</div>

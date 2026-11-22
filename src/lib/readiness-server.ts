@@ -159,13 +159,19 @@ export async function loadReadinessEvidence(userId: string, level: ExamLevel) {
   return { observations, criteria };
 }
 
-export async function getReadiness(userId: string, opts: { level?: ExamLevel; now?: Date } = {}): Promise<ReadinessResult> {
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { examLevel: true, examDate: true } });
+/**
+ * `useGoal` (default true) measures the learner's own goal: only the module(s)
+ * they still have to pass, against the band they aim for. Teachers' class views
+ * pass `useGoal: false` to compare everyone on all four skills at Pass.
+ */
+export async function getReadiness(userId: string, opts: { level?: ExamLevel; now?: Date; useGoal?: boolean } = {}): Promise<ReadinessResult> {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { examLevel: true, examDate: true, examModules: true, targetBand: true } });
   if (!user) return { level: null, report: null };
   const level = opts.level ?? (await resolveLevel(userId, user.examLevel));
   if (!level) return { level: null, report: null };
   const { observations, criteria } = await loadReadinessEvidence(userId, level);
   // Only use the exam date when it belongs to the level being measured.
   const examDate = user.examLevel === level ? user.examDate : null;
-  return { level, report: computeReadiness(observations, criteria, { now: opts.now, examDate }) };
+  const goal = opts.useGoal === false ? {} : { modules: user.examModules, target: user.targetBand };
+  return { level, report: computeReadiness(observations, criteria, { now: opts.now, examDate, ...goal }) };
 }

@@ -25,10 +25,11 @@ function noThinking(modelName: string) {
 }
 
 async function tryWithFallback<T>(
-  fn: (modelName: string) => Promise<T>
+  fn: (modelName: string) => Promise<T>,
+  models: readonly string[] = MODELS,
 ): Promise<T> {
   let lastError: unknown;
-  for (const modelName of MODELS) {
+  for (const modelName of models) {
     try {
       const result = await fn(modelName);
       return result;
@@ -36,8 +37,10 @@ async function tryWithFallback<T>(
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[Gemini] Model ${modelName} failed: ${msg.slice(0, 120)}`);
       lastError = err;
-      // Only retry on 503/overloaded/quota/malformed-JSON errors
-      if (!msg.includes("503") && !msg.includes("404") && !msg.includes("overloaded") && !msg.includes("high demand") && !msg.includes("RESOURCE_EXHAUSTED") && !msg.includes("Failed to generate JSON") && !msg.includes("Request aborted")) {
+      // Retry the next model on overload, quota (each model has its own daily quota),
+      // retired models, malformed JSON and timeouts.
+      const retryable = ["503", "404", "429", "quota", "overloaded", "high demand", "RESOURCE_EXHAUSTED", "Failed to generate JSON", "Request aborted"];
+      if (!retryable.some((k) => msg.includes(k))) {
         throw err; // Non-retryable error, don't try other models
       }
     }
@@ -135,7 +138,7 @@ export async function geminiGenerateChatJSONWithFiles(
   systemPrompt: string,
   userPrompt: string,
   files: { data: string; mimeType: string }[],
-  options?: { temperature?: number; timeoutMs?: number }
+  options?: { temperature?: number; timeoutMs?: number; noThinking?: boolean; /** Restrict the fallback chain (e.g. only fast models). */ models?: readonly string[] }
 ): Promise<unknown> {
   return tryWithFallback(async (modelName) => {
     const model = getGenAI().getGenerativeModel(
@@ -144,6 +147,8 @@ export async function geminiGenerateChatJSONWithFiles(
         generationConfig: {
           temperature: options?.temperature ?? 0.4,
           responseMimeType: "application/json",
+          // Reading a page needs no reasoning; skipping it roughly halves the time on 2.5 models.
+          ...(options?.noThinking ? noThinking(modelName) : {}),
         },
         systemInstruction: systemPrompt,
       },
@@ -155,7 +160,7 @@ export async function geminiGenerateChatJSONWithFiles(
       userPrompt,
     ]);
     return parseAIJson(result.response.text());
-  });
+  }, options?.models);
 }
 
 export async function geminiGenerateChatJSON(

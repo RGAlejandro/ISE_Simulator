@@ -312,7 +312,7 @@ export function HowItWorksSection() {
     },
   ];
 
-  return (    <section className="py-14 sm:py-20 lg:py-28 overflow-hidden">
+  return (    <section id="how-it-works" className="scroll-mt-20 py-14 sm:py-20 lg:py-28 overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <motion.div

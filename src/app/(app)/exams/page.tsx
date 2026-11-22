@@ -44,7 +44,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Search
     type === "oral" ? [] : prisma.writtenExam.findMany({
       where: writtenWhere,
       orderBy: { createdAt: "desc" },
-      select: { id: true, level: true, status: true, score: true, createdAt: true },
+      select: { id: true, level: true, mode: true, status: true, score: true, createdAt: true },
     }),
     type === "written" ? [] : prisma.oralExam.findMany({
       where: oralWhere,
@@ -57,7 +57,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Search
 
   const merged = [
     ...written.map(e => ({
-      id: e.id, type: "written" as const, level: e.level, status: e.status,
+      id: e.id, type: "written" as const, reading: e.mode === "READING", level: e.level, status: e.status,
       score: e.score, createdAt: e.createdAt.toISOString(),
     })),
     ...oral.map(e => ({

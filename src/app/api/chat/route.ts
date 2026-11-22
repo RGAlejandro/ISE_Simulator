@@ -7,7 +7,8 @@ import { isProUser, incrementUsage, consumeAiAssist } from "@/lib/user";
 import { FREE_CHAT_DAILY_LIMIT } from "@/lib/constants";
 import { buildTutorSnapshot } from "@/lib/tutor-context";
 import { buildTutorConversation, getTutorSystemPrompt } from "@/lib/prompts/tutor";
-import { sanitizeTutorResponse } from "@/lib/tutor";
+import { sanitizeTutorResponse, type TutorAction } from "@/lib/tutor";
+import { extractPhotoLists, photoListActions, photoListSummary, sanitizePhotoListMode, unreadableNote } from "@/lib/photo-lists";
 
 // Defensive caps on the prompt we build from client-provided history
 const MAX_HISTORY_MESSAGES = 20;
@@ -16,6 +17,13 @@ const MAX_MESSAGE_CHARS = 2000;
 // Photos for the Pro tutor (study material: flashcards, notes, textbook pages)
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 const MAX_PHOTOS = 5;
+
+/** Reply when the tutor's own answer failed but the photo lists are ready. */
+const LISTS_READY: Record<string, string> = {
+  es: "He leído tus fotos. Revisa las listas de abajo y créalas con un clic.",
+  en: "I've read your photos. Check the lists below and create them with one click.",
+  fr: "J'ai lu vos photos. Vérifiez les listes ci-dessous et créez-les en un clic.",
+};
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
 /** Gemini's inline-data request cap is ~20 MB. */
 const MAX_PHOTOS_TOTAL = 18 * 1024 * 1024;
@@ -119,20 +127,47 @@ export async function POST(req: NextRequest) {
       const snapshot = await buildTutorSnapshot(user.id);
       const system = getTutorSystemPrompt(snapshot, { locale, photoCount: photos.length });
       const conversation = buildTutorConversation(messages, photos.length);
-      const raw = photos.length > 0
-        ? await geminiGenerateChatJSONWithFiles(
-            system,
+
+      if (photos.length === 0) {
+        const tutor = sanitizeTutorResponse(await generateChatJSON(system, conversation, { temperature: 0.5, prefer: "gemini" }));
+        if (!tutor.reply && tutor.actions.length === 0) {
+          return NextResponse.json({ error: "Failed to generate response" }, { status: 502 });
+        }
+        return NextResponse.json({ message: tutor.reply, actions: tutor.actions, usedData: tutor.usedData });
+      }
+
+      // Photos: each one is read into its own word list, in parallel. Then the tutor
+      // replies from what was read (text only, fast) and just picks the grouping.
+      // Photos with no vocabulary on them (an essay, an exercise) go to the tutor as images.
+      const files = await Promise.all(
+        photos.map(async (p) => ({ data: Buffer.from(await p.arrayBuffer()).toString("base64"), mimeType: p.type })),
+      );
+      const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+      const lists = await extractPhotoLists(files, { instruction: lastUser, level: snapshot.goal.level });
+      const raw = lists.some((l) => l.words.length > 0)
+        ? await generateChatJSON(
+            getTutorSystemPrompt(snapshot, { locale, photoCount: photos.length, photoSummary: photoListSummary(lists) }),
             conversation,
-            await Promise.all(photos.map(async (p) => ({ data: Buffer.from(await p.arrayBuffer()).toString("base64"), mimeType: p.type }))),
-            { temperature: 0.3 },
-          )
-        : await generateChatJSON(system, conversation, { temperature: 0.5, prefer: "gemini" });
+            { temperature: 0.4 },
+          ).catch((err) => {
+            console.error("Tutor photo reply error:", err);
+            return null;
+          })
+        : await geminiGenerateChatJSONWithFiles(system, conversation, files, { temperature: 0.3, timeoutMs: 30_000 }).catch((err) => {
+            console.error("Tutor photo reply error:", err);
+            return null;
+          });
       const tutor = sanitizeTutorResponse(raw);
-      if (photos.length > 0 && !tutor.usedData.includes("photos")) tutor.usedData.push("photos");
-      if (!tutor.reply && tutor.actions.length === 0) {
+      const listActions = photoListActions(lists, sanitizePhotoListMode((raw as { photoLists?: unknown } | null)?.photoLists), locale);
+      const actions: TutorAction[] = [...listActions, ...tutor.actions.filter((a) => a.type !== "create_vocab_list")];
+      // The tutor already explains unread photos (they're in its context); add the note only if it didn't answer.
+      const reply = tutor.reply
+        || [listActions.length > 0 ? LISTS_READY[locale] ?? LISTS_READY.es : "", unreadableNote(lists, locale)].filter(Boolean).join("\n\n");
+      if (!reply && actions.length === 0) {
         return NextResponse.json({ error: "Failed to generate response" }, { status: 502 });
       }
-      return NextResponse.json({ message: tutor.reply, actions: tutor.actions, usedData: tutor.usedData });
+      const usedData = tutor.usedData.includes("photos") ? tutor.usedData : [...tutor.usedData, "photos" as const];
+      return NextResponse.json({ message: reply, actions, usedData });
     } catch (err) {
       console.error("Tutor chat error:", err);
       return NextResponse.json({ error: "Failed to generate response" }, { status: 500 });

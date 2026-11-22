@@ -6,10 +6,10 @@ test.describe("Pricing page", () => {
 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
-    // All 3 prices visible
-    await expect(page.getByText(/\$0/)).toBeVisible();
-    await expect(page.getByText(/\$9\.99/)).toBeVisible();
-    await expect(page.getByText(/\$89\.99/)).toBeVisible();
+    // All 3 prices visible (euros; the yearly price may be written 89,99 € in es/fr)
+    await expect(page.getByText(/€\s?0(?![.,\d])/).first()).toBeVisible();
+    await expect(page.getByText(/9[.,]99/).first()).toBeVisible();
+    await expect(page.getByText(/89[.,]99/).first()).toBeVisible();
 
     // "Most Popular" badge on the highlighted plan
     await expect(page.getByText(/Most Popular|M[áa]s popular|Le plus populaire/)).toBeVisible();

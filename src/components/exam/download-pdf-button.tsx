@@ -829,7 +829,7 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
       const writingSection = (
         taskNum: number,
         taskTitle: string,
-        task: WrittenExamContent["readingIntoWriting"],
+        task: NonNullable<WrittenExamContent["readingIntoWriting"]>,
       ) => {
         addPage();
         taskHeader(taskNum, taskTitle, `Suggested time: 40 minutes  ·  ${task.wordLimit.min}–${task.wordLimit.max} words`);
@@ -902,9 +902,9 @@ export function DownloadPdfButton({ content, level, examId }: Props) {
         doc.setTextColor(0);
       };
 
-      writingSection(3, "Reading into writing", content.readingIntoWriting);
+      if (content.readingIntoWriting) writingSection(3, "Reading into writing", content.readingIntoWriting);
       endOfTask(3);
-      writingSection(4, "Extended writing", content.extendedWriting);
+      if (content.extendedWriting) writingSection(4, "Extended writing", content.extendedWriting);
       endOfTask(4);
 
       // ────────────────────────────────────────────────────────────

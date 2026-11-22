@@ -19,9 +19,11 @@ export default async function WritingPracticePage({
 
   const practice = await prisma.writingPractice.findUnique({
     where: { id },
-    include: { drafts: { orderBy: { version: "asc" } } },
+    include: { drafts: { orderBy: { version: "asc" } }, user: { select: { id: true, name: true, email: true } } },
   });
-  if (!practice || practice.userId !== user.id || practice.hiddenAt) notFound();
+  // Owners see their own texts; admins can open anyone's in read-only mode (learner profile).
+  const isOwner = practice?.userId === user.id;
+  if (!practice || (!isOwner && user.plan !== "ADMIN") || (isOwner && practice.hiddenAt)) notFound();
 
   const drafts: WritingDraftData[] = practice.drafts.map((d) => ({
     id: d.id,
@@ -46,6 +48,7 @@ export default async function WritingPracticePage({
       task={practice.task as unknown as WritingTaskContent}
       initialDrafts={drafts}
       initialMode={mode === "learn" ? "learn" : "exam"}
+      readOnly={isOwner ? undefined : { ownerName: practice.user.name ?? practice.user.email, backHref: `/admin/users/${practice.user.id}` }}
     />
   );
 }

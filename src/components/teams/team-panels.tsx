@@ -55,7 +55,7 @@ function SortHeader({ k, sort, onSort, children, className }: { k: SortKey; sort
   );
 }
 
-export function MembersTable({ orgId, members }: { orgId: string; members: TeamMemberRow[] }) {
+export function MembersTable({ orgId, members, isAdmin = false }: { orgId: string; members: TeamMemberRow[]; isAdmin?: boolean }) {
   const { dict, t, locale } = useI18n();
   const tm = dict.teams;
   const [sort, setSort] = useState<SortState>({ key: "pPass", dir: 1 });
@@ -98,9 +98,14 @@ export function MembersTable({ orgId, members }: { orgId: string; members: TeamM
             return (
               <tr key={m.userId} className="border-t border-zinc-100 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/40">
                 <td className="px-2 py-2.5">
-                  <Link href={`/teams/${orgId}/members/${m.userId}`} className="font-medium text-zinc-900 underline-offset-2 hover:underline dark:text-zinc-50">
+                  <Link href={`/teams/${orgId}/members/${m.userId}`} className="font-medium text-ink underline-offset-2 hover:underline">
                     {m.name}
                   </Link>
+                  {isAdmin && (
+                    <Link href={`/admin/users/${m.userId}`} className="mt-0.5 block w-fit whitespace-nowrap text-[11px] text-ink-soft underline decoration-marker decoration-2 underline-offset-2 hover:text-ink">
+                      {dict.adminProfile.viewProfile}
+                    </Link>
+                  )}
                 </td>
                 <td className="px-2 py-2.5">
                   {m.observations ? (
@@ -264,7 +269,7 @@ export function LessonPanel({ orgId, lesson: initial }: { orgId: string; lesson:
       {!c ? (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">{tm.lessonEmpty}</p>
       ) : (
-        <article className={cn("space-y-5 rounded-2xl border border-zinc-200 bg-zinc-50/60 p-5 dark:border-zinc-800 dark:bg-zinc-950/40", busy && "opacity-60")}>
+        <article className={cn("space-y-5 border-y-2 border-ink py-5", busy && "opacity-60")}>
           <header className="space-y-1">
             <p className="text-xs text-zinc-500">
               {t("teams.lessonMinutes", { n: c.minutes })}

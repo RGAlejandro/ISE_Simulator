@@ -8,6 +8,22 @@ import type { ExamLevel } from "@/types";
 
 const VALID_LEVELS: ExamLevel[] = ["ISE_FOUNDATION", "ISE_I", "ISE_II", "ISE_III", "ISE_IV"];
 
+/** Every section the exam page and the marking need (writing prompts only for the full paper). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isCompleteQuestions(q: any, readingOnly: boolean): boolean {
+  const r1 = q?.reading1Questions;
+  const r2 = q?.reading2Questions;
+  return Boolean(
+    r1?.paragraphMatching?.correctAnswers?.length &&
+    r1?.statementSelection?.correctAnswers?.length &&
+    r1?.gapFill?.questions?.length &&
+    r2?.textMatching?.questions?.length &&
+    r2?.statementSelection?.correctAnswers?.length &&
+    r2?.gapFill?.questions?.length &&
+    (readingOnly || (q?.readingIntoWriting?.prompt && q?.extendedWriting?.prompt)),
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId: clerkId } = await auth();
@@ -17,6 +33,8 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { level } = body;
+    // Practice → Reading: the same paper, Tasks 1 and 2 only.
+    const readingOnly = body.mode === "reading";
 
     if (!level || !VALID_LEVELS.includes(level)) {
       return NextResponse.json({ error: "Invalid exam level" }, { status: 400 });
@@ -27,9 +45,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check daily usage limits
+    // Check daily usage limits (Reading practice shares the free "readings" allowance)
     const usage = await getDailyUsage(user.id);
-    if (!usage.canTakeWritten) {
+    if (readingOnly ? !usage.canTakeReading : !usage.canTakeWritten) {
       return NextResponse.json(
         { error: "Daily limit reached. Upgrade to Pro for unlimited exams." },
         { status: 429 }
@@ -57,12 +75,21 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 2: Generate questions based on the actual texts (higher quality — model sees real content)
-    const questionsPrompt = getQuestionsPrompt(level as ExamLevel, textsResult.reading1, textsResult.reading2);
+    const questionsPrompt = getQuestionsPrompt(level as ExamLevel, textsResult.reading1, textsResult.reading2, { readingOnly });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionsResult: any;
     try {
       console.log("[Exam] Step 2: generating questions...");
       questionsResult = await generateJSON(questionsPrompt, { temperature: 0.7, maxTokens: 4000 });
+      // A partial answer (e.g. a truncated model output) would save a broken exam:
+      // require every section and fall back to Gemini once if anything is missing.
+      if (!isCompleteQuestions(questionsResult, readingOnly)) {
+        console.warn("[Exam] Step 2 incomplete, retrying with Gemini. keys:", Object.keys(questionsResult ?? {}));
+        questionsResult = await generateJSON(questionsPrompt, { temperature: 0.7, maxTokens: 6000, prefer: "gemini" });
+      }
+      if (!isCompleteQuestions(questionsResult, readingOnly)) {
+        return NextResponse.json({ error: "AI returned incomplete exam questions. Please try again." }, { status: 503 });
+      }
       console.log("[Exam] Step 2 done. keys:", Object.keys(questionsResult ?? {}));
     } catch (aiError: unknown) {
       console.error("[Exam] Step 2 failed:", aiError);
@@ -85,8 +112,10 @@ export async function POST(req: NextRequest) {
         statementSelection: questionsResult?.reading2Questions?.statementSelection,
         gapFill: questionsResult?.reading2Questions?.gapFill,
       },
-      readingIntoWriting: questionsResult?.readingIntoWriting,
-      extendedWriting: questionsResult?.extendedWriting,
+      ...(readingOnly ? {} : {
+        readingIntoWriting: questionsResult?.readingIntoWriting,
+        extendedWriting: questionsResult?.extendedWriting,
+      }),
     };
 
     // Save exam to database
@@ -94,13 +123,14 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         level: level as ExamLevel,
+        mode: readingOnly ? "READING" : "FULL",
         content: examContent,
         status: "IN_PROGRESS",
       },
     });
 
     // Increment daily usage
-    await incrementUsage(user.id, "written");
+    await incrementUsage(user.id, readingOnly ? "reading" : "written");
 
     return NextResponse.json({ examId: exam.id, content: examContent });
   } catch (error) {

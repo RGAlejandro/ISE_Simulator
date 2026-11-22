@@ -19,6 +19,33 @@ const GROQ_MODELS = [
   "openai/gpt-oss-20b",
 ];
 
+/**
+ * gpt-oss and Qwen 3 are reasoning models: their hidden reasoning counts against
+ * max_tokens. Callers pass the size of the *visible* answer they need, so add
+ * headroom — otherwise long JSON (written exams) comes back truncated and short
+ * replies come back empty.
+ */
+const REASONING_HEADROOM = 4096;
+/** Conversational turns: small headroom so the reply length stays close to the requested size. */
+const CHAT_HEADROOM = 512;
+
+function budget(modelName: string, visible: number, headroom = REASONING_HEADROOM) {
+  return {
+    max_tokens: visible + headroom,
+    // Only the gpt-oss family accepts "low"; other models would reject the request.
+    ...(modelName.startsWith("openai/gpt-oss") ? { reasoning_effort: "low" as const } : {}),
+  };
+}
+
+/** Empty or cut-off output is a model failure: let the chain try the next model/provider. */
+function checkOutput(response: { choices: { message?: { content?: string | null } | null; finish_reason?: string | null }[] }): string {
+  const choice = response.choices[0];
+  const text = choice?.message?.content ?? "";
+  if (!text.trim()) throw new Error("Failed to generate: empty response");
+  if (choice?.finish_reason === "length") throw new Error("Failed to generate: truncated response");
+  return text;
+}
+
 function isRetryableError(msg: string): boolean {
   return (
     msg.includes("429") ||
@@ -32,7 +59,7 @@ function isRetryableError(msg: string): boolean {
     msg.includes("404") ||
     msg.includes("model_not_found") ||
     msg.includes("decommissioned") ||
-    msg.includes("Failed to generate JSON")
+    msg.includes("Failed to generate")
   );
 }
 
@@ -79,9 +106,9 @@ export async function groqGenerateText(
       model: modelName,
       messages: [{ role: "user", content: prompt }],
       temperature: options?.temperature ?? 0.7,
-      max_tokens: options?.maxTokens ?? 2048,
+      ...budget(modelName, options?.maxTokens ?? 2048),
     });
-    return response.choices[0]?.message?.content ?? "";
+    return checkOutput(response);
   });
 }
 
@@ -100,11 +127,10 @@ export async function groqGenerateJSON(
         { role: "user", content: prompt },
       ],
       temperature: options?.temperature ?? 0.7,
-      max_tokens: options?.maxTokens ?? 8192,
+      ...budget(modelName, options?.maxTokens ?? 8192),
       response_format: { type: "json_object" },
     });
-    const text = response.choices[0]?.message?.content ?? "{}";
-    return parseAIJson(text);
+    return parseAIJson(checkOutput(response));
   });
 }
 
@@ -121,11 +147,9 @@ export async function groqGenerateChat(
         { role: "user", content: userPrompt },
       ],
       temperature: options?.temperature ?? 0.7,
-      max_tokens: options?.maxTokens ?? 250,
-      // Short conversational turns: keep reasoning from eating the small token budget.
-      reasoning_effort: "low",
+      ...budget(modelName, options?.maxTokens ?? 250, CHAT_HEADROOM),
     });
-    return response.choices[0]?.message?.content ?? "";
+    return checkOutput(response);
   });
 }
 
@@ -145,10 +169,49 @@ export async function groqGenerateChatJSON(
         { role: "user", content: userPrompt },
       ],
       temperature: options?.temperature ?? 0.7,
-      max_tokens: options?.maxTokens ?? 8192,
+      ...budget(modelName, options?.maxTokens ?? 8192),
       response_format: { type: "json_object" },
     });
-    const text = response.choices[0]?.message?.content ?? "{}";
-    return parseAIJson(text);
+    return parseAIJson(checkOutput(response));
   });
+}
+
+/**
+ * Groq's only model that reads images (verified live on 2026-11-22: a 22-word page in ~2 s).
+ * On the free tier it allows 1000 output tokens per minute: fine for one photo, not five.
+ */
+const GROQ_VISION_MODEL = "qwen/qwen3.8-27b";
+
+/**
+ * Read one image and answer in JSON. No reasoning: this is transcription, and
+ * thinking only adds seconds. Throws on failure so the caller can fall back to Gemini.
+ */
+export async function groqReadImageJSON(
+  systemPrompt: string,
+  image: { data: string; mimeType: string },
+  options?: { temperature?: number; maxTokens?: number; timeoutMs?: number },
+): Promise<unknown> {
+  const response = await getGroq().chat.completions.create(
+    {
+      model: GROQ_VISION_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt + "\n\nYou must respond with valid JSON only. No markdown, no code fences, no extra text." },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Read this photo." },
+            { type: "image_url", image_url: { url: `data:${image.mimeType};base64,${image.data}` } },
+          ],
+        },
+      ],
+      temperature: options?.temperature ?? 0.1,
+      // Free tier: 1000 output tokens per minute on this model, so one page at a time.
+      // A longer page fails fast here and the caller falls back to Gemini.
+      max_tokens: options?.maxTokens ?? 1000,
+      reasoning_effort: "none",
+      response_format: { type: "json_object" },
+    },
+    { timeout: options?.timeoutMs ?? 25_000 },
+  );
+  return parseAIJson(checkOutput(response));
 }

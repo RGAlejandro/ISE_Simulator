@@ -7,11 +7,11 @@ export const ASSIGNMENT_KINDS: AssignmentKindValue[] = ["WRITTEN", "ORAL", "LIST
 
 /** Where a student goes to do each kind of assignment. */
 export const ASSIGNMENT_HREF: Record<AssignmentKindValue, string> = {
-  WRITTEN: "/practice",
+  WRITTEN: "/practice?start=written",
   ORAL: "/exam/oral/setup?mode=live",
-  LISTENING: "/practice",
+  LISTENING: "/practice?start=listening",
   WRITING: "/writing",
-  READING: "/vocabulary/reading",
+  READING: "/practice?start=reading",
   REVIEW: "/vocabulary/review",
 };
 

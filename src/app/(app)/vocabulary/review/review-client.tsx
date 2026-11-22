@@ -60,7 +60,6 @@ export function ReviewClient({ cards, stats, nextDueAt }: Props) {
   const [introduced, setIntroduced] = useState<Set<string>>(new Set());
   const [firstTry, setFirstTry] = useState<Map<string, boolean>>(new Map());
   const [finishing, setFinishing] = useState(false);
-  const [xp, setXp] = useState<number | null>(null);
 
   const [sentences, setSentences] = useState<Record<string, string>>({});
   const [checking, setChecking] = useState(false);
@@ -84,15 +83,14 @@ export function ReviewClient({ cards, stats, nextDueAt }: Props) {
     await Promise.allSettled(pending.current);
     pending.current = [];
     try {
-      const res = await fetch("/api/vocabulary/review/complete", {
+      // Closes the session server-side; the answers themselves are already saved.
+      await fetch("/api/vocabulary/review/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionKey }),
       });
-      const data = await res.json();
-      if (res.ok && data.award?.xpGained) setXp(data.award.xpGained);
     } catch {
-      /* XP is a bonus — the answers are already saved */
+      /* best effort */
     }
     setFirstTry(results);
     setFinishing(false);
@@ -172,8 +170,8 @@ export function ReviewClient({ cards, stats, nextDueAt }: Props) {
               <p className="font-display text-lg font-semibold text-zinc-900 dark:text-zinc-100">{r.noWords}</p>
               <p className="text-sm text-zinc-500">{r.addWordsHint}</p>
               <div className="flex flex-wrap justify-center gap-2">
-                <Link href="/vocabulary/reading"><Button variant="outline" className="gap-1.5"><BookOpen className="h-4 w-4" /> Reading Explorer</Button></Link>
-                <Link href="/writing"><Button variant="outline" className="gap-1.5"><PenTool className="h-4 w-4" /> Writing Lab</Button></Link>
+                <Link href="/vocabulary/reading"><Button variant="outline" className="gap-1.5"><BookOpen className="h-4 w-4" /> {dict.vocab.reading.title}</Button></Link>
+                <Link href="/writing"><Button variant="outline" className="gap-1.5"><PenTool className="h-4 w-4" /> Writing</Button></Link>
               </div>
             </>
           ) : cards.length === 0 ? (
@@ -301,12 +299,6 @@ export function ReviewClient({ cards, stats, nextDueAt }: Props) {
             <p className="text-3xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{correctCount}/{reviewed.length}</p>
             <p className="text-xs text-zinc-500">{r.firstTry}</p>
           </div>
-          {xp !== null && (
-            <div>
-              <p className="text-3xl font-bold tabular-nums text-amber-600">+{xp}</p>
-              <p className="text-xs text-zinc-500">XP</p>
-            </div>
-          )}
         </div>
       </section>
 
@@ -366,7 +358,7 @@ export function ReviewClient({ cards, stats, nextDueAt }: Props) {
 
       <div className="flex flex-col sm:flex-row gap-2">
         <Link href="/vocabulary" className="flex-1"><Button variant="outline" className="w-full">{r.finish}</Button></Link>
-        <Link href="/writing" className="flex-1"><Button className="w-full gap-1.5"><PenTool className="h-4 w-4" /> Writing Lab</Button></Link>
+        <Link href="/writing" className="flex-1"><Button className="w-full gap-1.5"><PenTool className="h-4 w-4" /> Writing</Button></Link>
       </div>
     </Shell>
   );

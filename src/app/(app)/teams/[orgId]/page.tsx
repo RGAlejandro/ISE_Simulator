@@ -15,5 +15,5 @@ export default async function TeamPanelPage({ params }: { params: Promise<{ orgI
   const dashboard = await getTeamDashboard(orgId);
   if (!dashboard) redirect("/teams");
 
-  return <TeamPanelClient data={dashboard} />;
+  return <TeamPanelClient data={dashboard} isAdmin={user.plan === "ADMIN"} />;
 }

@@ -32,7 +32,8 @@ export async function completedBy(
   let rows: { userId: string }[] = [];
   switch (a.kind) {
     case "WRITTEN":
-      rows = await prisma.writtenExam.findMany({ where: { userId: { in: userIds }, level, status: "EVALUATED", completedAt: window }, select: { userId: true }, distinct: ["userId"] });
+      // A full paper only: a Reading practice (Tasks 1 and 2) doesn't complete a written mock.
+      rows = await prisma.writtenExam.findMany({ where: { userId: { in: userIds }, level, mode: "FULL", status: "EVALUATED", completedAt: window }, select: { userId: true }, distinct: ["userId"] });
       break;
     case "ORAL":
       rows = await prisma.oralExam.findMany({ where: { userId: { in: userIds }, level, status: "EVALUATED", completedAt: window }, select: { userId: true }, distinct: ["userId"] });
@@ -48,13 +49,19 @@ export async function completedBy(
       rows = drafts.map((d) => ({ userId: d.practice.userId }));
       break;
     }
-    case "READING":
-      rows = await prisma.readingSession.findMany({
-        where: { userId: { in: userIds }, completedAt: window, ...(cefr ? { reading: { level: cefr } } : {}) },
-        select: { userId: true },
-        distinct: ["userId"],
-      });
+    case "READING": {
+      // Either a Trinity Reading practice or a vocabulary reading counts.
+      const [practice, readings] = await Promise.all([
+        prisma.writtenExam.findMany({ where: { userId: { in: userIds }, level, mode: "READING", status: "EVALUATED", completedAt: window }, select: { userId: true }, distinct: ["userId"] }),
+        prisma.readingSession.findMany({
+          where: { userId: { in: userIds }, completedAt: window, ...(cefr ? { reading: { level: cefr } } : {}) },
+          select: { userId: true },
+          distinct: ["userId"],
+        }),
+      ]);
+      rows = [...practice, ...readings];
       break;
+    }
     case "REVIEW":
       rows = await prisma.reviewLog.findMany({ where: { userId: { in: userIds }, createdAt: window }, select: { userId: true }, distinct: ["userId"] });
       break;
@@ -124,7 +131,7 @@ export async function getTeamDashboard(orgId: string, now = new Date()): Promise
   const studentIds = students.map((m) => m.userId);
 
   const [reports, drafts, completion] = await Promise.all([
-    Promise.all(students.map((m) => getReadiness(m.userId, { level: org.level, now }))),
+    Promise.all(students.map((m) => getReadiness(m.userId, { level: org.level, now, useGoal: false }))),
     prisma.writingDraft.findMany({
       where: { version: 1, createdAt: { gte: new Date(now.getTime() - CLASS_ERRORS_WINDOW_DAYS * DAY_MS) }, practice: { userId: { in: studentIds }, level: org.level } },
       select: { feedback: true, practice: { select: { userId: true } } },

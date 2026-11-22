@@ -19,10 +19,10 @@ export const VIZ = {
 } as const;
 
 export const SKILL_HREF: Record<Skill, string> = {
-  reading: "/practice",
+  reading: "/practice?start=reading",
   writing: "/writing",
   speaking: "/exam/oral/setup?mode=live",
-  listening: "/practice",
+  listening: "/practice?start=listening",
 };
 
 const pct = (p: number) => Math.round(p * 100);
@@ -31,6 +31,27 @@ const pct = (p: number) => Math.round(p * 100);
 export function BandChip({ band, className }: { band: Band; className?: string }) {
   const { dict } = useI18n();
   return <Stamp band={band} className={className}>{dict.readiness.band[band]}</Stamp>;
+}
+
+type Dict = ReturnType<typeof useI18n>["dict"];
+type Translate = ReturnType<typeof useI18n>["t"];
+
+/** "chance of passing today" / "…of passing Reading & Writing…" / "…of Merit or higher…", from the learner's goal. */
+export function heroLabel(report: ReadinessReport, dict: Dict, t: Translate): string {
+  const { modules, target } = report.focus;
+  const mod = dict.goal.modules[modules];
+  const band = dict.goal.targets[target];
+  if (target === "PASS") return modules === "BOTH" ? dict.readiness.heroLabel : t("goal.heroModule", { module: mod });
+  return modules === "BOTH" ? t("goal.heroTarget", { target: band }) : t("goal.heroTargetModule", { target: band, module: mod });
+}
+
+/** One line naming the module left out of the goal, or null when both count. */
+export function OutOfScopeNote({ report, className }: { report: ReadinessReport; className?: string }) {
+  const { dict, t } = useI18n();
+  const { modules } = report.focus;
+  if (modules === "BOTH") return null;
+  const other = modules === "READING_WRITING" ? "SPEAKING_LISTENING" : "READING_WRITING";
+  return <p className={cn("text-xs text-ink-soft", className)}>{t("goal.outOfScope", { module: dict.goal.modules[other] })}</p>;
 }
 
 /** Hero figure + meter against the ready line. */
@@ -61,7 +82,7 @@ export function ReadinessHero({ report, compact = false }: { report: ReadinessRe
           <span className="marker-underline">{p}</span>
           <span className={cn("align-top font-medium text-ink-soft", compact ? "text-2xl" : "text-3xl")}>%</span>
         </p>
-        <p className="pb-1 text-sm text-ink-soft">{r.heroLabel}</p>
+        <p className="pb-1 text-sm text-ink-soft">{heroLabel(report, dict, t)}</p>
       </div>
 
       {/* Meter: share of the way to certainty, with the ready line marked. */}
@@ -205,7 +226,7 @@ export function WeakestCriteria({ items }: { items: ReadinessReport["weakestCrit
   );
 }
 
-export function ActionList({ actions, limit }: { actions: ReadinessReport["actions"]; limit?: number }) {
+export function ActionList({ actions, limit, target = "PASS" }: { actions: ReadinessReport["actions"]; limit?: number; target?: ReadinessReport["focus"]["target"] }) {
   const { dict, t } = useI18n();
   const r = dict.readiness;
   return (
@@ -214,7 +235,7 @@ export function ActionList({ actions, limit }: { actions: ReadinessReport["actio
         <li key={a.skill} className="flex gap-4 py-3.5">
           <span className="font-display text-2xl font-semibold leading-none text-ink-soft/70 tabular-nums">{i + 1}</span>
           <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-sm text-ink leading-snug">{t(`readiness.action.${a.reason}`, { skill: r.skill[a.skill] })}</p>
+            <p className="text-sm text-ink leading-snug">{t(`readiness.action.${a.reason}`, { skill: r.skill[a.skill], target: dict.goal.targets[target] })}</p>
             <InkLink href={SKILL_HREF[a.skill]}>{r.actionCta[a.skill]}</InkLink>
           </div>
         </li>

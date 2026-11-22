@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/user";
 import { prisma } from "@/lib/prisma";
-import { LEARNED_BOX, SESSION_MAX_NEW, SESSION_MAX_REVIEWS } from "@/lib/srs";
+import { LEARNED_BOX, SESSION_MAX_REVIEWS } from "@/lib/srs";
+import { getReviewQueue } from "@/lib/srs-server";
 import { ReviewClient, type ReviewCard } from "./review-client";
 
 export default async function ReviewPage() {
@@ -9,6 +10,8 @@ export default async function ReviewPage() {
   if (!user) redirect("/sign-in");
   const now = new Date();
   const where = { userId: user.id };
+  // New words follow the same daily allowance as the dashboard's "Today" list.
+  const { newLeft } = await getReviewQueue(user.id, now);
 
   const [due, fresh, total, learned, newCount, dueCount, next] = await Promise.all([
     prisma.savedWord.findMany({
@@ -20,7 +23,7 @@ export default async function ReviewPage() {
     prisma.savedWord.findMany({
       where: { ...where, srsBox: 0 },
       orderBy: { createdAt: "desc" },
-      take: SESSION_MAX_NEW,
+      take: newLeft,
     }),
     prisma.savedWord.count({ where }),
     prisma.savedWord.count({ where: { ...where, srsBox: { gte: LEARNED_BOX } } }),

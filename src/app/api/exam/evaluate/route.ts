@@ -209,7 +209,9 @@ export async function POST(req: NextRequest) {
     // ═══════════════════════════════════════════════════════════════
     // EVALUATE WRITINGS WITH AI
     // ═══════════════════════════════════════════════════════════════
-    const writingTasks = [
+    // Practice → Reading papers have no writing tasks.
+    const readingOnly = exam.mode === "READING";
+    const writingTasks = readingOnly || !examContent.readingIntoWriting || !examContent.extendedWriting ? [] : [
       { key: "READING_INTO_WRITING", taskNum: 3, prompt: examContent.readingIntoWriting.prompt },
       { key: "EXTENDED_WRITING", taskNum: 4, prompt: examContent.extendedWriting.prompt },
     ];
@@ -240,15 +242,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Overall score = avg(reading%, writing%)
-    const writingScores = writingTasks
-      .map((t) => {
-        const r = results[t.key] as { score?: number } | undefined;
-        return r?.score ?? 0;
-      });
-    const avgWritingScore = writingScores.reduce((a, b) => a + b, 0) / writingScores.length;
+    // Overall score = avg(reading%, writing%); a reading-only paper is its reading %.
     const readingPct = (results.reading as { percentage: number }).percentage;
-    const overallScore = Math.round((readingPct * 0.5) + (avgWritingScore * 2.5));
+    let overallScore = readingPct;
+    if (writingTasks.length > 0) {
+      const writingScores = writingTasks.map((t) => (results[t.key] as { score?: number } | undefined)?.score ?? 0);
+      const avgWritingScore = writingScores.reduce((a, b) => a + b, 0) / writingScores.length;
+      overallScore = Math.round((readingPct * 0.5) + (avgWritingScore * 2.5));
+    }
 
     await prisma.writtenExam.update({
       where: { id: examId },

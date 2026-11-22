@@ -21,15 +21,15 @@ export function KpiRow({ kpis }: { kpis: TeamDashboard["kpis"] }) {
     { label: tm.kpiOnTrack, value: pct(kpis.onTrackShare), hint: tm.kpiMeasured },
   ];
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <dl className="grid grid-cols-2 border-y border-rule lg:grid-cols-4 lg:divide-x lg:divide-rule">
       {tiles.map((k) => (
-        <div key={k.label} className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">{k.label}</p>
-          <p className="mt-1 text-3xl font-semibold text-zinc-900 dark:text-zinc-50">{k.value}</p>
-          {k.hint && <p className="mt-0.5 text-[11px] text-zinc-500">{k.hint}</p>}
+        <div key={k.label} className="px-1 py-4 lg:px-5 lg:first:pl-0">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-soft">{k.label}</dt>
+          <dd className="mt-1 font-display text-4xl font-semibold tabular-nums text-ink">{k.value}</dd>
+          {k.hint && <dd className="mt-0.5 text-xs text-ink-soft">{k.hint}</dd>}
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
 

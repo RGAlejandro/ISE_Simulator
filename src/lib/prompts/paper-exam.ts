@@ -33,9 +33,9 @@ ${r1Questions}
 
 ${r2Questions}
 
-WRITING TASK 3 (Reading into Writing): "${readingIntoWriting.prompt}" (${readingIntoWriting.wordLimit.min}–${readingIntoWriting.wordLimit.max} words)
+${readingIntoWriting ? `WRITING TASK 3 (Reading into Writing): "${readingIntoWriting.prompt}" (${readingIntoWriting.wordLimit.min}–${readingIntoWriting.wordLimit.max} words)` : ""}
 
-WRITING TASK 4 (Extended Writing): "${extendedWriting.prompt}" (${extendedWriting.wordLimit.min}–${extendedWriting.wordLimit.max} words)
+${extendedWriting ? `WRITING TASK 4 (Extended Writing): "${extendedWriting.prompt}" (${extendedWriting.wordLimit.min}–${extendedWriting.wordLimit.max} words)` : ""}
 
 YOUR TASK:
 1. Carefully read each section of the student's paper in the image.

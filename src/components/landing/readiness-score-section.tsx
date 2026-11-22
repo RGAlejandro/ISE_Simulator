@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/components/i18n/language-provider";
+
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
@@ -31,6 +33,7 @@ function useCountUp(target: number, run: boolean, ms = 1100) {
 }
 
 export function ReadinessScoreSection() {
+  const t = useT();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const overall = useCountUp(OVERALL, inView);
@@ -50,18 +53,17 @@ export function ReadinessScoreSection() {
             <Sparkles className="h-3 w-3" /> Trinity Readiness Score
           </span>
           <h2 className="font-display mt-4 text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">
-            Know if you&apos;d{" "}
-            <span className="marker-underline italic text-brand">pass today</span>
+            {t("lp.readiness.titleA")}{" "}
+            <span className="marker-underline italic text-brand">{t("lp.readiness.titleB")}</span>
           </h2>
           <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-300 max-w-lg">
-            Every exam you take feeds one number: your probability of passing — broken
-            down by skill, with a predicted date you&apos;ll be ready for your real exam.
+            {t("lp.readiness.body")}
           </p>
           <ul className="mt-6 space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
             {[
-              "See exactly which skill is holding you back",
-              "A study plan that adapts to your exam date",
-              "Watch the score climb every week",
+              t("lp.readiness.b1"),
+              t("lp.readiness.b2"),
+              t("lp.readiness.b3"),
             ].map((f) => (
               <li key={f} className="flex items-start gap-2">
                 <span className="mt-0.5 text-brand">✓</span> {f}
@@ -70,7 +72,7 @@ export function ReadinessScoreSection() {
           </ul>
           <Link href="/sign-up" className="inline-block mt-7">
             <Button size="lg" className="gap-2 bg-brand-solid text-white hover:opacity-90">
-              Get your score <ArrowRight className="h-4 w-4" />
+              {t("lp.readiness.cta")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </motion.div>
@@ -85,10 +87,10 @@ export function ReadinessScoreSection() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <p className="text-xs uppercase tracking-wide text-zinc-400">ISE II · B2</p>
-              <p className="font-display text-lg font-semibold text-zinc-900 dark:text-zinc-50">Your readiness</p>
+              <p className="font-display text-lg font-semibold text-zinc-900 dark:text-zinc-50">{t("lp.readiness.yours")}</p>
             </div>
             <span className="rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-3 py-1">
-              HIGH
+              {t("lp.readiness.example")}
             </span>
           </div>
 
@@ -141,7 +143,7 @@ export function ReadinessScoreSection() {
           >
             <CalendarClock className="h-4 w-4 text-brand shrink-0" />
             <p className="text-sm text-zinc-700 dark:text-zinc-300">
-              At this pace you&apos;ll be ready by <strong className="text-brand">28 January</strong>.
+              {t("lp.readiness.readyBy")} <strong className="text-brand">{t("lp.readiness.readyDate")}</strong>.
             </p>
           </motion.div>
         </motion.div>

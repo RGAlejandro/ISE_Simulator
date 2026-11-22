@@ -18,13 +18,18 @@ const TASK_META = [
   { label: "Task 4", title: "Extended Writing", qRange: "Writing task" },
 ];
 
+/** Practice → Reading: about 30 minutes per reading task, as on the real paper. */
+const READING_ONLY_MINUTES = 60;
+
 interface Props {
   examId: string;
   content: WrittenExamContent;
   level: string;
+  /** READING = Tasks 1 and 2 only (Practice → Reading). */
+  mode?: "FULL" | "READING";
 }
 
-function isContentValid(content: WrittenExamContent): boolean {
+function isContentValid(content: WrittenExamContent, readingOnly: boolean): boolean {
   try {
     return !!(
       content?.reading1?.paragraphMatching?.instructions &&
@@ -33,20 +38,22 @@ function isContentValid(content: WrittenExamContent): boolean {
       content?.reading2?.textMatching?.instructions &&
       content?.reading2?.statementSelection?.instructions &&
       content?.reading2?.gapFill?.instructions &&
-      content?.readingIntoWriting &&
-      content?.extendedWriting
+      (readingOnly || (content?.readingIntoWriting && content?.extendedWriting))
     );
   } catch {
     return false;
   }
 }
 
-export function WrittenExamClient({ examId, content, level }: Props) {
+export function WrittenExamClient({ examId, content, level, mode = "FULL" }: Props) {
   const router = useRouter();
+  const readingOnly = mode === "READING";
+  const tasks = readingOnly ? TASK_META.slice(0, 2) : TASK_META;
+  const lastTask = tasks.length - 1;
   const [currentTask, setCurrentTask] = useState(0);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [readingAnswers, setReadingAnswers] = useState<Record<string, string | string[]>>({});
-  const [timeRemaining, setTimeRemaining] = useState((EXAM_DURATIONS[level] ?? 120) * 60);
+  const [timeRemaining, setTimeRemaining] = useState((readingOnly ? READING_ONLY_MINUTES : EXAM_DURATIONS[level] ?? 120) * 60);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -95,7 +102,7 @@ export function WrittenExamClient({ examId, content, level }: Props) {
 
   const levelLabel = level.replace(/_/g, " ");
 
-  if (!isContentValid(content)) {
+  if (!isContentValid(content, readingOnly)) {
     return (
       <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-lg shadow-sm border border-zinc-200 dark:border-zinc-700 p-8 text-center space-y-4">
@@ -130,19 +137,23 @@ export function WrittenExamClient({ examId, content, level }: Props) {
                 ISE Simulator — {levelLabel}
               </p>
               <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100 leading-tight">
-                Reading & Writing Exam
+                {readingOnly ? "Reading · Tasks 1 & 2" : "Reading & Writing Exam"}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <DownloadPdfButton content={content} level={level} examId={examId} />
-            <DownloadAnswersButton content={content} level={level} examId={examId} />
-            <Link href={`/exam/paper/${examId}/submit`}>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <Upload className="h-3.5 w-3.5" />
-                Submit Paper
-              </Button>
-            </Link>
+            {!readingOnly && (
+              <>
+                <DownloadPdfButton content={content} level={level} examId={examId} />
+                <DownloadAnswersButton content={content} level={level} examId={examId} />
+                <Link href={`/exam/paper/${examId}/submit`}>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Upload className="h-3.5 w-3.5" />
+                    Submit Paper
+                  </Button>
+                </Link>
+              </>
+            )}
             <div className={`flex items-center gap-2 text-base font-mono font-bold px-3 py-1.5 rounded-lg ${
               timeRemaining < 600
                 ? "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400"
@@ -157,7 +168,7 @@ export function WrittenExamClient({ examId, content, level }: Props) {
         {/* Task progress tabs */}
         <div className="border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
           <div className="mx-auto max-w-4xl px-4 flex gap-0">
-            {TASK_META.map((t, i) => (
+            {tasks.map((t, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentTask(i)}
@@ -213,14 +224,14 @@ export function WrittenExamClient({ examId, content, level }: Props) {
                 onAnswer={(key, val) => setReadingAnswers((prev) => ({ ...prev, [key]: val }))}
               />
             )}
-            {currentTask === 2 && (
+            {currentTask === 2 && content.readingIntoWriting && (
               <WritingTask
                 task={content.readingIntoWriting}
                 value={responses["READING_INTO_WRITING"] || ""}
                 onChange={(val) => setResponses((prev) => ({ ...prev, READING_INTO_WRITING: val }))}
               />
             )}
-            {currentTask === 3 && (
+            {currentTask === 3 && content.extendedWriting && (
               <WritingTask
                 task={content.extendedWriting}
                 value={responses["EXTENDED_WRITING"] || ""}
@@ -239,8 +250,8 @@ export function WrittenExamClient({ examId, content, level }: Props) {
           >
             <ChevronLeft className="h-4 w-4 mr-1" /> Previous
           </Button>
-          {currentTask < 3 ? (
-            <Button onClick={() => setCurrentTask((prev) => Math.min(3, prev + 1))}>
+          {currentTask < lastTask ? (
+            <Button onClick={() => setCurrentTask((prev) => Math.min(lastTask, prev + 1))}>
               Next <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (

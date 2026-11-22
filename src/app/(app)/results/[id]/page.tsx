@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, isProUser } from "@/lib/user";
+import { ProfileViewingBanner } from "@/components/admin/profile-viewing-banner";
 import { ResultsClient } from "./results-client";
 import { OralResultsClient } from "./oral-results-client";
 import type { LiveMetrics } from "@/lib/live-metrics";
@@ -15,16 +16,24 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
   const { type } = await searchParams;
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
+  // Owners see their own results; admins can open anyone's read-only (learner profile).
+  const isAdmin = user.plan === "ADMIN";
+  const scope = isAdmin ? { id } : { id, userId: user.id };
+  const owner = { select: { id: true, name: true, email: true } };
+  const banner = (u: { id: string; name: string | null; email: string }) =>
+    u.id === user.id ? null : <ProfileViewingBanner name={u.name ?? u.email} userId={u.id} />;
 
   if (type === "oral") {
     const exam = await prisma.oralExam.findUnique({
-      where: { id, userId: user.id },
-      include: { feedback: true, exchanges: { orderBy: { order: "asc" } } },
+      where: scope,
+      include: { feedback: true, exchanges: { orderBy: { order: "asc" } }, user: owner },
     });
 
     if (!exam) redirect("/dashboard");
 
     return (
+      <>
+      {banner(exam.user)}
       <OralResultsClient
         exam={{
           id: exam.id,
@@ -43,20 +52,24 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           role: e.role,
           content: e.content,
         }))}
-        isPro={user.plan === "PRO" || user.plan === "ADMIN"}
+        isPro={isProUser(user)}
         liveMetrics={exam.mode === "live" ? (exam.liveMetrics as unknown as LiveMetrics | null) : null}
+        readOnly={exam.user.id !== user.id}
       />
+      </>
     );
   }
 
   const exam = await prisma.writtenExam.findUnique({
-    where: { id, userId: user.id },
-    include: { responses: true },
+    where: scope,
+    include: { responses: true, user: owner },
   });
 
   if (!exam) redirect("/dashboard");
 
   return (
+    <>
+    {banner(exam.user)}
     <ResultsClient
       exam={{
         id: exam.id,
@@ -72,7 +85,10 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
         aiFeedback: r.aiFeedback ? JSON.parse(r.aiFeedback) : null,
         score: r.score,
       }))}
-      isPro={user.plan === "PRO"}
+      isPro={isProUser(user)}
+      readOnly={exam.user.id !== user.id}
+      mode={exam.mode}
     />
+    </>
   );
 }
