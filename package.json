@@ -12,7 +12,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
-    "test:e2e:install": "playwright install chromium"
+    "test:e2e:install": "playwright install chromium",
+    "demo:seed": "node --env-file=.env.local prisma/seed-demo-team.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.0.12",
@@ -35,7 +36,7 @@
     "jspdf": "^4.2.1",
     "lottie-react": "^2.4.1",
     "lucide-react": "^1.8.0",
-    "msedge-tts": "^2.0.5",
+    "msedge-tts": "^2.1.1",
     "next": "15.2.4",
     "pdf-parse": "^2.4.5",
     "react": "19.2.4",

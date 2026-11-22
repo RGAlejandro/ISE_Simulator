@@ -13,6 +13,11 @@ model User {
   email             String             @unique
   name              String?
   plan              Plan               @default(FREE)
+  /**
+   * Personal exam goal — drives the dashboard countdown + study plan.
+   */
+  examDate          DateTime?          @db.Date
+  examLevel         ExamLevel?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   dailyUsage        DailyUsage[]
@@ -26,32 +31,50 @@ model User {
   writtenExams      WrittenExam[]
   gamification      GamificationStats?
   weeklyXp          WeeklyXp[]
+  readingTexts      ReadingText[]
+  readingSessions   ReadingSession[]
+  writingPractices  WritingPractice[]
+  reviewLogs        ReviewLog[]
+  ownedOrgs         Organization[]     @relation("OrgOwner")
+  orgMemberships    OrgMember[]
+  assignmentsMade   Assignment[]       @relation("AssignmentCreator")
+  teamLessons       TeamLesson[]
 
   @@index([clerkId])
 }
 
-/** Per-user gamification state for the Quests mode (XP, level, streak, goal, badges). */
+/**
+ * Per-user gamification state for the Quests mode (XP, level, streak, goal, badges).
+ */
 model GamificationStats {
   id             String    @id @default(cuid())
   userId         String    @unique
   xp             Int       @default(0)
   currentStreak  Int       @default(0)
   longestStreak  Int       @default(0)
-  /** Last calendar day the user earned XP (drives streak + daily goal reset). */
+  /**
+   * Last calendar day the user earned XP (drives streak + daily goal reset).
+   */
   lastActiveDate DateTime? @db.Date
-  /** XP earned during lastActiveDate (resets when a new day starts). */
+  /**
+   * XP earned during lastActiveDate (resets when a new day starts).
+   */
   todayXp        Int       @default(0)
   dailyGoal      Int       @default(30)
   totalAnswered  Int       @default(0)
   totalCorrect   Int       @default(0)
   questsDone     Int       @default(0)
-  /** Unlocked achievement ids. */
+  /**
+   * Unlocked achievement ids.
+   */
   achievements   String[]  @default([])
   updatedAt      DateTime  @updatedAt
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/** Weekly XP totals, powering the leaderboard. weekStart = Monday (date). */
+/**
+ * Weekly XP totals, powering the leaderboard. weekStart = Monday (date).
+ */
 model WeeklyXp {
   id        String   @id @default(cuid())
   userId    String
@@ -86,7 +109,9 @@ model WrittenExam {
   content          Json
   status           ExamStatus        @default(IN_PROGRESS)
   score            Float?
-  /** Soft-delete: hidden from the user's lists but kept in the database. */
+  /**
+   * Soft-delete: hidden from the user's lists but kept in the database.
+   */
   hiddenAt         DateTime?
   startedAt        DateTime          @default(now())
   completedAt      DateTime?
@@ -115,28 +140,46 @@ model WrittenResponse {
 }
 
 model OralExam {
-  id           String         @id @default(cuid())
-  userId       String
-  level        ExamLevel
-  status       ExamStatus     @default(IN_PROGRESS)
-  overallScore Float?
-  /** Ordered list of tasks user opted into for this session, e.g. ["TOPIC","CONVERSATION","LISTENING"]. */
-  selectedTasks String[]      @default([])
-  /** Free-form bullet points / general outline candidate prepared for the Topic task. */
-  topicGeneral  String?       @db.Text
-  /** Full detailed essay candidate prepared for the Topic task. */
-  topicDetailed String?       @db.Text
-  /** Chosen examiner persona id (accent/tone/pace only — does not affect scoring). */
+  id              String         @id @default(cuid())
+  userId          String
+  level           ExamLevel
+  status          ExamStatus     @default(IN_PROGRESS)
+  overallScore    Float?
+  /**
+   * Ordered list of tasks user opted into for this session, e.g. ["TOPIC","CONVERSATION","LISTENING"].
+   */
+  selectedTasks   String[]       @default([])
+  /**
+   * Free-form bullet points / general outline candidate prepared for the Topic task.
+   */
+  topicGeneral    String?        @db.Text
+  /**
+   * Full detailed essay candidate prepared for the Topic task.
+   */
+  topicDetailed   String?        @db.Text
+  /**
+   * Chosen examiner persona id (accent/tone/pace only — does not affect scoring).
+   */
   examinerPersona String?
-  /** Soft-delete: hidden from the user's lists but kept in the database. */
-  hiddenAt     DateTime?
-  startedAt    DateTime       @default(now())
-  completedAt  DateTime?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exchanges    OralExchange[]
-  feedback     OralFeedback[]
+  /**
+   * "classic" = turn-based (record → Whisper → reply → TTS); "live" = full-duplex Gemini Live session.
+   */
+  mode            String         @default("classic")
+  /**
+   * Live Coach metrics computed client-side during a live session (pace, fillers, talk ratio…).
+   */
+  liveMetrics     Json?
+  /**
+   * Soft-delete: hidden from the user's lists but kept in the database.
+   */
+  hiddenAt        DateTime?
+  startedAt       DateTime       @default(now())
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exchanges       OralExchange[]
+  feedback        OralFeedback[]
 
   @@index([userId, createdAt])
 }
@@ -224,22 +267,183 @@ model VocabularyList {
 }
 
 model SavedWord {
-  id           String          @id @default(cuid())
-  userId       String
-  listId       String?
-  english      String
-  spanish      String
-  example      String
-  partOfSpeech String?
-  level        String
-  notes        String?
-  createdAt    DateTime        @default(now())
-  list         VocabularyList? @relation(fields: [listId], references: [id])
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String          @id @default(cuid())
+  userId         String
+  listId         String?
+  english        String
+  spanish        String
+  example        String
+  partOfSpeech   String?
+  level          String
+  notes          String?
+  /**
+   * Spaced repetition (Leitner): 0 = new, 1-6 = box. Each box doubles-ish the gap until the next review.
+   */
+  srsBox         Int             @default(0)
+  dueAt          DateTime        @default(now())
+  lastReviewedAt DateTime?
+  reviewCount    Int             @default(0)
+  lapses         Int             @default(0)
+  createdAt      DateTime        @default(now())
+  list           VocabularyList? @relation(fields: [listId], references: [id])
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewLogs     ReviewLog[]
 
   @@unique([userId, english])
   @@index([userId])
   @@index([listId])
+  @@index([userId, dueAt])
+}
+
+/// One answer given in a spaced-repetition review session.
+model ReviewLog {
+  id         String    @id @default(cuid())
+  userId     String
+  wordId     String
+  /**
+   * Client-generated id grouping one review session — XP is awarded once per session.
+   */
+  sessionKey String
+  correct    Boolean
+  /**
+   * Box after this answer.
+   */
+  box        Int
+  xpAwarded  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word       SavedWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, sessionKey])
+}
+
+/// Writing Lab: one standalone Trinity writing task (Task 3 or Task 4), improved over several drafts.
+model WritingPractice {
+  id        String          @id @default(cuid())
+  userId    String
+  level     ExamLevel
+  /**
+   * READING_INTO_WRITING (Task 3) or EXTENDED_WRITING (Task 4).
+   */
+  taskType  WrittenTaskType
+  genre     String
+  topic     String
+  /**
+   * WritingTaskContent: { title, prompt, bulletPoints, wordLimit, minutes, sources? }
+   */
+  task      Json
+  /**
+   * Soft-delete: hidden from the user's lists but kept in the database.
+   */
+  hiddenAt  DateTime?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drafts    WritingDraft[]
+
+  @@index([userId, createdAt])
+}
+
+/// One submitted version of a Writing Lab text with its AI feedback (version 1 = first attempt).
+model WritingDraft {
+  id          String          @id @default(cuid())
+  practiceId  String
+  version     Int
+  text        String          @db.Text
+  wordCount   Int
+  /**
+   * "typed" or "photo" (handwritten, transcribed by AI).
+   */
+  source      String          @default("typed")
+  secondsUsed Int?
+  /**
+   * WritingEvaluation: criteria, located issues, word upgrades, improved version.
+   */
+  feedback    Json
+  /**
+   * Mean of the Trinity criteria (0-4), comparable across Task 3 and Task 4.
+   */
+  score       Float
+  createdAt   DateTime        @default(now())
+  practice    WritingPractice @relation(fields: [practiceId], references: [id], onDelete: Cascade)
+
+  @@unique([practiceId, version])
+}
+
+/// AI-generated reading passage for vocabulary discovery (Reading Explorer).
+/// ownerId = null → shared pool, reused across users of the same level/locale to save AI calls.
+/// ownerId set → personalised text woven from that user's saved list; never shown to others.
+model ReadingText {
+  id        String           @id @default(cuid())
+  ownerId   String?
+  /**
+   * CEFR band A1..C2
+   */
+  level     String
+  topic     String
+  /**
+   * Language of translations / low-level quiz options (es, fr…).
+   */
+  locale    String
+  title     String
+  /**
+   * { paragraphs: string[], targetWords: ReadingTargetWord[], questions: ReadingQuestion[] }
+   */
+  content   Json
+  createdAt DateTime         @default(now())
+  owner     User?            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sessions  ReadingSession[]
+
+  @@index([level, locale, ownerId])
+}
+
+/// One user's pass through a ReadingText: words they looked up + quiz result.
+model ReadingSession {
+  id          String          @id @default(cuid())
+  userId      String
+  readingId   String
+  /**
+   * Quiz answers in question order: option index (number) or typed text (string).
+   */
+  answers     Json?
+  score       Int?
+  total       Int?
+  completedAt DateTime?
+  createdAt   DateTime        @default(now())
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reading     ReadingText     @relation(fields: [readingId], references: [id], onDelete: Cascade)
+  lookups     ReadingLookup[]
+
+  @@unique([userId, readingId])
+  @@index([userId, createdAt])
+}
+
+/// A word the learner tapped while reading, glossed in its sentence context.
+/// Also acts as a shared gloss cache: the same word in the same sentence of the
+/// same ReadingText is never sent to the AI twice.
+model ReadingLookup {
+  id           String         @id @default(cuid())
+  sessionId    String
+  /**
+   * Lower-cased surface form as tapped in the text.
+   */
+  word         String
+  /**
+   * Paragraph / sentence position of the tap (0-based).
+   */
+  paragraph    Int
+  sentence     Int
+  lemma        String
+  partOfSpeech String?
+  translation  String
+  definition   String
+  level        String?
+  createdAt    DateTime       @default(now())
+  session      ReadingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, word, paragraph, sentence])
+  @@index([word, paragraph, sentence])
 }
 
 model PaperSubmission {
@@ -267,6 +471,12 @@ model DailyUsage {
   oralCount      Int      @default(0)
   listeningCount Int      @default(0)
   chatCount      Int      @default(0)
+  readingCount   Int      @default(0)
+  writingCount   Int      @default(0)
+  /**
+   * Small AI helpers (handwriting transcription, sentence checks) — capped per day.
+   */
+  aiAssistCount  Int      @default(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
@@ -274,13 +484,13 @@ model DailyUsage {
 }
 
 model Feedback {
-  id         String           @id @default(cuid())
-  category   FeedbackCategory
-  message    String           @db.Text
-  isRead     Boolean          @default(false)
-  userAgent  String?
-  ipHash     String?
-  createdAt  DateTime         @default(now())
+  id        String           @id @default(cuid())
+  category  FeedbackCategory
+  message   String           @db.Text
+  isRead    Boolean          @default(false)
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime         @default(now())
 
   @@index([createdAt])
   @@index([isRead])
@@ -344,3 +554,87 @@ enum Role {
   EXAMINER
   CANDIDATE
 }
+
+// ─── Teams (teacher / company cohorts) ──────────────────────────────────────
+
+/**
+ * A class or company cohort preparing for one ISE level. Teachers see members'
+ * scores and progress (Readiness, criteria, error tags) but never their texts
+ * or recordings.
+ */
+model Organization {
+  id          String       @id @default(cuid())
+  name        String
+  /** Target level the cohort is preparing for (drives every member's Readiness in the panel). */
+  level       ExamLevel
+  /** Shareable invite code used in /teams/join/[code]. */
+  joinCode    String       @unique
+  ownerId     String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  owner       User         @relation("OrgOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     OrgMember[]
+  assignments Assignment[]
+  lessons     TeamLesson[]
+
+  @@index([ownerId])
+}
+
+enum OrgRole {
+  OWNER
+  TEACHER
+  STUDENT
+}
+
+model OrgMember {
+  id       String       @id @default(cuid())
+  orgId    String
+  userId   String
+  role     OrgRole      @default(STUDENT)
+  joinedAt DateTime     @default(now())
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@index([userId])
+}
+
+enum AssignmentKind {
+  WRITTEN
+  ORAL
+  LISTENING
+  WRITING
+  READING
+  REVIEW
+}
+
+/** Homework for a team. Completion is derived from members' activity between createdAt and dueAt. */
+model Assignment {
+  id          String         @id @default(cuid())
+  orgId       String
+  createdById String
+  title       String
+  kind        AssignmentKind
+  dueAt       DateTime
+  createdAt   DateTime       @default(now())
+  org         Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdBy   User           @relation("AssignmentCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([orgId, dueAt])
+}
+
+/** AI mini-lesson generated for a team from its most common weaknesses (cached so it isn't regenerated per view). */
+model TeamLesson {
+  id          String       @id @default(cuid())
+  orgId       String
+  createdById String
+  /** The weaknesses the lesson targets (criteria + error tags), as sent to the model. */
+  focus       Json
+  content     Json
+  createdAt   DateTime     @default(now())
+  org         Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdBy   User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([orgId, createdAt])
+}
+

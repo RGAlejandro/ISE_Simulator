@@ -4,9 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, ArrowLeft, Lock, Mic } from "lucide-react";
+import { Trophy, ArrowLeft, Lock, Mic, Radio } from "lucide-react";
 import Link from "next/link";
 import type { OralTaskType } from "@/types";
+import type { LiveMetrics } from "@/lib/live-metrics";
+import { CoachHud } from "@/components/exam/live/coach-hud";
+import { useI18n } from "@/components/i18n/language-provider";
 
 const TASK_LABELS: Record<OralTaskType, string> = {
   TOPIC: "Topic Task",
@@ -50,9 +53,12 @@ interface OralResultsClientProps {
     content: string;
   }>;
   isPro: boolean;
+  /** Present for Live Examiner sessions: delivery metrics measured during the session. */
+  liveMetrics?: LiveMetrics | null;
 }
 
-export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResultsClientProps) {
+export function OralResultsClient({ exam, feedback, exchanges, isPro, liveMetrics }: OralResultsClientProps) {
+  const { dict } = useI18n();
   const getBand = (score: number | null) => {
     if (score === null) return "N/A";
     if (score >= 80) return "Distinction";
@@ -97,6 +103,21 @@ export function OralResultsClient({ exam, feedback, exchanges, isPro }: OralResu
           </p>
         </CardContent>
       </Card>
+
+      {liveMetrics && liveMetrics.candidateWords > 0 && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-display text-xl">
+              <Radio className="h-5 w-5 text-rose-600" />
+              {dict.live.reportTitle}
+            </CardTitle>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">{dict.live.reportSubtitle}</p>
+          </CardHeader>
+          <CardContent>
+            <CoachHud metrics={liveMetrics} showNudges={false} />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Task-by-task feedback */}
       <h2 className="text-xl font-display font-semibold tracking-tight mb-4 text-zinc-900 dark:text-zinc-50">

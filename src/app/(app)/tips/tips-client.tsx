@@ -27,7 +27,7 @@ interface SectionConfig {
 const SECTION_CONFIG: SectionConfig[] = [
   { slug: "reading-tasks",        key: "readingTasks",       category: "reading",  icon: PenTool,        ctaHref: "/practice",  minutes: 50 },
   { slug: "reading-into-writing", key: "readingIntoWriting", category: "writing",  icon: BookOpen,       ctaHref: "/practice",  minutes: 35 },
-  { slug: "extended-writing",     key: "extendedWriting",    category: "writing",  icon: Target,         ctaHref: "/practice",  minutes: 45 },
+  { slug: "extended-writing",     key: "extendedWriting",    category: "writing",  icon: Target,         ctaHref: "/practice",  minutes: 35 },
   { slug: "oral-topic",           key: "oralTopic",          category: "oral",     icon: Mic,            ctaHref: "/practice",  minutes: 6  },
   { slug: "oral-conversation",    key: "oralConversation",   category: "oral",     icon: MessagesSquare, ctaHref: "/practice",  minutes: 6  },
   { slug: "exam-strategy",        key: "examStrategy",       category: "strategy", icon: Clock,          ctaHref: "/dashboard"             },
@@ -84,7 +84,7 @@ const TIME_ALLOCATION: { en: string; es: string; minutes: number; category: Cate
   { en: "Long Reading",         es: "Long Reading",          minutes: 25, category: "reading" },
   { en: "Multi-Text Reading",   es: "Multi-Text Reading",    minutes: 25, category: "reading" },
   { en: "Reading into Writing", es: "Reading into Writing",  minutes: 35, category: "writing" },
-  { en: "Extended Writing",     es: "Extended Writing",      minutes: 45, category: "writing" },
+  { en: "Extended Writing",     es: "Extended Writing",      minutes: 35, category: "writing" },
 ];
 
 export function TipsClient() {

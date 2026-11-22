@@ -182,9 +182,13 @@ export interface UserUsage {
   writtenCount: number;
   oralCount: number;
   listeningCount: number;
+  readingCount: number;
+  writingCount: number;
   canTakeWritten: boolean;
   canTakeOral: boolean;
   canTakeListening: boolean;
+  canTakeReading: boolean;
+  canTakeWriting: boolean;
 }
 
 export interface VocabCard {
@@ -214,6 +218,71 @@ export interface VocabularyListData {
   color: string;
   wordCount: number;
 }
+
+/** A key word the AI picked to teach in a Reading Explorer text. */
+export interface ReadingTargetWord {
+  /** Exact form as it appears in the text (e.g. "thrived", "came across"). */
+  word: string;
+  /** Dictionary form (e.g. "thrive", "come across"). */
+  lemma: string;
+  partOfSpeech: string;
+  /** Translation in the learner's language, for this context. */
+  translation: string;
+  /** Simple English definition. */
+  definition: string;
+  /** Woven in from the learner's own saved list. */
+  fromList?: boolean;
+}
+
+export type ReadingQuestion =
+  | {
+      /** "Context Detective": infer the meaning of a word from its sentence. */
+      type: "context";
+      word: string;
+      /** The sentence of the text where the word appears. */
+      sentence: string;
+      question: string;
+      options: string[];
+      answer: number;
+      explanation: string;
+    }
+  | {
+      /** "Word Hunt": scan the text for the word that matches a clue. */
+      type: "find";
+      clue: string;
+      /** 1-based paragraph where the word is, when known. */
+      paragraph: number | null;
+      answer: string;
+      explanation: string;
+    }
+  | {
+      type: "comprehension";
+      question: string;
+      options: string[];
+      answer: number;
+      explanation: string;
+    };
+
+export interface ReadingContent {
+  paragraphs: string[];
+  targetWords: ReadingTargetWord[];
+  questions: ReadingQuestion[];
+}
+
+/** A word the learner tapped while reading, glossed in context. */
+export interface ReadingLookupData {
+  word: string;
+  paragraph: number;
+  sentence: number;
+  lemma: string;
+  partOfSpeech: string | null;
+  translation: string;
+  definition: string;
+  level: string | null;
+}
+
+/** Answer given to a reading quiz question: option index or typed word. */
+export type ReadingAnswer = number | string | null;
 
 export interface WordDetails {
   ipa: string;
@@ -275,4 +344,86 @@ export interface ListeningRound2Feedback {
   comments: string;
   capturedDetails: string[];
   missedDetails: string[];
+}
+
+// ═══════════════════════════════════════════
+// WRITING LAB — standalone Task 3 / Task 4 practice
+// ═══════════════════════════════════════════
+
+export type WritingTaskType = "READING_INTO_WRITING" | "EXTENDED_WRITING";
+
+/** A Writing Lab prompt (stored in WritingPractice.task). */
+export interface WritingTaskContent {
+  title: string;
+  prompt: string;
+  bulletPoints: string[];
+  wordLimit: { min: number; max: number };
+  /** Suggested time in exam conditions. */
+  minutes: number;
+  /** Task 3 only: the four source texts A–D (D is an infographic). */
+  sources?: ReadingText[];
+}
+
+/** Trinity writing criteria; readingForWriting only applies to Task 3. */
+export type WritingCriterionKey = "readingForWriting" | "taskFulfilment" | "organisation" | "languageControl";
+
+export interface WritingCriterion {
+  /** Trinity rating scale 0-4 (2 = pass at the level, 3 = merit, 4 = distinction). */
+  score: number;
+  comment: string;
+}
+
+export type WritingIssueCategory = "grammar" | "vocabulary" | "register" | "cohesion" | "spelling" | "punctuation";
+
+/** A located error in the candidate's text. Offsets are [start, end) into the draft text. */
+export interface WritingIssue {
+  start: number;
+  end: number;
+  quote: string;
+  correction: string;
+  category: WritingIssueCategory;
+  /** Error-notebook tag (WRITING_ERROR_TAGS). */
+  tag: string;
+  explanation: string;
+}
+
+export interface WritingUpgradeSuggestion {
+  text: string;
+  /** Translation in the learner's language. */
+  translation: string;
+}
+
+/** A correct-but-basic expression with stronger C1 alternatives ("Word Upgrade"). */
+export interface WritingUpgrade {
+  start: number;
+  end: number;
+  quote: string;
+  suggestions: WritingUpgradeSuggestion[];
+  /** The candidate's sentence rewritten with the first suggestion. */
+  example: string;
+  note: string;
+}
+
+export interface WritingEvaluation {
+  criteria: Partial<Record<WritingCriterionKey, WritingCriterion>>;
+  summary: string;
+  strengths: string[];
+  issues: WritingIssue[];
+  upgrades: WritingUpgrade[];
+  /** The candidate's text rewritten at a strong level, keeping their ideas. */
+  improvedVersion: string;
+  nextSteps: string[];
+}
+
+export interface WritingDraftData {
+  id: string;
+  version: number;
+  text: string;
+  wordCount: number;
+  source: "typed" | "photo";
+  secondsUsed: number | null;
+  /** Mean of the criteria, 0-4. */
+  score: number;
+  feedback: WritingEvaluation;
+  createdAt: string;
 }

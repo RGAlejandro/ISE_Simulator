@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Volume2, BookOpen, Loader2, PenTool, Mic,
-  Sparkles, AlertCircle, GraduationCap, Layers, Trophy,
+  Sparkles, AlertCircle, GraduationCap, Layers, Trophy, BookOpenText, Radio,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -26,6 +26,8 @@ interface PracticeClientProps {
   writtenCount: number;
   oralCount: number;
   listeningCount: number;
+  readingCount: number;
+  writingCount: number;
   canTakeWritten: boolean;
   canTakeOral: boolean;
   canTakeListening: boolean;
@@ -43,7 +45,7 @@ const SETUP_STYLE: Record<SetupKind, {
 };
 
 export function PracticeClient({
-  isPro, writtenCount, oralCount, listeningCount,
+  isPro, writtenCount, oralCount, listeningCount, readingCount, writingCount,
   canTakeWritten, canTakeOral, canTakeListening,
 }: PracticeClientProps) {
   const router = useRouter();
@@ -347,6 +349,16 @@ export function PracticeClient({
                   )}
                 </Button>
               }
+              secondaryCta={
+                canTakeOral ? (
+                  <Link href="/exam/oral/setup?mode=live" className="block">
+                    <Button variant="outline" className="w-full gap-2 border-rose-200 text-rose-700 hover:bg-rose-50 dark:border-rose-900 dark:text-rose-300 dark:hover:bg-rose-950/40">
+                      <Radio className="h-4 w-4" /> {t("live.ctaPractice")}
+                      <span className="rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">Beta</span>
+                    </Button>
+                  </Link>
+                ) : null
+              }
             />
           </div>
         </section>
@@ -359,6 +371,23 @@ export function PracticeClient({
           </div>
 
           <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* WRITING LAB */}
+            <ModuleCard
+              icon={<PenTool className="h-5 w-5" />}
+              tone="blue"
+              title={t("practice.cards.writing.title")}
+              description={t("practice.cards.writing.description")}
+              badge={usageLabel(writingCount, FREE_DAILY_LIMIT.writing)}
+              bulletsKey="writing"
+              cta={
+                <Link href="/writing" className="block">
+                  <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700">
+                    <PenTool className="h-4 w-4" /> {t("practice.cards.writing.cta")}
+                  </Button>
+                </Link>
+              }
+            />
+
             {/* QUESTS */}
             <ModuleCard
               icon={<Trophy className="h-5 w-5" />}
@@ -451,6 +480,23 @@ export function PracticeClient({
                 </Link>
               }
             />
+
+            {/* READING EXPLORER */}
+            <ModuleCard
+              icon={<BookOpenText className="h-5 w-5" />}
+              tone="amber"
+              title={t("practice.cards.reading.title")}
+              description={t("practice.cards.reading.description")}
+              badge={usageLabel(readingCount, FREE_DAILY_LIMIT.reading)}
+              bulletsKey="reading"
+              cta={
+                <Link href="/vocabulary/reading" className="block">
+                  <Button className="w-full gap-2 bg-amber-600 hover:bg-amber-700">
+                    <BookOpenText className="h-4 w-4" /> {t("practice.cards.reading.cta")}
+                  </Button>
+                </Link>
+              }
+            />
           </div>
         </section>
       </div>
@@ -470,10 +516,10 @@ const TONE_STYLES: Record<Tone, { iconBg: string; iconColor: string; bg: string;
   violet: { iconBg: "bg-violet-100 dark:bg-violet-900/50", iconColor: "text-violet-600 dark:text-violet-300", bg: "from-violet-50/70 to-transparent dark:from-violet-950/30", ring: "ring-violet-200/60 dark:ring-violet-900/40", topBorder: "from-violet-500 to-purple-500" },
 };
 
-type BulletsKey = "written" | "oral" | "listening" | "grammar" | "vocab" | "pronunciation" | "quests";
+type BulletsKey = "written" | "oral" | "listening" | "grammar" | "vocab" | "pronunciation" | "quests" | "reading" | "writing";
 
 function ModuleCard({
-  icon, tone, title, description, badge, bulletsKey, cta,
+  icon, tone, title, description, badge, bulletsKey, cta, secondaryCta,
 }: {
   icon: React.ReactNode;
   tone: Tone;
@@ -482,6 +528,7 @@ function ModuleCard({
   badge: string;
   bulletsKey: BulletsKey;
   cta: React.ReactNode;
+  secondaryCta?: React.ReactNode;
 }) {
   const t = TONE_STYLES[tone];
   const { dict } = useI18n();
@@ -508,7 +555,10 @@ function ModuleCard({
             </li>
           ))}
         </ul>
-        <div className="mt-auto">{cta}</div>
+        <div className="mt-auto space-y-2">
+          {cta}
+          {secondaryCta}
+        </div>
       </CardContent>
     </Card>
   );

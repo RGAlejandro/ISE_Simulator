@@ -12,9 +12,11 @@ function getGroq(): Groq {
   return _groq;
 }
 
+// Groq retired the Llama 3.x models (404 since late 2026). Verified live on 2026-11-16.
 const GROQ_MODELS = [
-  "llama-3.3-70b-versatile",
-  "llama-3.1-8b-instant",
+  "openai/gpt-oss-120b",
+  "qwen/qwen3.8-27b",
+  "openai/gpt-oss-20b",
 ];
 
 function isRetryableError(msg: string): boolean {
@@ -26,6 +28,10 @@ function isRetryableError(msg: string): boolean {
     msg.includes("503") ||
     msg.includes("overloaded") ||
     msg.includes("capacity") ||
+    // A retired/renamed model must not stop the fallback chain.
+    msg.includes("404") ||
+    msg.includes("model_not_found") ||
+    msg.includes("decommissioned") ||
     msg.includes("Failed to generate JSON")
   );
 }
@@ -116,6 +122,8 @@ export async function groqGenerateChat(
       ],
       temperature: options?.temperature ?? 0.7,
       max_tokens: options?.maxTokens ?? 250,
+      // Short conversational turns: keep reasoning from eating the small token budget.
+      reasoning_effort: "low",
     });
     return response.choices[0]?.message?.content ?? "";
   });

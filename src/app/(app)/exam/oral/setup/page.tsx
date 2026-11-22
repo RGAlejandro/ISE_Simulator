@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, getDailyUsage } from "@/lib/user";
 import { OralSetupClient } from "./setup-client";
 
-type SearchParams = Promise<{ level?: string }>;
+type SearchParams = Promise<{ level?: string; mode?: string }>;
 
 export default async function OralExamSetupPage({ searchParams }: { searchParams: SearchParams }) {
   const user = await getCurrentUser();
@@ -15,5 +15,5 @@ export default async function OralExamSetupPage({ searchParams }: { searchParams
 
   const params = await searchParams;
 
-  return <OralSetupClient initialLevel={params.level ?? null} />;
+  return <OralSetupClient initialLevel={params.level ?? null} initialMode={params.mode === "live" ? "live" : "classic"} />;
 }

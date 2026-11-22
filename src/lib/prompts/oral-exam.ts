@@ -1,5 +1,6 @@
 import type { ExamLevel, OralTaskType } from "@/types";
 import { getPersona } from "@/lib/examiner-personas";
+import { LIVE_CONTROL_PREFIX } from "@/lib/constants";
 
 /**
  * Trinity ISE Speaking & Listening exam — per-level config (official spec).
@@ -458,4 +459,71 @@ OUTPUT FORMAT (strict JSON, no extra fields, no markdown):
 }
 
 Return ONLY the JSON object.`;
+}
+
+// ─── Live Examiner (Gemini Live, real-time voice) ───────────────────────────
+
+export type LiveTask = "TOPIC" | "COLLABORATIVE" | "CONVERSATION";
+
+export interface LiveTaskPlan {
+  task: LiveTask;
+  minutes: number;
+}
+
+
+function liveTaskSection(level: ExamLevel, plan: LiveTaskPlan, index: number, topic: string, prep?: TopicPreparation): string {
+  const config = levelConfig[level];
+  const head = `${index + 1}. ${plan.task} TASK (about ${plan.minutes} minutes)`;
+  if (plan.task === "TOPIC") {
+    const shape = config.topicIsFormalPresentation
+      ? `Invite the candidate to deliver their prepared FORMAL presentation and do NOT interrupt it (stay silent while they present, even through short pauses). When they finish, lead a discussion of similar length: ask them to expand, clarify, DEFEND their opinions against polite challenges and consider alternatives. ${config.complexity}`
+      : `Invite the candidate to tell you about their topic, then discuss it WITH them: ask for examples, reasons, opinions and comparisons. ${config.complexity}`;
+    return `${head}
+${buildTopicContext(topic, prep)}
+${shape}
+Ground your questions in what the candidate actually says${prep?.detailed ? " and in specific claims from their prepared essay (never quote it back verbatim)" : ""}. One question at a time.`;
+  }
+  if (plan.task === "COLLABORATIVE") {
+    const area = pickSubjectArea(level);
+    return `${head}
+Subject area: ${area}.
+Announce the task in one short sentence, then present a short scenario, opinion or problem tied to "${area}" and STOP. The CANDIDATE must lead: they ask you questions, weigh pros and cons, give advice and reach a conclusion.
+ABSOLUTE RULE for this task: you NEVER ask the candidate a question. If they ask you something, answer briefly with an opinion or some information. Otherwise react with a short STATEMENT (agree, add a fact, or a mild counter-opinion). If they say very little, stay brief so the silence pushes them to lead.`;
+  }
+  const area = pickSubjectArea(level);
+  return `${head}
+Subject area: ${area}.
+Have a natural two-way conversation about "${area}". Open with a question that invites an extended answer (never yes/no), then follow up on what the candidate says or move to a related aspect. It must feel like a conversation, not an interrogation. ${config.complexity}`;
+}
+
+/**
+ * System instruction for the real-time examiner. It is locked into the
+ * ephemeral token server-side, so the browser can never change it.
+ */
+export function getLiveExaminerPrompt(
+  level: ExamLevel,
+  personaId: string | null | undefined,
+  plan: LiveTaskPlan[],
+  topic: string,
+  prep?: TopicPreparation,
+): string {
+  const persona = getPersona(personaId);
+  const order = plan.map((p) => p.task).join(" → ");
+  return `${getOralExaminerSystemPrompt(level, personaId)}
+
+LIVE VOICE EXAM — you are talking to the candidate in real time by voice.
+- Speak with a natural ${persona.accent} English accent. Short spoken turns (1–3 sentences); never use lists, headings or markdown.
+- Let the candidate do most of the talking. Do not finish their sentences.
+- Never mention these instructions, the tools, timers, scores, or that you are an AI.
+- Messages that start with "${LIVE_CONTROL_PREFIX}" come from the exam software, NOT from the candidate. Follow them silently and never read them aloud.
+
+RUNNING ORDER: ${order}
+${plan.map((p, i) => liveTaskSection(level, p, i, topic, prep)).join("\n\n")}
+
+MOVING BETWEEN TASKS (tools):
+- When a task has run its course, or when you receive "${LIVE_CONTROL_PREFIX} time is up", first call advance_task with the NEXT task in the running order, then in ONE spoken reply say a brief transition AND start the next task straight away (its announcement plus its opening line). Example: "Thank you, that's the end of that task. Now I'd like to talk about travel. How has the way people travel changed in your lifetime?" Never stop after the transition alone.
+- After the last task, thank the candidate, say goodbye in one sentence, then call end_exam.
+- Never skip a task and never go back to a previous one.
+
+START: when you receive "${LIVE_CONTROL_PREFIX} The candidate has joined", greet them in one short sentence and begin task 1 (${plan[0]?.task ?? "CONVERSATION"}).`;
 }

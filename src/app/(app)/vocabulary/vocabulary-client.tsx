@@ -24,6 +24,10 @@ import {
   RotateCcw,
   Trophy,
   BookmarkCheck,
+  BookOpen,
+  ArrowRight,
+  Repeat,
+  Camera,
 } from "lucide-react";
 
 const CEFR_LEVELS: CefrBand[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -32,7 +36,7 @@ const SCORE_DELTA_WRONG = 8;
 
 type Phase = "setup" | "loading" | "studying" | "done";
 
-export function VocabularyClient() {
+export function VocabularyClient({ reviewDue, isPro }: { reviewDue: number; isPro: boolean }) {
   const [phase, setPhase] = useState<Phase>("setup");
   const [selectedStart, setSelectedStart] = useState<CefrBand | "">("");
   const [category, setCategory] = useState<VocabCategory>("words");
@@ -64,7 +68,7 @@ export function VocabularyClient() {
   const currentCard = cards[cardIndex];
   const currentLevel = scoreToLevel(score);
 
-  const { dict, locale } = useI18n();
+  const { dict, locale, t } = useI18n();
   const { show } = useToast();
   const ttsErrorShownRef = useRef(false);
   const handleTtsError = useCallback((msg: string) => {
@@ -290,6 +294,55 @@ export function VocabularyClient() {
               Easier when you struggle. Infinite session.
             </p>
           </div>
+
+          <Link href="/vocabulary/review" className="block group">
+            <div className="flex items-center gap-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4 transition-all group-hover:border-amber-400 group-hover:shadow-md">
+              <div className="relative h-11 w-11 shrink-0 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center">
+                <Repeat className="h-5 w-5" />
+                {reviewDue > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 min-w-5 rounded-full bg-amber-500 px-1 text-center text-[10px] font-bold leading-5 text-white tabular-nums">{reviewDue}</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-base font-semibold text-zinc-900 dark:text-zinc-100">{dict.vocab.review.title}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
+                  {reviewDue > 0 ? t("vocab.review.hubDesc", { n: reviewDue }) : dict.vocab.review.hubDescNone}
+                </p>
+              </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-amber-600 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </Link>
+
+          <Link href="/vocabulary/reading" className="block group">
+            <div className="flex items-center gap-4 rounded-2xl border-2 border-amber-300 dark:border-amber-700 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/20 px-4 py-4 transition-all group-hover:border-amber-400 group-hover:shadow-md">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-amber-500 text-white flex items-center justify-center">
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-base font-semibold text-zinc-900 dark:text-zinc-100">{dict.vocab.reading.title}</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">{dict.vocab.reading.hubDesc}</p>
+              </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-amber-600 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </Link>
+
+          <Link href={isPro ? "/chat?photos=1" : "/pricing"} className="block group">
+            <div className="flex items-center gap-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4 transition-all group-hover:border-amber-400 group-hover:shadow-md">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-brand text-brand-foreground flex items-center justify-center">
+                <Camera className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-2 font-display text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                  {dict.chat.vocabEntry.title}
+                  <span className="rounded-full bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 font-sans text-[10px] font-semibold uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                    {dict.chat.vocabEntry.pro}
+                  </span>
+                </p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">{dict.chat.vocabEntry.body}</p>
+              </div>
+              <ArrowRight className="h-4 w-4 shrink-0 text-amber-600 transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </Link>
 
           {error && (
             <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">

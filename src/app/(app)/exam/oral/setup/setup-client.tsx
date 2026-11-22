@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Mic, MessagesSquare, Users, Volume2, FileText,
-  ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, Sparkles, Dices,
+  ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, Sparkles, Dices, Radio,
 } from "lucide-react";
+import { useI18n } from "@/components/i18n/language-provider";
 import { EXAM_LEVELS, ORAL_TASK_MINUTES } from "@/lib/constants";
 import { EXAMINER_PERSONAS, type ExaminerPersona } from "@/lib/examiner-personas";
 import { cn } from "@/lib/utils";
@@ -45,12 +46,16 @@ function taskMinutes(level: ExamLevel | "", task: OralTaskType): number | null {
 
 interface Props {
   initialLevel: string | null;
+  /** Preselect the real-time Live Examiner (e.g. from ?mode=live). */
+  initialMode?: "classic" | "live";
 }
 
 type Step = "level" | "tasks" | "topic" | "examiner" | "review";
 
-export function OralSetupClient({ initialLevel }: Props) {
+export function OralSetupClient({ initialLevel, initialMode = "classic" }: Props) {
   const router = useRouter();
+  const { dict } = useI18n();
+  const [mode, setMode] = useState<"classic" | "live">(initialMode);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>(initialLevel ? "tasks" : "level");
@@ -68,14 +73,15 @@ export function OralSetupClient({ initialLevel }: Props) {
   const [spinning, setSpinning] = useState(false);
   const [spinIndex, setSpinIndex] = useState(0);
   const spinTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // null = not yet checked (SSR-safe), false = browser lacks Web Speech API
+  // null = not yet checked (SSR-safe), false = browser can't capture the microphone.
+  // Speech-to-text runs server-side (Whisper / Gemini Live), so any browser with
+  // getUserMedia works — the old Web Speech API check wrongly blocked Brave/Firefox.
   const [speechSupported, setSpeechSupported] = useState<boolean | null>(null);
 
-  // Detect speech recognition support up front, BEFORE the exam starts —
+  // Detect microphone support up front, BEFORE the exam starts —
   // starting consumes the free user's daily oral exam, so they must know now.
   useEffect(() => {
-    const w = window as unknown as Record<string, unknown>;
-    setSpeechSupported(Boolean(w.SpeechRecognition || w.webkitSpeechRecognition));
+    setSpeechSupported(Boolean(navigator.mediaDevices?.getUserMedia) && typeof window.AudioContext !== "undefined");
   }, []);
 
   const allowedTasks: OralTaskType[] = level ? ALLOWED_TASKS_BY_LEVEL[level as ExamLevel] : [];
@@ -173,10 +179,33 @@ export function OralSetupClient({ initialLevel }: Props) {
     }
   };
 
+  const liveTasks = Array.from(tasks).filter((t) => t !== "LISTENING");
+
   const startExam = async () => {
     setError(null);
+    if (mode === "live" && liveTasks.length === 0) {
+      setError("Live mode runs the spoken tasks. Select Topic, Collaborative or Conversation.");
+      return;
+    }
     setSubmitting(true);
     try {
+      if (mode === "live") {
+        const res = await fetch("/api/exam/oral/live/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            level,
+            selectedTasks: liveTasks,
+            topicGeneral: topicGeneral.trim() || null,
+            topicDetailed: topicDetailed.trim() || null,
+            examinerPersona: examinerPersona || null,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to start the live exam");
+        router.push(`/exam/oral/live/${data.examId}`);
+        return;
+      }
       const res = await fetch("/api/exam/oral/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -237,8 +266,8 @@ export function OralSetupClient({ initialLevel }: Props) {
           <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
             <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
-              Your browser does not support speech recognition, which the oral exam needs for voice answers.
-              Please use <strong>Chrome</strong> or <strong>Edge</strong> to take the oral exam.
+              Your browser can&apos;t access a microphone, which the oral exam needs for voice answers.
+              Please use an up-to-date <strong>Chrome</strong>, <strong>Edge</strong> or <strong>Firefox</strong> over HTTPS.
             </span>
           </div>
         )}
@@ -478,6 +507,41 @@ export function OralSetupClient({ initialLevel }: Props) {
               <p className="text-sm text-zinc-500 dark:text-zinc-400">Quick recap before launching.</p>
             </div>
 
+            {/* Exam mode: classic turn-based vs real-time Live Examiner */}
+            <div>
+              <p className="text-[10px] uppercase tracking-wide font-semibold text-zinc-500 dark:text-zinc-400 mb-2">{dict.live.modeTitle}</p>
+              <div className="grid sm:grid-cols-2 gap-3" role="radiogroup" aria-label={dict.live.modeTitle}>
+                {([
+                  { id: "classic", icon: Mic, title: dict.live.modeClassic, desc: dict.live.modeClassicDesc },
+                  { id: "live", icon: Radio, title: dict.live.modeLive, desc: dict.live.modeLiveDesc },
+                ] as const).map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={mode === m.id}
+                    onClick={() => setMode(m.id)}
+                    className={cn(
+                      "relative text-left rounded-xl border-2 p-4 transition-all",
+                      mode === m.id
+                        ? "border-rose-500 bg-rose-50/60 dark:border-rose-500 dark:bg-rose-950/30 ring-2 ring-rose-500/20"
+                        : "border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600",
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <m.icon className="h-4 w-4 text-rose-600" />
+                      <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{m.title}</span>
+                      {m.id === "live" && (
+                        <Badge className="border-0 bg-rose-600 text-white text-[10px]">Beta</Badge>
+                      )}
+                      {mode === m.id && <Check className="ml-auto h-4 w-4 text-rose-600" />}
+                    </div>
+                    <p className="mt-1.5 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">{m.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
                 <p className="text-[10px] uppercase tracking-wide font-semibold text-zinc-500 dark:text-zinc-400">Level</p>
@@ -486,7 +550,7 @@ export function OralSetupClient({ initialLevel }: Props) {
               <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
                 <p className="text-[10px] uppercase tracking-wide font-semibold text-zinc-500 dark:text-zinc-400">Tasks ({tasks.size})</p>
                 <div className="flex flex-wrap gap-1 mt-1.5">
-                  {(["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"] as OralTaskType[]).filter(t => tasks.has(t)).map(t => (
+                  {(["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"] as OralTaskType[]).filter(t => tasks.has(t) && !(mode === "live" && t === "LISTENING")).map(t => (
                     <Badge key={t} className="border-0 bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 text-[10px]">
                       {TASK_META[t].label}
                     </Badge>
@@ -536,7 +600,9 @@ export function OralSetupClient({ initialLevel }: Props) {
                 {submitting ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Starting...</>
                 ) : (
-                  <><Sparkles className="h-4 w-4" /> Start oral exam</>
+                  mode === "live"
+                    ? <><Radio className="h-4 w-4" /> {dict.live.start}</>
+                    : <><Sparkles className="h-4 w-4" /> Start oral exam</>
                 )}
               </Button>
             </div>

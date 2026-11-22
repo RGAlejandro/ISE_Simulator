@@ -10,19 +10,14 @@ import {
   getConversationTaskPrompt,
 } from "@/lib/prompts/oral-exam";
 import { getPersona } from "@/lib/examiner-personas";
+import { ORAL_TASKS_BY_LEVEL } from "@/lib/constants";
 import type { ExamLevel, OralTaskType } from "@prisma/client";
 
 const VALID_LEVELS: ExamLevel[] = ["ISE_FOUNDATION", "ISE_I", "ISE_II", "ISE_III", "ISE_IV"];
 const ALL_TASKS: OralTaskType[] = ["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"];
 
 // Per-level allowed tasks (Trinity official spec)
-const ALLOWED_TASKS_BY_LEVEL: Record<ExamLevel, OralTaskType[]> = {
-  ISE_FOUNDATION: ["TOPIC", "CONVERSATION", "LISTENING"],
-  ISE_I:          ["TOPIC", "CONVERSATION", "LISTENING"],
-  ISE_II:         ["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"],
-  ISE_III:        ["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"],
-  ISE_IV:         ["TOPIC", "COLLABORATIVE", "CONVERSATION", "LISTENING"],
-};
+const ALLOWED_TASKS_BY_LEVEL = ORAL_TASKS_BY_LEVEL as Record<ExamLevel, readonly OralTaskType[]>;
 
 interface Body {
   level?: string;

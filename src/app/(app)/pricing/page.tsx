@@ -8,9 +8,9 @@ import { Check, Loader2 } from "lucide-react";
 import { useI18n } from "@/components/i18n/language-provider";
 
 const PLAN_CONFIG = [
-  { key: "free",    price: "$0",     periodKey: "forever",  highlighted: false, priceId: null },
-  { key: "monthly", price: "$9.99",  periodKey: "perMonth", highlighted: true,  priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || "monthly" },
-  { key: "yearly",  price: "$89.99", periodKey: "perYear",  highlighted: false, priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID  || "yearly"  },
+  { key: "free",    price: "€0",     periodKey: "forever",  highlighted: false, priceId: null },
+  { key: "monthly", price: "€9.99",  periodKey: "perMonth", highlighted: true,  priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || "monthly" },
+  { key: "yearly",  price: "€89.99", periodKey: "perYear",  highlighted: false, priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID  || "yearly"  },
 ] as const;
 
 export default function PricingPage() {

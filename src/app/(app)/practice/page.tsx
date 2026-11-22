@@ -14,6 +14,8 @@ export default async function PracticePage() {
       writtenCount={usage.writtenCount}
       oralCount={usage.oralCount}
       listeningCount={usage.listeningCount}
+      readingCount={usage.readingCount}
+      writingCount={usage.writingCount}
       canTakeWritten={usage.canTakeWritten}
       canTakeOral={usage.canTakeOral}
       canTakeListening={usage.canTakeListening}

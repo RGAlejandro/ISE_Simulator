@@ -3,10 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateJSON } from "@/lib/ai-provider";
 import { getEvaluateWritingPrompt, getReadingExplanationsPrompt } from "@/lib/prompts/written-exam";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, isProUser } from "@/lib/user";
 import type { ExamLevel, WrittenExamContent, ReadingQuestionResult } from "@/types";
-
-const isPro = (plan: string) => plan === "PRO" || plan === "ADMIN";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +14,7 @@ export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const userIsPro = isPro(user.plan);
+    const userIsPro = isProUser(user);
 
     const body = await req.json();
     const { examId, responses, readingAnswers } = body;

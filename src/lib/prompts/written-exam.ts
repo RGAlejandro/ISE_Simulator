@@ -8,7 +8,7 @@ import type { ExamLevel } from "@/types";
 // language complexity requirements, question difficulty, and writing specs.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-interface LevelSpec {
+export interface LevelSpec {
   cefr: string;
   examDuration: number; // minutes
 
@@ -283,6 +283,11 @@ const levelSpecs: Record<ExamLevel, LevelSpec> = {
     },
   },
 };
+
+/** Read-only access to a level's spec — the Writing Lab reuses genres, word limits and language guidance. */
+export function getLevelSpec(level: ExamLevel): Readonly<LevelSpec> {
+  return levelSpecs[level];
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PROMPT BUILDERS (two-step generation to avoid token limits)

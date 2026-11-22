@@ -14,6 +14,18 @@
   --marker-strong: #facc15;
   --paper: #faf8f4;          /* warm paper */
   --paper-line: #e7e1d6;
+  /* Exam-notebook screens */
+  --ink: #1e2a4a;            /* body ink */
+  --ink-soft: #5b6479;       /* secondary ink */
+  --rule: rgba(30, 42, 74, 0.14);   /* hairline section rules */
+  --margin-line: #eab3ad;    /* exercise-book margin */
+  --pen: #c0392b;            /* teacher's red pen */
+  --btn: #1e2a4a;            /* primary button (ink navy) */
+  --btn-hover: #2c3d6b;
+  --stamp-below: #b3261e;
+  --stamp-pass: #1f5fb8;
+  --stamp-merit: #1e2a4a;
+  --stamp-distinction: #8a6400;
 }
 
 @theme inline {
@@ -27,6 +39,14 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
+  --font-hand: var(--font-hand);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-rule: var(--rule);
+  --color-margin: var(--margin-line);
+  --color-pen: var(--pen);
+  --color-btn: var(--btn);
+  --color-btn-hover: var(--btn-hover);
 }
 
 /* Dark mode via .dark class (controlled by ThemeProvider + anti-flash script) */
@@ -40,6 +60,17 @@
   --marker-strong: #4a5f8a;
   --paper: #09090b;          /* match zinc-950 so sections blend seamlessly */
   --paper-line: transparent; /* no ruled lines in dark */
+  --ink: #e7eaf3;
+  --ink-soft: #a3abc0;
+  --rule: rgba(231, 234, 243, 0.12);
+  --margin-line: rgba(234, 120, 110, 0.35);
+  --pen: #f1978c;
+  --btn: #33467a;
+  --btn-hover: #3d5390;
+  --stamp-below: #f1978c;
+  --stamp-pass: #8fb4f5;
+  --stamp-merit: #d9def0;
+  --stamp-distinction: #e6c35c;
 }
 
 body {
@@ -68,6 +99,18 @@ body {
   background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
   background-size: 100% 2rem;
   background-position: 0 -1px;
+}
+
+/* Live Examiner orb: idle breathing */
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.orb-breathe {
+  animation: orb-breathe 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb-breathe { animation: none; }
 }
 
 /* Smooth scrolling */

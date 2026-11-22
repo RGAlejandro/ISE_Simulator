@@ -27,7 +27,9 @@ type Provider = {
   generateChatJSON: (systemPrompt: string, userPrompt: string, options?: { temperature?: number }) => Promise<any>;
 };
 
-function getProviders(): Provider[] {
+type ProviderKey = "groq" | "gemini" | "openrouter";
+
+function getProviders(prefer?: ProviderKey): Provider[] {
   const allProviders: Record<string, Provider | null> = {
     groq: process.env.GROQ_API_KEY
       ? {
@@ -60,9 +62,11 @@ function getProviders(): Provider[] {
 
   // AI_PROVIDER_ORDER lets you set priority, e.g. "openrouter,gemini,groq"
   // Default order: groq, gemini, openrouter
-  const order = (process.env.AI_PROVIDER_ORDER || "groq,gemini,openrouter")
+  const configured = (process.env.AI_PROVIDER_ORDER || "groq,gemini,openrouter")
     .split(",")
     .map((s) => s.trim().toLowerCase());
+  // Quality-sensitive calls (e.g. writing correction) can jump the queue.
+  const order = prefer ? [prefer, ...configured.filter((k) => k !== prefer)] : configured;
 
   const providers: Provider[] = [];
   for (const key of order) {
@@ -93,9 +97,10 @@ function isRetryableError(msg: string): boolean {
 
 async function tryProviders<T>(
   fnName: keyof Omit<Provider, "name">,
-  args: unknown[]
+  args: unknown[],
+  prefer?: ProviderKey
 ): Promise<T> {
-  const providers = getProviders();
+  const providers = getProviders(prefer);
   if (providers.length === 0) {
     throw new Error("No AI provider configured. Set GROQ_API_KEY or GEMINI_API_KEY.");
   }
@@ -131,11 +136,11 @@ export async function generateText(
 
 export async function generateJSON(
   prompt: string,
-  options?: { temperature?: number; maxTokens?: number }
+  options?: { temperature?: number; maxTokens?: number; prefer?: ProviderKey }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return tryProviders<any>("generateJSON", [prompt, options]);
+  return tryProviders<any>("generateJSON", [prompt, options], options?.prefer);
 }
 
 export async function generateChat(
@@ -149,9 +154,9 @@ export async function generateChat(
 export async function generateChatJSON(
   systemPrompt: string,
   userPrompt: string,
-  options?: { temperature?: number; maxTokens?: number }
+  options?: { temperature?: number; maxTokens?: number; prefer?: ProviderKey }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return tryProviders<any>("generateChatJSON", [systemPrompt, userPrompt, options]);
+  return tryProviders<any>("generateChatJSON", [systemPrompt, userPrompt, options], options?.prefer);
 }

@@ -19,6 +19,8 @@ export interface ExaminerPersona {
   flag: string;
   /** msedge-tts neural voice id (must be allow-listed in /api/tts). */
   voice: string;
+  /** Gemini Live prebuilt voice used by the real-time examiner (accent comes from the prompt). */
+  liveVoice: string;
   difficulty: ExaminerDifficulty;
   /** 1 = gentle, 2 = moderate, 3 = demanding (drives the difficulty meter). */
   difficultyLevel: 1 | 2 | 3;
@@ -37,6 +39,7 @@ export const EXAMINER_PERSONAS: ExaminerPersona[] = [
     accent: "British (RP)",
     flag: "🇬🇧",
     voice: "en-GB-SoniaNeural",
+    liveVoice: "Kore",
     difficulty: "Gentle",
     difficultyLevel: 1,
     tags: ["Warm", "Patient", "Encouraging"],
@@ -50,6 +53,7 @@ export const EXAMINER_PERSONAS: ExaminerPersona[] = [
     accent: "British",
     flag: "🇬🇧",
     voice: "en-GB-RyanNeural",
+    liveVoice: "Charon",
     difficulty: "Demanding",
     difficultyLevel: 3,
     tags: ["Formal", "Exacting", "Rigorous"],
@@ -63,6 +67,7 @@ export const EXAMINER_PERSONAS: ExaminerPersona[] = [
     accent: "British",
     flag: "🇬🇧",
     voice: "en-GB-LibbyNeural",
+    liveVoice: "Aoede",
     difficulty: "Moderate",
     difficultyLevel: 2,
     tags: ["Friendly", "Clear", "Methodical"],
@@ -76,6 +81,7 @@ export const EXAMINER_PERSONAS: ExaminerPersona[] = [
     accent: "British",
     flag: "🇬🇧",
     voice: "en-GB-ThomasNeural",
+    liveVoice: "Orus",
     difficulty: "Moderate",
     difficultyLevel: 2,
     tags: ["Calm", "Measured", "Fair"],
@@ -89,6 +95,7 @@ export const EXAMINER_PERSONAS: ExaminerPersona[] = [
     accent: "British",
     flag: "🇬🇧",
     voice: "en-GB-MaisieNeural",
+    liveVoice: "Leda",
     difficulty: "Moderate",
     difficultyLevel: 2,
     tags: ["Lively", "Direct", "Curious"],
@@ -102,6 +109,7 @@ export const EXAMINER_PERSONAS: ExaminerPersona[] = [
     accent: "Irish",
     flag: "🇮🇪",
     voice: "en-IE-ConnorNeural",
+    liveVoice: "Puck",
     difficulty: "Demanding",
     difficultyLevel: 3,
     tags: ["Quick-witted", "Energetic", "Challenging"],

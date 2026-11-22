@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user";
 import { ResultsClient } from "./results-client";
 import { OralResultsClient } from "./oral-results-client";
+import type { LiveMetrics } from "@/lib/live-metrics";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -43,6 +44,7 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
           content: e.content,
         }))}
         isPro={user.plan === "PRO" || user.plan === "ADMIN"}
+        liveMetrics={exam.mode === "live" ? (exam.liveMetrics as unknown as LiveMetrics | null) : null}
       />
     );
   }

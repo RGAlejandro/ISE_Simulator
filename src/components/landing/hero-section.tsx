@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Mic, Star } from "lucide-react";
+import { ArrowRight, CheckCircle2, Mic } from "lucide-react";
 import { useT } from "@/components/i18n/language-provider";
 
 function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
@@ -296,38 +296,15 @@ export function HeroSection() {
               </Link>
             </motion.div>
 
-            {/* Social proof */}
-            <motion.div
+            {/* Origin — a true statement instead of invented social proof */}
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex items-center gap-4 pt-1"
+              className="pt-1 text-xs text-zinc-500 dark:text-zinc-400"
             >
-              <div className="flex -space-x-2">
-                {[
-                  { bg: "bg-blue-500", letter: "S" },
-                  { bg: "bg-purple-500", letter: "M" },
-                  { bg: "bg-emerald-500", letter: "A" },
-                  { bg: "bg-orange-500", letter: "L" },
-                  { bg: "bg-pink-500", letter: "K" },
-                ].map(({ bg, letter }, i) => (
-                  <div
-                    key={i}
-                    className={`h-8 w-8 rounded-full border-2 border-white dark:border-zinc-950 ${bg} flex items-center justify-center text-xs text-white font-bold shadow-sm`}
-                  >
-                    {letter}
-                  </div>
-                ))}
-              </div>
-              <div>
-                <div className="flex items-center gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Loved by ISE students worldwide</p>
-              </div>
-            </motion.div>
+              Built by an ISE III candidate, for ISE candidates. Marked against Trinity&apos;s official criteria.
+            </motion.p>
           </div>
 
           {/* RIGHT — Animated product demo */}

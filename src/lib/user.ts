@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { FREE_DAILY_LIMIT } from "@/lib/constants";
+import { AI_ASSIST_DAILY_LIMIT, FREE_DAILY_LIMIT } from "@/lib/constants";
 import type { UserUsage } from "@/types";
 import type { Plan, SubscriptionStatus } from "@prisma/client";
 
@@ -72,18 +72,24 @@ export async function getDailyUsage(userId: string): Promise<UserUsage> {
   const writtenCount = usage?.writtenCount ?? 0;
   const oralCount = usage?.oralCount ?? 0;
   const listeningCount = usage?.listeningCount ?? 0;
+  const readingCount = usage?.readingCount ?? 0;
+  const writingCount = usage?.writingCount ?? 0;
 
   return {
     writtenCount,
     oralCount,
     listeningCount,
+    readingCount,
+    writingCount,
     canTakeWritten: isPro || writtenCount < FREE_DAILY_LIMIT.written,
     canTakeOral: isPro || oralCount < FREE_DAILY_LIMIT.oral,
     canTakeListening: isPro || listeningCount < FREE_DAILY_LIMIT.listening,
+    canTakeReading: isPro || readingCount < FREE_DAILY_LIMIT.reading,
+    canTakeWriting: isPro || writingCount < FREE_DAILY_LIMIT.writing,
   };
 }
 
-export async function incrementUsage(userId: string, type: "written" | "oral" | "listening" | "chat") {
+export async function incrementUsage(userId: string, type: "written" | "oral" | "listening" | "chat" | "reading" | "writing") {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -91,6 +97,8 @@ export async function incrementUsage(userId: string, type: "written" | "oral" | 
     type === "written" ? "writtenCount"
     : type === "oral" ? "oralCount"
     : type === "listening" ? "listeningCount"
+    : type === "reading" ? "readingCount"
+    : type === "writing" ? "writingCount"
     : "chatCount";
 
   await prisma.dailyUsage.upsert({
@@ -98,4 +106,20 @@ export async function incrementUsage(userId: string, type: "written" | "oral" | 
     create: { userId, date: today, [field]: 1 },
     update: { [field]: { increment: 1 } },
   });
+}
+
+/**
+ * Count one small AI helper call (handwriting transcription, sentence check)
+ * against the daily cap. Increments first, so concurrent calls can't slip past.
+ */
+export async function consumeAiAssist(userId: string, isPro: boolean): Promise<boolean> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const usage = await prisma.dailyUsage.upsert({
+    where: { userId_date: { userId, date: today } },
+    create: { userId, date: today, aiAssistCount: 1 },
+    update: { aiAssistCount: { increment: 1 } },
+  });
+  return usage.aiAssistCount <= (isPro ? AI_ASSIST_DAILY_LIMIT.pro : AI_ASSIST_DAILY_LIMIT.free);
 }

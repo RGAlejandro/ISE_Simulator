@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { generateJSON } from "@/lib/ai-provider";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, isProUser } from "@/lib/user";
 import { getOralEvaluationPrompt } from "@/lib/prompts/oral-exam";
 import type { ExamLevel, OralTaskType } from "@/types";
 
@@ -47,11 +47,10 @@ export async function POST(req: NextRequest) {
     // Normalise each task to 0-100 then average for the overall score.
     const taskScoresAsPercent: number[] = [];
 
-    // Evaluate each task type
-    for (const taskType of TASK_TYPES) {
+    // Build one transcript per task, then mark all tasks in parallel (one AI call each).
+    const toEvaluate = TASK_TYPES.flatMap((taskType) => {
       const taskExchanges = exam.exchanges.filter((e: typeof exam.exchanges[number]) => e.taskType === taskType);
-      if (taskExchanges.length === 0) continue;
-
+      if (taskExchanges.length === 0) return [];
       const transcript = taskExchanges
         .map((e: typeof exam.exchanges[number]) => {
           if (e.taskType === "LISTENING" && e.role === "EXAMINER") {
@@ -67,34 +66,27 @@ export async function POST(req: NextRequest) {
           return `${e.role === "EXAMINER" ? "Examiner" : "Candidate"}: ${e.content}`;
         })
         .join("\n");
+      return [{ taskType, transcript }];
+    });
 
-      const evaluationPrompt = getOralEvaluationPrompt(
-        exam.level as ExamLevel,
+    const evaluations = await Promise.all(
+      toEvaluate.map(async ({ taskType, transcript }) => ({
         taskType,
-        transcript
-      );
+        feedback: await generateJSON(getOralEvaluationPrompt(exam.level as ExamLevel, taskType, transcript), { temperature: 0.3 }),
+      })),
+    );
 
-      const feedback = await generateJSON(evaluationPrompt, { temperature: 0.3 });
+    await prisma.oralFeedback.createMany({
+      data: evaluations.map(({ taskType, feedback }) => ({ examId, taskType, feedback, score: feedback.score ?? 0 })),
+    });
 
-      // Save feedback to DB
-      await prisma.oralFeedback.create({
-        data: {
-          examId,
-          taskType,
-          feedback,
-          score: feedback.score ?? 0,
-        },
-      });
-
+    for (const { taskType, feedback } of evaluations) {
       const max = taskType === "LISTENING" ? 5 : 20;
       const raw = Math.min(max, Math.max(0, feedback.score ?? 0));
       taskScoresAsPercent.push((raw / max) * 100);
 
       // Only return detailed feedback for Pro users
-      feedbackResults[taskType] =
-        user.plan === "PRO"
-          ? feedback
-          : { score: feedback.score };
+      feedbackResults[taskType] = isProUser(user) ? feedback : { score: feedback.score };
     }
 
     const overallScore = taskScoresAsPercent.length

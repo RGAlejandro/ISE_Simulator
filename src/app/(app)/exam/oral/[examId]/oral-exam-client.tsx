@@ -607,9 +607,9 @@ export function OralExamClient({
                 </>
               )}
             </Button>
-            {isPro && (
+            {!isPro && (
               <p className="text-xs text-zinc-500">
-                Pro users get detailed feedback on pronunciation, grammar, vocabulary, and fluency.
+                The free plan shows your score for each task. Pro adds detailed comments on every Trinity criterion.
               </p>
             )}
           </div>

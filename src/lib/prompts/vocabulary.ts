@@ -53,6 +53,16 @@ const TRANSLATION_LANG: Record<string, { name: string; hint: string; noWordNote:
 };
 const DEFAULT_TRANSLATION_LANG = TRANSLATION_LANG.es;
 
+/** Learner's translation language for a UI locale (falls back to Spanish). */
+export function getTranslationLang(locale: string) {
+  return TRANSLATION_LANG[locale] ?? DEFAULT_TRANSLATION_LANG;
+}
+
+/** Locale key of the translation language actually used for `locale`. */
+export function translationLocale(locale: string): string {
+  return locale in TRANSLATION_LANG ? locale : "es";
+}
+
 export type VocabCategory = "words" | "phrasal_verbs" | "idioms";
 
 const CATEGORY_SPEC: Record<VocabCategory, { noun: string; itemRule: string; extraHint: string; partOfSpeech: string }> = {

@@ -24,6 +24,8 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
   const navLinks = [
     { href: "/dashboard", label: t("nav.dashboard") },
     { href: "/practice", label: t("nav.practice") },
+    { href: "/readiness", label: t("readiness.nav") },
+    { href: "/teams", label: t("teams.nav") },
     { href: "/tips", label: t("nav.tips") },
     { href: "/chat", label: t("nav.chat") },
     { href: "/pricing", label: t("nav.pricing") },

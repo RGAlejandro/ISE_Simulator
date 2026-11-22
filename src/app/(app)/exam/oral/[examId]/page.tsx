@@ -30,6 +30,10 @@ export default async function OralExamPage({ params }: PageProps) {
     redirect(`/results/${exam.id}?type=oral`);
   }
 
+  if (exam.mode === "live") {
+    redirect(`/exam/oral/live/${exam.id}`);
+  }
+
   // Get the first examiner message
   const firstExchange = exam.exchanges[0];
 
