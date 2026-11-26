@@ -7,7 +7,7 @@ test.describe("Pricing page", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     // All 3 prices visible (euros; the yearly price may be written 89,99 € in es/fr)
-    await expect(page.getByText(/€\s?0(?![.,\d])/).first()).toBeVisible();
+    await expect(page.getByText(/(€\s?0|\b0\s?€)(?![.,\d])/).first()).toBeVisible();
     await expect(page.getByText(/9[.,]99/).first()).toBeVisible();
     await expect(page.getByText(/89[.,]99/).first()).toBeVisible();
 

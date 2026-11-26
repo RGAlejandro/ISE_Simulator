@@ -15,9 +15,9 @@ export function bandOf(pct: number): StampBand {
   return "below";
 }
 
-export function BandStamp({ pct, className }: { pct: number; className?: string }) {
+export function BandStamp({ pct, band: forced, className }: { pct: number; band?: StampBand; className?: string }) {
   const { dict } = useI18n();
-  const band = bandOf(pct);
+  const band = forced ?? bandOf(pct);
   return <Stamp band={band} className={className}>{dict.readiness.band[band]}</Stamp>;
 }
 
@@ -29,14 +29,29 @@ export function useResultEyebrow(level: string, kind: string, createdAt: string)
   return `${levelLabel} · ${kind} · ${date}`;
 }
 
+/**
+ * The module's band. Trinity passes Reading & Writing only when EACH skill
+ * reaches Pass: one skill below 50 % means the module isn't passed, whatever
+ * the average.
+ */
+export function moduleBand(score: number, parts: (number | null)[] = []): StampBand {
+  return parts.some((p) => p != null && p < 50) ? "below" : bandOf(score);
+}
+
+/** The skill (of those given) that is below Pass while the average isn't, if any. */
+export function failingSkill(score: number | null, parts: { label: string; pct: number | null }[]): string | null {
+  if (score == null || score < 50) return null;
+  return parts.find((p) => p.pct != null && p.pct < 50)?.label ?? null;
+}
+
 /** Big overall score with its stamp, for the page title. */
-export function ScoreTitle({ score }: { score: number | null }) {
+export function ScoreTitle({ score, parts }: { score: number | null; parts?: (number | null)[] }) {
   const { dict } = useI18n();
   if (score == null) return <>{dict.results.pending}</>;
   return (
     <span className="inline-flex flex-wrap items-center gap-x-4 gap-y-2">
       <span className="tabular-nums">{score}{"\u00a0"}%</span>
-      <BandStamp pct={score} className="text-xs" />
+      <BandStamp pct={score} band={moduleBand(score, parts)} className="text-xs" />
     </span>
   );
 }

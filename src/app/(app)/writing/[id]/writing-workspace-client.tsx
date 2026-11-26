@@ -13,7 +13,7 @@ import { FeedbackView, TaskCard, BAND_STYLES } from "@/components/writing/feedba
 import { SourceTexts } from "@/components/writing/source-texts";
 import { PhraseBank } from "@/components/writing/phrase-bank";
 import { phraseForInsert } from "@/lib/writing-phrases";
-import { MAX_DRAFTS, MIN_SUBMIT_WORDS, bandFromScore, countWords } from "@/lib/writing";
+import { MAX_DRAFTS, MIN_SUBMIT_WORDS, bandFromScore, countWords, countStruck, countInserted } from "@/lib/writing";
 import { cn } from "@/lib/utils";
 import type { WritingDraftData, WritingTaskContent, WritingTaskType } from "@/types";
 
@@ -482,6 +482,7 @@ export function WritingWorkspaceClient({
                       <div>
                         <p className="font-display font-semibold text-zinc-900 dark:text-zinc-100">{w.photoTitle}</p>
                         <p className="text-xs text-zinc-500 mt-0.5">{w.photoHint}</p>
+                        <p className="text-xs text-zinc-500 mt-1">{w.handwritingTip}</p>
                       </div>
                       <div className="grid grid-cols-3 gap-3">
                         {photos.map((p, i) => (
@@ -534,6 +535,16 @@ export function WritingWorkspaceClient({
                           {illegible > 0 && (
                             <p className="flex gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
                               <AlertTriangle className="h-4 w-4 shrink-0" /> {t("writing.illegibleWarning", { n: illegible })}
+                            </p>
+                          )}
+                          {countInserted(text) > 0 && (
+                            <p className="flex gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+                              <AlertTriangle className="h-4 w-4 shrink-0" /> {t("writing.insertedNote", { n: countInserted(text) })}
+                            </p>
+                          )}
+                          {countStruck(text) > 0 && (
+                            <p className="flex gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+                              <AlertTriangle className="h-4 w-4 shrink-0" /> {t("writing.struckNote", { n: countStruck(text) })}
                             </p>
                           )}
                         </div>

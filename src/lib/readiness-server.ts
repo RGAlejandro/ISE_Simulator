@@ -14,6 +14,8 @@ import type { ExamLevel } from "@/types";
 
 /** Practice formats that aren't the exam itself count for less. */
 const READING_EXPLORER_WEIGHT = 0.35;
+/** A real Trinity paper marked with its official key is the strongest reading evidence. */
+const OFFICIAL_READING_WEIGHT = { official: 1.5, aiKey: 1 };
 const SPOKEN_TASKS = new Set(["TOPIC", "COLLABORATIVE", "CONVERSATION"]);
 const SPOKEN_CRITERIA = ["communicativeEffectiveness", "interactiveListening", "languageControl", "delivery"] as const;
 /** Mock-exam writing feedback uses slightly different key names than the Writing Lab. */
@@ -72,7 +74,7 @@ async function resolveLevel(userId: string, goal: ExamLevel | null): Promise<Exa
 /** Gather every marked attempt at `level` as band-scale observations. */
 export async function loadReadinessEvidence(userId: string, level: ExamLevel) {
   const cefr = EXAM_LEVELS.find((l) => l.value === level)?.cefr;
-  const [written, drafts, orals, listening, reading] = await Promise.all([
+  const [written, drafts, orals, listening, reading, official] = await Promise.all([
     prisma.writtenExam.findMany({
       where: { userId, level, status: "EVALUATED", hiddenAt: null },
       select: { completedAt: true, createdAt: true, responses: { select: { taskType: true, score: true, aiFeedback: true } } },
@@ -95,6 +97,11 @@ export async function loadReadinessEvidence(userId: string, level: ExamLevel) {
           select: { score: true, total: true, completedAt: true },
         })
       : Promise.resolve([]),
+    // Official papers marked on paper (their writings are Writing practices, already counted above).
+    prisma.officialPaper.findMany({
+      where: { userId, level, status: "MARKED" },
+      select: { readingResult: true, content: true, updatedAt: true },
+    }),
   ]);
 
   const observations: Observation[] = [];
@@ -144,6 +151,21 @@ export async function loadReadinessEvidence(userId: string, level: ExamLevel) {
     // Skipped sessions (admin "jump to transcript") and keyboard-mash answers aren't evidence.
     if ((s.round1Response?.trim().split(/\s+/).filter((w) => /[aeiou]/i.test(w)).length ?? 0) < 3) continue;
     observations.push({ skill: "listening", value: percentToBand(s.overallScore as number), weight: 1, at: s.completedAt ?? s.createdAt, source: "listening" });
+  }
+
+  for (const p of official) {
+    const res = asObject(p.readingResult);
+    const correct = typeof res?.correct === "number" ? res.correct : null;
+    const total = typeof res?.total === "number" ? res.total : 0;
+    if (correct === null || total < 10) continue;
+    const officialKey = asObject(p.content)?.keySource !== "ai";
+    observations.push({
+      skill: "reading",
+      value: percentToBand((correct / total) * 100),
+      weight: officialKey ? OFFICIAL_READING_WEIGHT.official : OFFICIAL_READING_WEIGHT.aiKey,
+      at: p.updatedAt,
+      source: "officialReading",
+    });
   }
 
   for (const r of reading) {

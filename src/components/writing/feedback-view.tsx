@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/toaster";
 import { useI18n } from "@/components/i18n/language-provider";
 import { AnnotatedText, type AnnotationRef } from "./annotated-text";
 import { SourceTexts } from "./source-texts";
-import { CRITERIA_FOR_TASK, bandFromScore, type WritingBand } from "@/lib/writing";
+import { CRITERIA_FOR_TASK, bandFromScore, type WritingBand, reflowLines } from "@/lib/writing";
 import { cn } from "@/lib/utils";
 import type { WritingDraftData, WritingTaskContent, WritingTaskType } from "@/types";
 
@@ -300,7 +300,7 @@ export function FeedbackView({ draft, previous, taskType, task, cefr }: Props) {
                   {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? w.copied : w.copy}
                 </Button>
               </div>
-              <div className="whitespace-pre-wrap font-serif text-[15px] sm:text-base leading-8 text-zinc-800 dark:text-zinc-200">{fb.improvedVersion}</div>
+              <div className="whitespace-pre-wrap font-serif text-[15px] sm:text-base leading-8 text-zinc-800 dark:text-zinc-200">{reflowLines(fb.improvedVersion)}</div>
             </div>
           </TabsContent>
         )}

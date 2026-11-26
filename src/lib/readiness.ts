@@ -25,7 +25,7 @@ export const SKILLS: Skill[] = ["reading", "writing", "speaking", "listening"];
 
 export type Band = "below" | "pass" | "merit" | "distinction";
 export type Confidence = "none" | "low" | "medium" | "high";
-export type ObservationSource = "mockReading" | "mockWriting" | "writingLab" | "oralExam" | "oralListening" | "listening" | "readingExplorer";
+export type ObservationSource = "mockReading" | "officialReading" | "mockWriting" | "writingLab" | "oralExam" | "oralListening" | "listening" | "readingExplorer";
 
 export interface Observation {
   skill: Skill;

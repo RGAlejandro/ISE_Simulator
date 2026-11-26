@@ -7,8 +7,9 @@ import { isProUser, incrementUsage, consumeAiAssist } from "@/lib/user";
 import { FREE_CHAT_DAILY_LIMIT } from "@/lib/constants";
 import { buildTutorSnapshot } from "@/lib/tutor-context";
 import { buildTutorConversation, getTutorSystemPrompt } from "@/lib/prompts/tutor";
-import { sanitizeTutorResponse, type TutorAction } from "@/lib/tutor";
+import { MAX_TUTOR_PHOTOS, sanitizeTutorResponse, type TutorAction } from "@/lib/tutor";
 import { extractPhotoLists, photoListActions, photoListSummary, sanitizePhotoListMode, unreadableNote } from "@/lib/photo-lists";
+import { findYouTubeUrl, readYouTubeVideo, videoListAction, videoMessage, videoSummaryForTutor } from "@/lib/video-lists";
 
 // Defensive caps on the prompt we build from client-provided history
 const MAX_HISTORY_MESSAGES = 20;
@@ -16,13 +17,18 @@ const MAX_MESSAGE_CHARS = 2000;
 
 // Photos for the Pro tutor (study material: flashcards, notes, textbook pages)
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
-const MAX_PHOTOS = 5;
+const MAX_PHOTOS = MAX_TUTOR_PHOTOS;
+
+/** The learner's latest message. */
+function lastUserMessage(messages: ChatMessage[]): string {
+  return [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+}
 
 /** Reply when the tutor's own answer failed but the photo lists are ready. */
 const LISTS_READY: Record<string, string> = {
-  es: "He leído tus fotos. Revisa las listas de abajo y créalas con un clic.",
-  en: "I've read your photos. Check the lists below and create them with one click.",
-  fr: "J'ai lu vos photos. Vérifiez les listes ci-dessous et créez-les en un clic.",
+  es: "He leído tus fotos. Revisa las palabras de abajo y crea la lista con un clic.",
+  en: "I've read your photos. Check the words below and create the list with one click.",
+  fr: "J'ai lu vos photos. Vérifiez les mots ci-dessous et créez la liste en un clic.",
 };
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024;
 /** Gemini's inline-data request cap is ~20 MB. */
@@ -128,6 +134,32 @@ export async function POST(req: NextRequest) {
       const system = getTutorSystemPrompt(snapshot, { locale, photoCount: photos.length });
       const conversation = buildTutorConversation(messages, photos.length);
 
+      // A YouTube link: the app watches the video (Gemini), then the tutor answers from what it found.
+      const videoUrl = photos.length === 0 ? findYouTubeUrl(lastUserMessage(messages)) : null;
+      if (videoUrl) {
+        if (!(await consumeAiAssist(user.id, true))) {
+          return NextResponse.json({ error: "Daily limit for AI helpers reached. Try again tomorrow." }, { status: 429 });
+        }
+        const video = await readYouTubeVideo(videoUrl, { instruction: lastUserMessage(messages), level: snapshot.goal.level, locale });
+        if (video.failed) {
+          return NextResponse.json({ message: videoMessage(video.busy ? "busy" : "unavailable", locale), actions: [], usedData: ["video"] });
+        }
+        const raw = await generateChatJSON(
+          getTutorSystemPrompt(snapshot, { locale, photoCount: 0, videoSummary: videoSummaryForTutor(video) }),
+          conversation,
+          { temperature: 0.4 },
+        ).catch((err) => {
+          console.error("Tutor video reply error:", err);
+          return null;
+        });
+        const tutor = sanitizeTutorResponse(raw);
+        const listActions = videoListAction(video, (raw as { videoList?: unknown } | null)?.videoList, lastUserMessage(messages));
+        const actions: TutorAction[] = [...listActions, ...tutor.actions.filter((a) => a.type !== "create_vocab_list")];
+        const reply = tutor.reply || (listActions.length > 0 ? videoMessage("ready", locale) : video.summary);
+        const usedData = tutor.usedData.includes("video") ? tutor.usedData : [...tutor.usedData, "video" as const];
+        return NextResponse.json({ message: reply, actions, usedData });
+      }
+
       if (photos.length === 0) {
         const tutor = sanitizeTutorResponse(await generateChatJSON(system, conversation, { temperature: 0.5, prefer: "gemini" }));
         if (!tutor.reply && tutor.actions.length === 0) {
@@ -176,7 +208,10 @@ export async function POST(req: NextRequest) {
 
   // ── Free: general English assistant (unchanged), no access to personal data ──
   if (photos.length > 0) {
-    return NextResponse.json({ error: "Photos are part of the Pro personal tutor.", upsell: true }, { status: 403 });
+    return NextResponse.json({ error: "Photos are part of the Pro personal tutor.", code: "photosPro", upsell: true }, { status: 403 });
+  }
+  if (findYouTubeUrl(lastUserMessage(messages))) {
+    return NextResponse.json({ error: "YouTube videos are part of the Pro personal tutor.", code: "videoPro", upsell: true }, { status: 403 });
   }
 
   // Rate-limit free users server-side: persistent daily counter, not client-sent history

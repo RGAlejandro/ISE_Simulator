@@ -26,6 +26,7 @@ model User {
   dailyUsage          DailyUsage[]
   grammarSessions     GrammarSession[]
   translationSessions TranslationSession[]
+  officialPapers      OfficialPaper[]
   listeningSessions   ListeningSession[]
   oralExams           OralExam[]
   paperSubmissions    PaperSubmission[]
@@ -241,6 +242,38 @@ model ListeningSession {
   @@index([userId])
 }
 
+/// A real Trinity Reading & Writing paper done on paper: the blank paper and the
+/// candidate's answers are read by AI, checked by the learner, then marked.
+model OfficialPaper {
+  id              String              @id @default(cuid())
+  userId          String
+  level           ExamLevel
+  title           String
+  status          OfficialPaperStatus @default(PARSED)
+  /// OfficialPaperContent: question blocks with their key, Task 3/4 prompts, Task 2 texts.
+  content         Json
+  /// OfficialAnswers as transcribed, then as confirmed by the learner.
+  answers         Json?
+  /// OfficialReadingResult once marked.
+  readingResult   Json?
+  /// Writing practices holding the marked Task 3 / Task 4 (full Writing feedback).
+  task3PracticeId String?
+  task4PracticeId String?
+  /// 0–100 estimate, same formula as the mock exam.
+  score           Float?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+enum OfficialPaperStatus {
+  PARSED
+  TRANSCRIBED
+  MARKED
+}
+
 /// Translation drill: sentences in the learner's language to write in English, pitched at an ISE level.
 model TranslationSession {
   id          String    @id @default(cuid())
@@ -266,7 +299,12 @@ model GrammarSession {
   id           String    @id @default(cuid())
   userId       String
   cefrLevel    String
+  /// "gap_fill" | "mcq" | "error_correction", or "lesson" for a Teacher lesson.
   exerciseType String
+  /// Teacher lessons: the error tag taught (e.g. "prepositions").
+  focus        String?
+  /// Teacher lessons: TeacherLesson (title, rules, the learner's own mistakes).
+  lesson       Json?
   questions    Json
   responses    Json?
   feedback     Json?
@@ -277,6 +315,7 @@ model GrammarSession {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([userId, focus])
 }
 
 model VocabularyList {

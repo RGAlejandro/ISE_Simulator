@@ -3,12 +3,9 @@ import { auth } from "@clerk/nextjs/server";
 import { generateJSON } from "@/lib/ai-provider";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getDailyUsage } from "@/lib/user";
-import { EXAM_LEVEL_VALUES, sanitizeItems, type SourceLang } from "@/lib/translation";
+import { DEFAULT_ROUND, EXAM_LEVEL_VALUES, isRoundSize, sanitizeItems, type SourceLang } from "@/lib/translation";
 import { pickStructures, translationGeneratePrompt } from "@/lib/prompts/translation";
 import type { ExamLevel } from "@/types";
-
-/** Minimum usable sentences for a round. */
-const MIN_ITEMS = 6;
 
 export async function POST(req: Request) {
   try {
@@ -17,11 +14,14 @@ export async function POST(req: Request) {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const body = (await req.json().catch(() => ({}))) as { level?: string; locale?: string };
+    const body = (await req.json().catch(() => ({}))) as { level?: string; locale?: string; count?: unknown };
     const level = body.level as ExamLevel;
     if (!EXAM_LEVEL_VALUES.includes(level)) {
       return NextResponse.json({ error: "Invalid level" }, { status: 400 });
     }
+    const count = isRoundSize(body.count) ? body.count : DEFAULT_ROUND;
+    // A round may come back a little short; below this it isn't worth starting.
+    const minItems = Math.ceil(count * 0.75);
 
     const usage = await getDailyUsage(user.id);
     if (!usage.canTakeTranslation) {
@@ -30,13 +30,14 @@ export async function POST(req: Request) {
 
     // Source sentences follow the UI language; English speakers get Spanish (the app's main audience).
     const source: SourceLang = body.locale === "fr" ? "fr" : "es";
-    const prompt = translationGeneratePrompt(level, source, pickStructures(level));
+    const prompt = translationGeneratePrompt(level, source, pickStructures(level, count), body.locale ?? "es");
+    const opts = { temperature: 0.8, maxTokens: 300 + count * 170 };
 
-    let items = sanitizeItems(await generateJSON(prompt, { temperature: 0.8 }).catch(() => null));
-    if (items.length < MIN_ITEMS) {
-      items = sanitizeItems(await generateJSON(prompt, { temperature: 0.8, prefer: "gemini" }).catch(() => null));
+    let items = sanitizeItems(await generateJSON(prompt, opts).catch(() => null), count);
+    if (items.length < minItems) {
+      items = sanitizeItems(await generateJSON(prompt, { ...opts, prefer: "gemini" }).catch(() => null), count);
     }
-    if (items.length < MIN_ITEMS) {
+    if (items.length < minItems) {
       return NextResponse.json({ error: "Failed to generate sentences" }, { status: 503 });
     }
 

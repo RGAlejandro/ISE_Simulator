@@ -40,6 +40,8 @@ export function VocabularyClient({ reviewDue, isPro }: { reviewDue: number; isPr
   const [phase, setPhase] = useState<Phase>("setup");
   const [selectedStart, setSelectedStart] = useState<CefrBand | "">("");
   const [category, setCategory] = useState<VocabCategory>("words");
+  // Translation on the front: say the English word, then flip to check.
+  const [reverse, setReverse] = useState(false);
   const categoryRef = useRef<VocabCategory>("words");
   categoryRef.current = category;
 
@@ -378,6 +380,29 @@ export function VocabularyClient({ reviewDue, isPro }: { reviewDue: number; isPr
 
           <div className="space-y-3">
             <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center">
+              {dict.vocab.games.directionLabel}
+            </p>
+            <div role="radiogroup" aria-label={dict.vocab.games.directionLabel} className="grid grid-cols-2 gap-2">
+              {[false, true].map((v) => (
+                <button
+                  key={String(v)}
+                  role="radio"
+                  aria-checked={reverse === v}
+                  onClick={() => setReverse(v)}
+                  className={`rounded-xl py-3 px-2 border-2 text-xs font-semibold transition-all ${
+                    reverse === v
+                      ? "border-amber-400 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300"
+                      : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600"
+                  }`}
+                >
+                  {v ? dict.vocab.games.directionTrFirst : dict.vocab.games.directionEnFirst}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center">
               Where do you want to start?
             </p>
             <div className="grid grid-cols-3 gap-3">
@@ -548,6 +573,7 @@ export function VocabularyClient({ reviewDue, isPro }: { reviewDue: number; isPr
               <Flashcard
                 key={cardIndex}
                 card={currentCard}
+                reverse={reverse}
                 isFlipped={isFlipped && !isExiting}
                 onFlip={() => { if (!isExiting) setIsFlipped((f) => !f); }}
                 onSpeak={speak}
@@ -583,8 +609,8 @@ export function VocabularyClient({ reviewDue, isPro }: { reviewDue: number; isPr
                 </Button>
               </div>
             ) : (
-              <div className="h-12 flex items-center justify-center text-sm text-zinc-400">
-                {dict.vocab.tapToReveal}
+              <div className="h-12 flex items-center justify-center text-center text-sm text-zinc-400">
+                {reverse ? dict.vocab.tapToRevealEnglish : dict.vocab.tapToReveal}
               </div>
             )}
 

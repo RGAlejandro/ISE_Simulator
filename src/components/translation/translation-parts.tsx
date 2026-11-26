@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Stamp, type StampBand } from "@/components/notebook/notebook";
 import { useI18n } from "@/components/i18n/language-provider";
-import type { TranslationResult, Verdict } from "@/lib/translation";
+import { DEFAULT_ROUND, isRoundSize, type RoundSize, type TranslationResult, type Verdict } from "@/lib/translation";
 
 const VERDICT_BAND: Record<Verdict, StampBand> = { correct: "pass", almost: "distinction", wrong: "below" };
 
@@ -13,21 +13,35 @@ export function VerdictStamp({ verdict, className }: { verdict: Verdict; classNa
   return <Stamp band={VERDICT_BAND[verdict]} className={className}>{dict.translation.verdict[verdict]}</Stamp>;
 }
 
-/** Start a new round at `level` and open it. Returns `start`, `starting` and an error message. */
+/** Remembered round size (per browser; storage may be unavailable). */
+const COUNT_KEY = "translation.count";
+export function loadRoundSize(): RoundSize {
+  try {
+    const n = Number(localStorage.getItem(COUNT_KEY));
+    return isRoundSize(n) ? n : DEFAULT_ROUND;
+  } catch {
+    return DEFAULT_ROUND;
+  }
+}
+export function saveRoundSize(n: RoundSize) {
+  try { localStorage.setItem(COUNT_KEY, String(n)); } catch { /* storage blocked */ }
+}
+
+/** Start a new round at `level` (of `count` sentences) and open it. Returns `start`, `starting` and an error message. */
 export function useStartRound() {
   const router = useRouter();
   const { dict, locale } = useI18n();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const start = async (level: string) => {
+  const start = async (level: string, count: RoundSize = loadRoundSize()) => {
     setStarting(true);
     setError(null);
     try {
       const res = await fetch("/api/translation/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level, locale }),
+        body: JSON.stringify({ level, locale, count }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.code === "DAILY_LIMIT" ? dict.translation.limitReached : dict.translation.error);
@@ -58,6 +72,7 @@ export function ResultDetail({ result }: { result: TranslationResult }) {
       {result.natural && (
         <Row label={tr.natural}><span className="italic text-ink">{result.natural}</span></Row>
       )}
+      {!!result.hints && <p className="text-xs text-ink-soft">{tr.withHint}</p>}
     </div>
   );
 }

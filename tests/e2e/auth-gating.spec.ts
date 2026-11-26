@@ -31,6 +31,10 @@ test.describe("Auth gating (protected routes)", () => {
     "/listening/sample-id",
     "/translation",
     "/translation/sample-id",
+    "/official",
+    "/official/sample-id",
+    "/grammar",
+    "/grammar/sample-id", "/quiz", "/quiz/sample-id",
   ];
 
   for (const path of PROTECTED) {

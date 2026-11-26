@@ -18,8 +18,8 @@ const TASK_META = [
   { label: "Task 4", title: "Extended Writing", qRange: "Writing task" },
 ];
 
-/** Practice → Reading: about 30 minutes per reading task, as on the real paper. */
-const READING_ONLY_MINUTES = 60;
+/** Practice → Reading: Trinity suggests about 20 minutes per reading task. */
+const READING_ONLY_MINUTES = 40;
 
 interface Props {
   examId: string;

@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotebookHeader, NotebookPage, Section } from "@/components/notebook/notebook";
 import { useI18n } from "@/components/i18n/language-provider";
 import { LevelPicker } from "@/components/practice/level-picker";
-import { useStartRound } from "@/components/translation/translation-parts";
+import { loadRoundSize, saveRoundSize, useStartRound } from "@/components/translation/translation-parts";
 import { BandStamp } from "@/components/results/results-parts";
 import { EXAM_LEVELS } from "@/lib/constants";
-import { TRANSLATION_ROUND } from "@/lib/translation";
+import { DEFAULT_ROUND, ROUND_SIZES, roundMinutes, type RoundSize } from "@/lib/translation";
+import { cn } from "@/lib/utils";
 
 interface Round {
   id: string;
@@ -22,6 +23,8 @@ interface Round {
   createdAt: string;
 }
 
+const noSubscribe = () => () => {};
+
 export function TranslationHomeClient({ isPro, canStart, defaultLevel, rounds }: {
   isPro: boolean;
   canStart: boolean;
@@ -31,7 +34,15 @@ export function TranslationHomeClient({ isPro, canStart, defaultLevel, rounds }:
   const { dict, t, locale } = useI18n();
   const tr = dict.translation;
   const [level, setLevel] = useState<string>(defaultLevel ?? "ISE_II");
+  // The last size this browser used (the server renders the default).
+  const stored = useSyncExternalStore(noSubscribe, loadRoundSize, () => DEFAULT_ROUND);
+  const [picked, setPicked] = useState<RoundSize | null>(null);
+  const count = picked ?? stored;
   const { start, starting, error } = useStartRound();
+  const pickCount = (n: RoundSize) => {
+    setPicked(n);
+    saveRoundSize(n);
+  };
   const levelLabel = (v: string) => EXAM_LEVELS.find((l) => l.value === v)?.label ?? v;
 
   return (
@@ -45,12 +56,32 @@ export function TranslationHomeClient({ isPro, canStart, defaultLevel, rounds }:
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{tr.level}</p>
               <LevelPicker value={level} onChange={setLevel} />
             </div>
+            <div>
+              <p id="round-size" className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{tr.count}</p>
+              <div role="radiogroup" aria-labelledby="round-size" className="inline-flex gap-2">
+                {ROUND_SIZES.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    role="radio"
+                    aria-checked={count === n}
+                    onClick={() => pickCount(n)}
+                    className={cn(
+                      "w-14 rounded-md border py-2 text-sm font-semibold tabular-nums transition-colors",
+                      count === n ? "border-ink bg-ink text-paper" : "border-rule text-ink hover:border-ink",
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
             {canStart ? (
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                <Button size="lg" onClick={() => start(level)} disabled={starting}>
+                <Button size="lg" onClick={() => start(level, count)} disabled={starting}>
                   {starting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{tr.starting}</> : tr.start}
                 </Button>
-                <span className="text-sm text-ink-soft">{t("translation.roundInfo", { n: TRANSLATION_ROUND })}</span>
+                <span className="text-sm text-ink-soft">{t("translation.roundInfo", { n: count, m: roundMinutes(count) })}</span>
               </div>
             ) : (
               <div className="space-y-3">

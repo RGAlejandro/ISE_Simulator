@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,7 @@ import { LEVEL_COLORS } from "@/components/vocabulary/flashcard";
 import { useEnglishTTS } from "@/hooks/use-english-tts";
 import { useToast } from "@/components/ui/toaster";
 import { useI18n } from "@/components/i18n/language-provider";
-import { ArrowLeft, Plus, Volume2, Info, Trash2, MoreVertical, BookOpen, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Plus, Volume2, Info, Trash2, MoreVertical, BookOpen, Loader2, Sparkles, Search, X } from "lucide-react";
 import type { CefrBand } from "@/lib/prompts/vocabulary";
 import type { SavedWordData, VocabularyListData } from "@/types";
 
@@ -37,6 +37,30 @@ const COLORS = [
   { id: "orange", cls: "bg-orange-500" },
   { id: "red", cls: "bg-red-500" },
 ];
+
+/** Lower case, no accents: "Pájaro" finds "pajaro". */
+const fold = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().trim();
+
+/** 0 = the English starts with it, 1 = a translation starts with it, 2 = contains it, -1 = no match. */
+function matchRank(w: SavedWordData, q: string): number {
+  const en = fold(w.english);
+  const tr = fold(w.spanish);
+  if (en.startsWith(q)) return 0;
+  if (tr.split(/[,;/]\s*/).some((t) => t.startsWith(q))) return 1;
+  return en.includes(q) || tr.includes(q) ? 2 : -1;
+}
+
+/** Word types the filter offers, in display order. */
+const POS_KEYS = ["noun", "verb", "adjective", "adverb", "phrasalVerb", "idiom", "phrase", "other"] as const;
+type PosKey = (typeof POS_KEYS)[number];
+
+/** The AI writes "phrasal verb · + on sth. · transitive", "Noun"…: keep the base type. */
+function posKey(partOfSpeech: string | null): PosKey {
+  const base = (partOfSpeech ?? "").split("·")[0].trim().toLowerCase();
+  if (base === "phrasal verb") return "phrasalVerb";
+  if (base === "collocation" || base === "expression") return "phrase";
+  return (POS_KEYS as readonly string[]).includes(base) ? (base as PosKey) : "other";
+}
 
 interface Props {
   initialLists: VocabularyListData[];
@@ -55,16 +79,61 @@ export function SavedClient({ initialLists, initialWords }: Props) {
   const [detailsWord, setDetailsWord] = useState<{ english: string; level: CefrBand } | null>(null);
   const [addInput, setAddInput] = useState("");
   const [adding, setAdding] = useState(false);
+  const [query, setQuery] = useState("");
+  const [pos, setPos] = useState<PosKey | "all">("all");
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const { speak, isPlaying, supported } = useEnglishTTS();
   const { show } = useToast();
-  const { locale } = useI18n();
+  const { locale, dict, t } = useI18n();
+  const ts = dict.vocab.savedSearch;
 
-  const filteredWords = useMemo(() => {
+  const listWords = useMemo(() => {
     if (activeListId === "all") return words;
     if (activeListId === "_unfiled") return words.filter((w) => w.listId === null);
     return words.filter((w) => w.listId === activeListId);
   }, [words, activeListId]);
+
+  const q = fold(query);
+  // Best matches first: the word itself, then its translation, then anywhere inside.
+  const searched = useMemo(() => {
+    if (!q) return listWords;
+    return listWords
+      .map((w) => ({ w, rank: matchRank(w, q) }))
+      .filter((x) => x.rank >= 0)
+      .sort((a, b) => a.rank - b.rank)
+      .map((x) => x.w);
+  }, [listWords, q]);
+  // Types present in what the list + search show, with counts.
+  const posCounts = useMemo(() => {
+    const c = new Map<PosKey, number>();
+    for (const w of searched) c.set(posKey(w.partOfSpeech), (c.get(posKey(w.partOfSpeech)) ?? 0) + 1);
+    return POS_KEYS.filter((k) => c.has(k) || k === pos).map((k) => ({ key: k, n: c.get(k) ?? 0 }));
+  }, [searched, pos]);
+  const filteredWords = useMemo(
+    () => (pos === "all" ? searched : searched.filter((w) => posKey(w.partOfSpeech) === pos)),
+    [searched, pos],
+  );
+  const filtering = !!q || pos !== "all";
+  const matchesFilters = (w: SavedWordData) => (!q || matchRank(w, q) >= 0) && (pos === "all" || posKey(w.partOfSpeech) === pos);
+  // Matches in other lists, so an empty result can point there.
+  const elsewhere = filtering && activeListId !== "all" ? words.filter(matchesFilters).length - filteredWords.length : 0;
+  const clearFilters = () => {
+    setQuery("");
+    setPos("all");
+  };
+
+  // "/" jumps to the search box (unless already typing somewhere).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || el?.closest("input, textarea, [contenteditable=true]")) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const unfiledCount = useMemo(() => words.filter((w) => w.listId === null).length, [words]);
 
@@ -207,10 +276,38 @@ export function SavedClient({ initialLists, initialWords }: Props) {
                 {words.length} {words.length === 1 ? "word" : "words"} across {lists.length} {lists.length === 1 ? "list" : "lists"}
               </p>
             </div>
-            <Button onClick={() => setCreateOpen(true)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              New list
-            </Button>
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+              <label className="relative flex min-w-0 flex-1 items-center sm:w-72 sm:flex-none">
+                <span className="sr-only">{ts.label}</span>
+                <Search className="pointer-events-none absolute left-3 h-4 w-4 text-zinc-400" aria-hidden />
+                <input
+                  ref={searchRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Escape") setQuery(""); }}
+                  placeholder={ts.placeholder}
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="h-10 w-full rounded-xl border border-zinc-200 bg-white pl-9 pr-9 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 [&::-webkit-search-cancel-button]:hidden"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => { setQuery(""); searchRef.current?.focus(); }}
+                    aria-label={ts.clear}
+                    title={ts.clear}
+                    className="absolute right-2 flex h-6 w-6 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </label>
+              <Button onClick={() => setCreateOpen(true)} className="gap-2 shrink-0">
+                <Plus className="h-4 w-4" />
+                New list
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -311,8 +408,55 @@ export function SavedClient({ initialLists, initialWords }: Props) {
           </Button>
         </div>
 
+        <div className="space-y-3">
+        {/* Word type filter (only when the list mixes types) */}
+        {(posCounts.length > 1 || pos !== "all") && (
+          <div role="radiogroup" aria-label={ts.typeLabel} className="flex gap-1.5 overflow-x-auto pb-1">
+            {[{ key: "all" as const, n: searched.length }, ...posCounts].map(({ key, n }) => {
+              const active = pos === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setPos(key)}
+                  className={`flex-shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                    active
+                      ? "border-transparent bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                      : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                  }`}
+                >
+                  {key === "all" ? ts.allTypes : ts.types[key]}
+                  <span className={`ml-1.5 tabular-nums ${active ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-400"}`}>{n}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Filter result line */}
+        {filtering && filteredWords.length > 0 && (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite">
+            {t("vocab.savedSearch.results", { n: filteredWords.length, total: listWords.length })}
+          </p>
+        )}
+
         {/* Word grid */}
-        {filteredWords.length === 0 ? (
+        {filtering && filteredWords.length === 0 ? (
+          <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-10 text-center" aria-live="polite">
+            <Search className="mx-auto mb-3 h-6 w-6 text-zinc-400" aria-hidden />
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              {q ? t("vocab.savedSearch.noMatch", { q: query.trim() }) : ts.noMatchFilters}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {elsewhere > 0 && (
+                <Button size="sm" onClick={() => setActiveListId("all")}>{t("vocab.savedSearch.inAllLists", { n: elsewhere })}</Button>
+              )}
+              <Button size="sm" variant="outline" onClick={clearFilters}>{ts.clearFilters}</Button>
+            </div>
+          </div>
+        ) : filteredWords.length === 0 ? (
           <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 p-12 text-center">
             <div className="text-4xl mb-3">📚</div>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -394,6 +538,7 @@ export function SavedClient({ initialLists, initialWords }: Props) {
             })}
           </div>
         )}
+        </div>
       </div>
 
       {/* Create list dialog */}

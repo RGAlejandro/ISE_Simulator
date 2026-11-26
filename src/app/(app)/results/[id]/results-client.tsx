@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/components/i18n/language-provider";
 import { Ledger, LedgerRow, NotebookHeader, NotebookPage, Section } from "@/components/notebook/notebook";
 import {
-  BackLink, CriterionScore, LockedNote, NextSteps, ScoreTitle, SkillScore, Suggestions, useResultEyebrow,
+  BackLink, CriterionScore, LockedNote, NextSteps, ScoreTitle, SkillScore, Suggestions, failingSkill, useResultEyebrow,
 } from "@/components/results/results-parts";
 import type { WritingFeedback, ReadingQuestionResult } from "@/types";
 
@@ -62,12 +62,26 @@ export function ResultsClient({ exam, responses, isPro, readOnly = false, mode =
   // Writing: average of the marked tasks (each 0–20, normalised to 0–100).
   const wScores = writings.filter((w) => w.score != null).map((w) => ((w.score as number) / 20) * 100);
   const writingPct = wScores.length > 0 ? Math.round(wScores.reduce((a, b) => a + b, 0) / wScores.length) : null;
+  // Trinity: Reading and Writing must each reach Pass.
+  const failing = readingOnly ? null : failingSkill(exam.score, [
+    { label: r.reading, pct: readingPct },
+    { label: r.writing, pct: writingPct },
+  ]);
 
   return (
     <div className="flex-1 bg-paper">
       <NotebookPage className="pb-16">
         {!readOnly && <BackLink />}
-        <NotebookHeader eyebrow={eyebrow} title={<ScoreTitle score={exam.score} />} subtitle={readingOnly ? r.subtitleReading : r.subtitleWritten} />
+        <NotebookHeader
+          eyebrow={eyebrow}
+          title={<ScoreTitle score={exam.score} parts={readingOnly ? undefined : [readingPct, writingPct]} />}
+          subtitle={readingOnly ? r.subtitleReading : r.subtitleWritten}
+        />
+        {failing && (
+          <p className="-mt-4 mb-8 max-w-2xl border-l-2 border-pen pl-4 text-sm leading-relaxed text-ink" role="note">
+            {t("results.mustPassBoth", { skill: failing })}
+          </p>
+        )}
 
         {!readingOnly && (
         <Section n={1} title={r.summary}>

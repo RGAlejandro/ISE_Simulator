@@ -382,3 +382,77 @@ export function aggregateErrorTags(evaluations: WritingEvaluation[], maxExamples
   }
   return [...byTag.values()].sort((a, b) => b.count - a.count);
 }
+
+// ─── Handwriting transcriptions ──────────────────────────────────────────────
+
+/** Opening/closing marks the transcription puts around words it thinks are crossed out. */
+export const STRUCK_OPEN = "⟦";
+export const STRUCK_CLOSE = "⟧";
+const STRUCK_RE = /⟦[^⟦⟧]*⟧/g;
+
+/** Words added with a caret (^), placed by the transcription and marked ⟨…⟩ for the learner to check. */
+const INSERTED_RE = /⟨[^⟨⟩]*⟩/g;
+
+/** Fragments the transcription wasn't sure were crossed out (marked ⟦…⟧ for the learner to check). */
+export function countStruck(text: string): number {
+  return (text.match(STRUCK_RE) ?? []).length;
+}
+
+/** Caret insertions the learner should check (marked ⟨…⟩). */
+export function countInserted(text: string): number {
+  return (text.match(INSERTED_RE) ?? []).length;
+}
+
+/**
+ * Final text before marking: ⟦…⟧ fragments are dropped (treated as crossed
+ * out), ⟨…⟩ insertions keep their words, and the spaces are tidied.
+ */
+export function stripStruck(text: string): string {
+  return text
+    .replace(STRUCK_RE, "")
+    .replace(/[⟨⟩]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/ +([,.;:!?])/g, "$1")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
+}
+
+const LIST_ITEM = /^\s*(?:[-•*]|\d+[.)])\s/;
+
+/** Tidy a fresh transcription: no stray carets, page wraps joined. */
+export function cleanTranscription(text: string): string {
+  return reflowLines(
+    text
+      .replace(/\r\n/g, "\n")
+      .replace(/\^/g, " ")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/ +([,.;:!?])/g, "$1")
+      .replace(/[ \t]+\n/g, "\n")
+      .trim(),
+  );
+}
+
+/**
+ * Join lines that only wrap at the edge of a handwritten page. Paragraphs
+ * (blank lines) stay, and so do deliberate breaks: greetings and sign-offs
+ * ("Dear Sir,"), list items and short headings followed by a capitalised line.
+ * Each joining "\n" becomes one space, so character offsets stay valid.
+ */
+export function reflowLines(text: string): string {
+  const chars = text.split("");
+  for (let i = 0; i < chars.length; i++) {
+    if (chars[i] !== "\n" || chars[i - 1] === "\n" || chars[i + 1] === "\n") continue;
+    const lineStart = text.lastIndexOf("\n", i - 1) + 1;
+    const prev = text.slice(lineStart, i).trim();
+    const nextEnd = text.indexOf("\n", i + 1);
+    const next = text.slice(i + 1, nextEnd === -1 ? undefined : nextEnd);
+    if (!prev || !next.trim()) continue;
+    // "Dear Sir," / "Best wishes," on their own line, before or after the break.
+    const greeting = (prev.length <= 40 && /,$/.test(prev)) || (next.trim().length <= 40 && /,$/.test(next.trim()));
+    const list = LIST_ITEM.test(next);
+    const heading = prev.length <= 50 && !/[.,;:!?)]$/.test(prev) && /^[A-Z]/.test(prev) && /^\s*[A-Z]/.test(next) && prev.split(/\s+/).length <= 7;
+    if (greeting || list || heading) continue;
+    chars[i] = " ";
+  }
+  return chars.join("");
+}

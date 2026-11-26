@@ -181,3 +181,32 @@ export async function geminiGenerateChatJSON(
     return parseAIJson(result.response.text());
   });
 }
+
+/**
+ * Watch a public YouTube video (Gemini reads it from the URL; nothing is
+ * downloaded) and answer in JSON. Low media resolution: about 100 tokens per
+ * second of video instead of ~300, plenty for speech and on-screen text.
+ */
+export async function geminiVideoJSON(
+  prompt: string,
+  videoUrl: string,
+  options?: { temperature?: number; timeoutMs?: number }
+): Promise<unknown> {
+  return tryWithFallback(async (modelName) => {
+    const model = getGenAI().getGenerativeModel(
+      {
+        model: modelName,
+        generationConfig: {
+          temperature: options?.temperature ?? 0.2,
+          responseMimeType: "application/json",
+          ...noThinking(modelName),
+          // Not in this SDK's types yet, but passed through to the API.
+          ...({ mediaResolution: "MEDIA_RESOLUTION_LOW" } as Record<string, unknown>),
+        },
+      },
+      { timeout: options?.timeoutMs ?? 180_000 },
+    );
+    const result = await model.generateContent([{ fileData: { fileUri: videoUrl, mimeType: "video/*" } }, prompt]);
+    return parseAIJson(result.response.text());
+  }, ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-flash-latest"]);
+}

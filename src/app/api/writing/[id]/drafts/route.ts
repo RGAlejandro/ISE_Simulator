@@ -2,16 +2,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user";
-import { generateJSON } from "@/lib/ai-provider";
 import { awardXp, type AwardResult } from "@/lib/gamification-server";
-import { getWritingEvaluationPrompt } from "@/lib/prompts/writing";
-import {
-  CRITERIA_FOR_TASK, MAX_DRAFTS, MAX_TEXT_CHARS, MIN_SUBMIT_WORDS,
-  countWords, meanScore, sanitizeEvaluation,
-} from "@/lib/writing";
-import type {
-  ExamLevel, WritingCriterionKey, WritingDraftData, WritingEvaluation, WritingTaskContent, WritingTaskType,
-} from "@/types";
+import { MAX_DRAFTS, MAX_TEXT_CHARS, MIN_SUBMIT_WORDS, countWords, stripStruck } from "@/lib/writing";
+import { markWritingText } from "@/lib/writing-marking";
+import type { ExamLevel, WritingDraftData, WritingEvaluation, WritingTaskContent, WritingTaskType } from "@/types";
 
 /** XP for a first text and for each rewrite (flat: writing isn't a quiz). */
 const XP_FIRST_DRAFT = 60;
@@ -44,7 +38,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const { text: rawText, source, secondsUsed, locale = "es" } = body as {
       text?: string; source?: string; secondsUsed?: number; locale?: string;
     };
-    const text = (rawText ?? "").replace(/\r\n/g, "\n").trim();
+    // ⟦…⟧ = words the photo transcription thought were crossed out and the learner left marked.
+    const text = stripStruck((rawText ?? "").replace(/\r\n/g, "\n"));
     const wordCount = countWords(text);
     if (wordCount < MIN_SUBMIT_WORDS) {
       return NextResponse.json({ error: `Write at least ${MIN_SUBMIT_WORDS} words before submitting.` }, { status: 400 });
@@ -61,35 +56,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "This version is identical to the previous one." }, { status: 400 });
     }
 
-    const taskType = practice.taskType as WritingTaskType;
-    const criteria = CRITERIA_FOR_TASK[taskType];
-    const prevFeedback = previous ? (previous.feedback as unknown as WritingEvaluation) : null;
-    const prompt = getWritingEvaluationPrompt({
+    const marked = await markWritingText({
       level: practice.level as ExamLevel,
-      taskType,
+      taskType: practice.taskType as WritingTaskType,
       genre: practice.genre,
       task: practice.task as unknown as WritingTaskContent,
       text,
-      wordCount,
       locale,
-      criteria,
-      previous: previous && prevFeedback
-        ? {
-            version: previous.version,
-            scores: Object.fromEntries(criteria.map((k) => [k, prevFeedback.criteria[k]?.score])) as Partial<Record<WritingCriterionKey, number>>,
-          }
-        : null,
+      previous: previous?.feedback ? { version: previous.version, feedback: previous.feedback as unknown as WritingEvaluation } : null,
     });
-
-    let evaluation = sanitizeEvaluation(await generateJSON(prompt, { temperature: 0.2, prefer: "gemini" }), text, taskType);
-    if (!evaluation) {
-      evaluation = sanitizeEvaluation(await generateJSON(prompt, { temperature: 0.3, prefer: "gemini" }), text, taskType);
-    }
-    if (!evaluation) {
+    if (!marked) {
       return NextResponse.json({ error: "Couldn't mark your text right now. Please try again." }, { status: 503 });
     }
-
-    const score = meanScore(evaluation, taskType);
+    const { evaluation, score } = marked;
     const seconds = typeof secondsUsed === "number" && secondsUsed > 0 && secondsUsed <= MAX_SECONDS
       ? Math.round(secondsUsed)
       : null;

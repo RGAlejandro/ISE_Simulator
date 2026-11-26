@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { buildAnnotatedSegments } from "@/lib/writing";
+import { buildAnnotatedSegments, reflowLines } from "@/lib/writing";
 import type { WritingIssue, WritingUpgrade } from "@/types";
 
 export type AnnotationRef = { kind: "issue" | "upgrade"; index: number };
@@ -21,7 +21,8 @@ interface Props {
  * already guaranteed they point at real, non-overlapping spans.
  */
 export function AnnotatedText({ text, issues, upgrades, selected, onSelect }: Props) {
-  const segments = useMemo(() => buildAnnotatedSegments(text, issues, upgrades), [text, issues, upgrades]);
+  // Handwritten transcriptions keep the page's line wraps: join them for reading (offsets are unchanged).
+  const segments = useMemo(() => buildAnnotatedSegments(reflowLines(text), issues, upgrades), [text, issues, upgrades]);
 
   return (
     <div className="whitespace-pre-wrap font-serif text-[15px] sm:text-base leading-8 text-zinc-800 dark:text-zinc-200">

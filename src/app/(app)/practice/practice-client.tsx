@@ -4,9 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle, AudioLines, BookOpen, BookOpenText, Languages, Layers, Loader2, Mic, PenLine, PenTool, Radio, Volume2,
-} from "lucide-react";
+import { AlertCircle, AudioLines, FileCheck, BookOpenText, GraduationCap, Languages, Layers, Loader2, Mic, PenLine, PenTool, Radio, Volume2, ListChecks } from "lucide-react";
 import { NotebookHeader, NotebookPage, Section, Stamp } from "@/components/notebook/notebook";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -104,6 +102,12 @@ export function PracticeClient({ isPro, usage, examModules, examLevel, autoStart
           icon={PenTool} title={p.written.t} description={p.written.d}
           onClick={() => openSetup("written")} disabled={busy || !usage.canTakeWritten} busy={loading === "written"}
           note={left(usage.writtenCount, FREE_DAILY_LIMIT.written)}
+          extra={
+            <Link href="/official" className="relative z-10 inline-flex items-center gap-1.5 text-sm font-medium text-ink underline decoration-marker decoration-4 underline-offset-2">
+              <FileCheck className="h-3.5 w-3.5" /> {dict.official.entry}
+              {!isPro && <Stamp band="pass" tilt={-2}>Pro</Stamp>}
+            </Link>
+          }
         />
         <Entry
           icon={BookOpenText} title={p.reading.t} description={p.reading.d}
@@ -204,9 +208,10 @@ export function PracticeClient({ isPro, usage, examModules, examLevel, autoStart
           <Section n={3} title={<CategoryTitle cat="lang">{p.lang}</CategoryTitle>}>
             <ul className={cn(GRID, "cat-lang")}>
               <Entry icon={Layers} title={p.vocab.t} description={p.vocab.d} href="/vocabulary" />
-              <Entry icon={BookOpen} title={p.grammar.t} description={p.grammar.d} href="/grammar" />
+              <Entry icon={GraduationCap} title={p.grammar.t} description={p.grammar.d} href="/grammar" />
               <Entry icon={Languages} title={p.translation.t} description={p.translation.d} href="/translation"
                 note={left(usage.translationCount, FREE_DAILY_LIMIT.translation)} />
+              <Entry icon={ListChecks} title={p.quiz.t} description={p.quiz.d} href="/quiz" />
             </ul>
           </Section>
         </NotebookPage>

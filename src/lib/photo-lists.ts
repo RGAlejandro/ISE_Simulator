@@ -26,6 +26,8 @@ const isBusy = (err: unknown) => BUSY.some((k) => String(err instanceof Error ? 
 export type PhotoListMode = "per_photo" | "single" | "none";
 
 const PHOTO_LABEL: Record<string, string> = { es: "Foto", en: "Photo", fr: "Photo" };
+/** Name of a list merged from photos with no headings. */
+const PHOTOS_NAME: Record<string, string> = { es: "Mis fotos", en: "My photos", fr: "Mes photos" };
 
 function extractionPrompt(instruction: string, level: string | null, compact = false): string {
   return `You read ONE photo of an English learner's study material (vocabulary lists, flashcards, notes, a textbook page) and turn it into flashcards.
@@ -92,12 +94,29 @@ export async function extractPhotoLists(
   });
 }
 
-/** The tutor's choice of how to group the photo words. Anything unclear means one list per photo. */
+/**
+ * The tutor's choice of how to group the photo words. Anything unclear means
+ * one list with every photo: the learner studies the whole set together.
+ */
 export function sanitizePhotoListMode(raw: unknown): { mode: PhotoListMode; name: string } {
   const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
-  const mode: PhotoListMode = o.mode === "single" || o.mode === "none" ? o.mode : "per_photo";
+  const mode: PhotoListMode = o.mode === "per_photo" || o.mode === "none" ? o.mode : "single";
   const name = typeof o.name === "string" ? o.name.replace(/\s+/g, " ").trim().slice(0, MAX_LIST_NAME) : "";
   return { mode, name };
+}
+
+/** "Lifestyles · Family roles": the photos' own headings, as many as fit in a list name. */
+function joinedTitles(lists: PhotoList[]): string {
+  const seen = new Set<string>();
+  let out = "";
+  for (const { title } of lists) {
+    if (!title || seen.has(title.toLowerCase())) continue;
+    seen.add(title.toLowerCase());
+    const next = out ? `${out} · ${title}` : title;
+    if (next.length > MAX_LIST_NAME) break;
+    out = next;
+  }
+  return out;
 }
 
 /** Build the list proposals the learner confirms in the chat. */
@@ -114,7 +133,9 @@ export function photoListActions(lists: PhotoList[], choice: { mode: PhotoListMo
       seen.add(k);
       return true;
     });
-    const name = choice.name || usable[0].title || `${label} 1`;
+    const name = usable.length === 1
+      ? choice.name || usable[0].title || `${label} ${usable[0].index + 1}`
+      : choice.name || joinedTitles(usable) || (PHOTOS_NAME[locale] ?? PHOTOS_NAME.es);
     return [{ type: "create_vocab_list", name, words }];
   }
 

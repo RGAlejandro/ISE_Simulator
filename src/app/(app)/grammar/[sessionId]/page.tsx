@@ -2,6 +2,9 @@ import { redirect, notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/user";
 import { prisma } from "@/lib/prisma";
 import { GrammarSessionClient } from "./grammar-session-client";
+import { LessonClient } from "./lesson-client";
+import { QUIZ_TYPE } from "@/lib/quiz";
+import { LESSON_TYPE, isTeachable, readLessonFeedback, toClientExercise, type LessonExercise, type TeacherLesson } from "@/lib/teacher";
 import type { GrammarQuestion, GrammarQuestionResult, CefrLevel, GrammarExerciseType } from "@/types";
 
 type ClientQuestion = {
@@ -27,6 +30,22 @@ export default async function GrammarSessionPage({ params }: { params: Promise<{
 
   const session = await prisma.grammarSession.findUnique({ where: { id: sessionId } });
   if (!session || session.userId !== user.id) notFound();
+  // Quizzes share the table; they have their own page.
+  if (session.exerciseType === QUIZ_TYPE) redirect(`/quiz/${session.id}`);
+
+  // Teacher lesson: the rule, the learner's own mistakes, and the exercises (answers stay on the server).
+  if (session.exerciseType === LESSON_TYPE && session.lesson && isTeachable(session.focus)) {
+    return (
+      <LessonClient
+        id={session.id}
+        focus={session.focus}
+        lesson={session.lesson as unknown as TeacherLesson}
+        exercises={(session.questions as unknown as LessonExercise[]).map(toClientExercise)}
+        initialAnswers={(session.responses ?? {}) as Record<string, string>}
+        initialFeedback={readLessonFeedback(session.feedback)}
+      />
+    );
+  }
 
   const questions = (session.questions as unknown as GrammarQuestion[]).map(toClientQuestion);
   const feedback = session.feedback ? (session.feedback as unknown as GrammarQuestionResult[]) : null;

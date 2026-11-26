@@ -18,6 +18,14 @@ export default async function StudyListPage({ params }: { params: Promise<{ list
   if (!list || list.userId !== user.id) notFound();
   if (list.words.length === 0) redirect("/vocabulary/saved");
 
+  // Wrong options for the quiz when the list alone is too short.
+  const others = await prisma.savedWord.findMany({
+    where: { userId: user.id, OR: [{ listId: null }, { listId: { not: list.id } }] },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+    select: { english: true, spanish: true, partOfSpeech: true },
+  });
+
   const cards: (VocabCard & { id: string; level: CefrBand })[] = list.words.map((w) => ({
     id: w.id,
     english: w.english,
@@ -32,6 +40,7 @@ export default async function StudyListPage({ params }: { params: Promise<{ list
       listName={list.name}
       listEmoji={list.emoji}
       cards={cards}
+      extraWords={others.map((w) => ({ english: w.english, translation: w.spanish, partOfSpeech: w.partOfSpeech ?? "word" }))}
     />
   );
 }

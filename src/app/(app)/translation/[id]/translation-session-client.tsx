@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Lightbulb, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InkBar, InkLink, NotebookPage, Section } from "@/components/notebook/notebook";
 import { useI18n } from "@/components/i18n/language-provider";
 import { BandStamp } from "@/components/results/results-parts";
 import { ResultDetail, VerdictStamp, useStartRound } from "@/components/translation/translation-parts";
 import { EXAM_LEVELS } from "@/lib/constants";
-import { MAX_ANSWER, roundScore, type TranslationItem, type TranslationResult } from "@/lib/translation";
+import { MAX_ANSWER, hintsFor, roundScore, type Hint, type TranslationItem, type TranslationResult } from "@/lib/translation";
 
 interface Props {
   id: string;
@@ -29,12 +29,15 @@ export function TranslationSessionClient({ id, level, items, initialAnswers, can
   const [draft, setDraft] = useState("");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Hints opened for the current sentence. */
+  const [shown, setShown] = useState(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
   const item = items[index];
   const result = item ? answers[item.id] : undefined;
   const checked = items.filter((i) => answers[i.id]).length;
+  const hints = item ? hintsFor(item) : [];
   const levelLabel = EXAM_LEVELS.find((l) => l.value === level)?.label ?? level;
 
   useEffect(() => {
@@ -50,7 +53,7 @@ export function TranslationSessionClient({ id, level, items, initialAnswers, can
       const res = await fetch(`/api/translation/${id}/check`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId: item.id, answer: draft, locale }),
+        body: JSON.stringify({ itemId: item.id, answer: draft, locale, hints: shown }),
       });
       const data = await res.json();
       if (!res.ok || !data.result) throw new Error();
@@ -65,6 +68,7 @@ export function TranslationSessionClient({ id, level, items, initialAnswers, can
   const next = () => {
     setDraft("");
     setError(null);
+    setShown(0);
     setIndex((i) => i + 1);
   };
 
@@ -97,6 +101,11 @@ export function TranslationSessionClient({ id, level, items, initialAnswers, can
 
           {!result ? (
             <div className="mt-8">
+              {shown > 0 && (
+                <ul aria-live="polite" className="mb-6 space-y-2 rounded-md border border-rule bg-[color-mix(in_srgb,var(--marker)_12%,transparent)] px-4 py-3 text-[15px] leading-relaxed text-ink">
+                  {hints.slice(0, shown).map((h) => <HintLine key={h.kind} hint={h} />)}
+                </ul>
+              )}
               <label htmlFor="translation-answer" className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{tr.translateTo}</label>
               <textarea
                 id="translation-answer"
@@ -118,6 +127,13 @@ export function TranslationSessionClient({ id, level, items, initialAnswers, can
                 <Button onClick={check} disabled={checking || draft.trim().length < 2}>
                   {checking ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{tr.checking}</> : tr.check}
                 </Button>
+                {shown < hints.length && (
+                  <Button variant="ghost" onClick={() => { setShown((n) => n + 1); inputRef.current?.focus(); }} disabled={checking}>
+                    <Lightbulb className="mr-1.5 h-4 w-4" aria-hidden />
+                    {shown === 0 ? tr.hint : tr.hintMore}
+                    <span className="ml-1.5 text-xs tabular-nums text-ink-soft">{shown + 1}/{hints.length}</span>
+                  </Button>
+                )}
                 <span className="hidden text-xs text-ink-soft sm:inline">{tr.enterHint}</span>
               </div>
               {error && (
@@ -139,6 +155,29 @@ export function TranslationSessionClient({ id, level, items, initialAnswers, can
   );
 }
 
+function HintLine({ hint }: { hint: Hint }) {
+  const { dict } = useI18n();
+  const tr = dict.translation;
+  const label = hint.kind === "pattern" ? tr.hintPattern : hint.kind === "words" ? tr.hintWords : tr.hintStart;
+  return (
+    <li>
+      <span className="mr-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">{label}</span>
+      {hint.kind === "words" ? (
+        <span>
+          {hint.words.map((w, i) => (
+            <span key={i}>
+              {i > 0 && <span className="text-ink-soft"> · </span>}
+              {w.from} → <span lang="en" className="font-semibold">{w.to}</span>
+            </span>
+          ))}
+        </span>
+      ) : (
+        <span lang={hint.kind === "start" ? "en" : undefined} className={hint.kind === "start" ? "font-semibold" : undefined}>{hint.text}</span>
+      )}
+    </li>
+  );
+}
+
 function Summary({ items, answers, header, level, canStartAnother }: {
   items: TranslationItem[];
   answers: Record<string, TranslationResult>;
@@ -151,6 +190,7 @@ function Summary({ items, answers, header, level, canStartAnother }: {
   const results = items.map((i) => answers[i.id]).filter(Boolean);
   const score = roundScore(results, items.length);
   const count = (v: TranslationResult["verdict"]) => results.filter((r) => r.verdict === v).length;
+  const hinted = results.filter((r) => r.hints).length;
   const { start, starting, error } = useStartRound();
 
   return (
@@ -165,6 +205,7 @@ function Summary({ items, answers, header, level, canStartAnother }: {
           </h1>
           <p className="text-base text-ink-soft">
             {t("translation.doneSummary", { c: count("correct"), a: count("almost"), w: count("wrong") })}
+            {hinted > 0 && <> · {t("translation.hintsSummary", { n: hinted })}</>}
           </p>
         </header>
 

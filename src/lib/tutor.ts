@@ -4,11 +4,11 @@
  * and every field is re-validated here and again on the server that saves it.
  */
 
-export const TUTOR_DATA_KEYS = ["readiness", "attempts", "writingErrors", "vocabulary", "photos"] as const;
+export const TUTOR_DATA_KEYS = ["readiness", "attempts", "writingErrors", "vocabulary", "photos", "video"] as const;
 export type TutorDataKey = (typeof TUTOR_DATA_KEYS)[number];
 
 export const PRACTICE_MODULES = [
-  "written", "oral", "live", "listening", "writing", "reading", "grammar", "translation", "review", "vocabulary",
+  "written", "oral", "live", "listening", "writing", "reading", "grammar", "translation", "quiz", "review", "vocabulary",
 ] as const;
 export type PracticeModule = (typeof PRACTICE_MODULES)[number];
 
@@ -19,8 +19,10 @@ export type CefrLevel = (typeof CEFR_LEVELS)[number];
 export const MAX_TUTOR_LIST_WORDS = 40;
 /** Words read from one photo (a full page of vocabulary). */
 export const MAX_PHOTO_LIST_WORDS = 60;
-/** Words the bulk-save endpoint accepts in one request (several photos merged into one list). */
-export const MAX_BULK_WORDS = 150;
+/** Photos the tutor reads in one message. */
+export const MAX_TUTOR_PHOTOS = 5;
+/** Words the bulk-save endpoint accepts in one request: every photo of a message merged into one list. */
+export const MAX_BULK_WORDS = MAX_TUTOR_PHOTOS * MAX_PHOTO_LIST_WORDS;
 export const MAX_LIST_NAME = 60;
 const MAX_REPLY_CHARS = 4000;
 const MAX_ACTIONS = 3;
@@ -60,11 +62,44 @@ function str(v: unknown, max: number): string {
   return typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "";
 }
 
+const GRAMMAR_LABEL: Record<string, string> = {
+  t: "transitive", i: "intransitive", tr: "transitive", intr: "intransitive",
+  transitive: "transitive", intransitive: "intransitive", sep: "separable", separable: "separable",
+  insep: "inseparable", inseparable: "inseparable",
+};
+
+/** "to" + determiner/possessive, or a fixed sentence adverbial: the "to" is part of the phrase. */
+const KEEPS_TO = /^to\s+(?:(?:the|a|an|my|your|his|her|its|our|their|some|no|this|that|what|date|and|be\s+(?:honest|fair|frank)|begin\s+with|start\s+with|sum\s+up|conclude|tell\s+the\s+truth|say\s+the\s+least|put\s+it)\b)/i;
+
+/**
+ * A flashcard headword as the learner will type it: "tell off", not
+ * "to tell off (t)". Bracketed notes from the source — (t)/(i) for
+ * transitive/intransitive, an optional particle like (on), (with/behind) —
+ * and the "to" of an infinitive move to the part-of-speech line.
+ */
+export function cleanHeadword(english: string, partOfSpeech: string): { english: string; partOfSpeech: string } {
+  const notes: string[] = [];
+  let word = english.replace(/\s*[([]([^)\]]*)[)\]]\s*/g, (_m, inner: string) => {
+    const parts = inner.split(/[,/&]|\band\b/).map((p) => p.trim().toLowerCase()).filter(Boolean);
+    if (parts.length > 0 && parts.every((p) => GRAMMAR_LABEL[p])) notes.push(parts.map((p) => GRAMMAR_LABEL[p]).join(" & "));
+    else if (inner.trim()) notes.push(`+ ${inner.trim()}`);
+    return " ";
+  }).replace(/\s+/g, " ").trim();
+  // Trailing object placeholders: "get on with sth." → "get on with".
+  word = word.replace(/(\s+(sth|sb|someone|something|smb|smth)\.?)+$/i, "").trim();
+  // One rule for every card: no infinitive "to" ("give up", "take for granted").
+  // Only phrases where "to" is the preposition keep it: "to some extent", "to my mind", "to be honest".
+  if (/^to\s+\S/i.test(word) && !KEEPS_TO.test(word)) word = word.replace(/^to\s+/i, "");
+  const pos = [partOfSpeech.trim(), ...notes].filter(Boolean).join(" · ");
+  return { english: word || english.trim(), partOfSpeech: pos.slice(0, 60) };
+}
+
 /** Validate one proposed word. Returns null when it can't be saved as a flashcard. */
 export function sanitizeWord(raw: unknown): TutorWord | null {
   if (!raw || typeof raw !== "object") return null;
   const w = raw as Record<string, unknown>;
-  const english = str(w.english, 60);
+  const cleaned = cleanHeadword(str(w.english, 80), str(w.partOfSpeech, 40));
+  const english = cleaned.english.slice(0, 60);
   const spanish = str(w.spanish ?? w.translation, 80);
   if (!english || !spanish || !/[a-z]/i.test(english)) return null;
   const level = typeof w.level === "string" && (CEFR_LEVELS as readonly string[]).includes(w.level.toUpperCase())
@@ -74,7 +109,7 @@ export function sanitizeWord(raw: unknown): TutorWord | null {
     english,
     spanish,
     example: str(w.example, 240),
-    partOfSpeech: str(w.partOfSpeech, 30) || null,
+    partOfSpeech: cleaned.partOfSpeech || null,
     level,
   };
 }
@@ -110,6 +145,7 @@ export function practiceHref(module: PracticeModule, params?: { writingType?: st
     case "reading": return "/practice?start=reading";
     case "grammar": return "/grammar";
     case "translation": return "/translation";
+    case "quiz": return "/quiz";
     case "review": return "/vocabulary/review";
     case "vocabulary": return "/vocabulary";
   }

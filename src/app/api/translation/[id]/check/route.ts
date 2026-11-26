@@ -4,7 +4,7 @@ import { generateJSON } from "@/lib/ai-provider";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user";
 import {
-  MAX_ANSWER, matchesReference, roundScore, sanitizeResult,
+  MAX_ANSWER, hintsFor, matchesReference, roundScore, sanitizeResult,
   type SourceLang, type TranslationItem, type TranslationResult,
 } from "@/lib/translation";
 import { translationCheckPrompt } from "@/lib/prompts/translation";
@@ -17,7 +17,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const { id } = await params;
-    const body = (await req.json().catch(() => ({}))) as { itemId?: string; answer?: string; locale?: string };
+    const body = (await req.json().catch(() => ({}))) as { itemId?: string; answer?: string; locale?: string; hints?: unknown };
     const answer = typeof body.answer === "string" ? body.answer.trim().slice(0, MAX_ANSWER) : "";
     if (!body.itemId || answer.length < 2) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -51,6 +51,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       });
       result = sanitizeResult(await generateJSON(prompt, { temperature: 0.2 }), answer);
     }
+
+    const hints = typeof body.hints === "number" && Number.isInteger(body.hints) ? Math.min(Math.max(body.hints, 0), hintsFor(item).length) : 0;
+    if (hints > 0) result.hints = hints;
 
     const next = { ...answers, [item.id]: result };
     const done = items.every((i) => next[i.id]);

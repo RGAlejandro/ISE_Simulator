@@ -7,7 +7,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Navbar isAdmin={isAdmin} />
-      <main className="flex-1 bg-zinc-50 dark:bg-zinc-950">{children}</main>
+      {/* overflow-x-clip: the sheet slides in from the side without a horizontal scrollbar. */}
+      <main className="flex-1 overflow-x-clip bg-zinc-50 dark:bg-zinc-950">{children}</main>
       <Footer />
     </>
   );

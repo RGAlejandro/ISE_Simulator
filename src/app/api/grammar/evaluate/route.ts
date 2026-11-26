@@ -40,6 +40,10 @@ export async function POST(req: Request) {
     if (!session || session.userId !== user.id) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
+    // Teacher lessons and quizzes have their own checking routes.
+    if (session.exerciseType === "lesson" || session.exerciseType === "quiz") {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    }
     if (session.completedAt) {
       return NextResponse.json({ feedback: session.feedback, score: session.score });
     }

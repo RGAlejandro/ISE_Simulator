@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import type { SubscriptionStatus } from "@prisma/client";
+import { activateSubscription, periodEnd } from "@/lib/billing";
 
 function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus {
   switch (status) {
@@ -18,10 +19,6 @@ function mapStripeStatus(status: Stripe.Subscription.Status): SubscriptionStatus
   }
 }
 
-function periodEnd(subscription: Stripe.Subscription): Date {
-  const ts = (subscription as unknown as { current_period_end?: number }).current_period_end;
-  return ts ? new Date(ts * 1000) : new Date();
-}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -73,37 +70,13 @@ async function handleEvent(event: Stripe.Event) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
-      if (!userId) break;
-
-      const subResponse = await getStripe().subscriptions.retrieve(
-        session.subscription as string
+      if (!userId || !session.subscription || !session.customer) break;
+      // Same activation as the return page (/pricing/success); whichever runs first wins, both are idempotent.
+      await activateSubscription(
+        userId,
+        typeof session.customer === "string" ? session.customer : session.customer.id,
+        typeof session.subscription === "string" ? session.subscription : session.subscription.id,
       );
-      const subscription = subResponse as unknown as Stripe.Subscription;
-
-      await prisma.subscription.upsert({
-        where: { userId },
-        create: {
-          userId,
-          stripeCustomerId: session.customer as string,
-          stripeSubscriptionId: subscription.id,
-          stripePriceId: subscription.items.data[0].price.id,
-          plan: "PRO",
-          status: "ACTIVE",
-          currentPeriodEnd: periodEnd(subscription),
-        },
-        update: {
-          stripeSubscriptionId: subscription.id,
-          stripePriceId: subscription.items.data[0].price.id,
-          plan: "PRO",
-          status: "ACTIVE",
-          currentPeriodEnd: periodEnd(subscription),
-        },
-      });
-
-      await prisma.user.update({
-        where: { id: userId },
-        data: { plan: "PRO" },
-      });
       break;
     }
 

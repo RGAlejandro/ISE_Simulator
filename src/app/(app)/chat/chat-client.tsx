@@ -4,18 +4,16 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  Sparkles, Send, Loader2, MessageSquare, SpellCheck, BookOpen, Layers, GraduationCap,
-  BarChart3, CalendarClock, Camera, Target, ImagePlus, X, RotateCcw, Crown,
-} from "lucide-react";
+import { Sparkles, Send, Loader2, MessageSquare, SpellCheck, BookOpen, Layers, GraduationCap, BarChart3, Camera, Target, ImagePlus, X, RotateCcw, Crown, SquarePlay } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/components/i18n/language-provider";
 import { RichText } from "@/components/chat/rich-text";
 import { PracticeAction, SetGoalAction, UsedDataChips, VocabListGroup } from "@/components/chat/tutor-actions";
+import { findYouTubeUrl } from "@/lib/youtube";
 import { downscaleImage } from "@/lib/image-resize";
-import type { TutorAction, TutorDataKey } from "@/lib/tutor";
+import { MAX_TUTOR_PHOTOS, type TutorAction, type TutorDataKey } from "@/lib/tutor";
 
-const MAX_PHOTOS = 5;
+const MAX_PHOTOS = MAX_TUTOR_PHOTOS;
 
 interface Message {
   role: "user" | "assistant";
@@ -44,7 +42,7 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(startWithPhotos ? c.suggestionsPro.photos.prompt : "");
   const [photos, setPhotos] = useState<Pending[]>([]);
-  const [loading, setLoading] = useState<null | "text" | "photos">(null);
+  const [loading, setLoading] = useState<null | "text" | "photos" | "video">(null);
   const [notice, setNotice] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -93,7 +91,7 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
     setInput("");
     setPhotos([]);
     setNotice(null);
-    setLoading(attached.length > 0 ? "photos" : "text");
+    setLoading(attached.length > 0 ? "photos" : isPro && findYouTubeUrl(text) ? "video" : "text");
 
     const history = next.map((m) => ({ role: m.role, content: m.content }));
     try {
@@ -115,7 +113,9 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         // Server faults get the translated generic message; 4xx explain themselves (limits, photo size).
-        const content = res.status < 500 && typeof data.error === "string" ? data.error : c.errors.generic;
+        const content = data.code === "videoPro" ? c.errors.videoPro
+          : data.code === "photosPro" ? c.errors.photosPro
+            : res.status < 500 && typeof data.error === "string" ? data.error : c.errors.generic;
         setMessages((prev) => [...prev, { role: "assistant", content }]);
         return;
       }
@@ -151,12 +151,18 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
   ];
   const proSuggestions = [
     { icon: BarChart3, ...c.suggestionsPro.analyse, photos: false },
-    { icon: CalendarClock, ...c.suggestionsPro.examSoon, photos: false },
+    { icon: SquarePlay, ...c.suggestionsPro.video, photos: false, fill: true },
     { icon: Camera, ...c.suggestionsPro.photos, photos: true },
     { icon: Target, ...c.suggestionsPro.today, photos: false },
   ];
 
-  function pickSuggestion(s: { prompt: string; photos?: boolean }) {
+  function pickSuggestion(s: { prompt: string; photos?: boolean; fill?: boolean }) {
+    // "From a video": write the request and let the learner paste the link.
+    if (s.fill) {
+      setInput(s.prompt);
+      inputRef.current?.focus();
+      return;
+    }
     if (s.photos) {
       setInput(s.prompt);
       fileRef.current?.click();
@@ -313,7 +319,7 @@ export function ChatClient({ isPro, firstName, startWithPhotos }: Props) {
                   </span>
                   {isPro && (
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {loading === "photos" ? c.readingPhotos : c.thinking}
+                      {loading === "photos" ? c.readingPhotos : loading === "video" ? c.watchingVideo : c.thinking}
                     </span>
                   )}
                 </div>

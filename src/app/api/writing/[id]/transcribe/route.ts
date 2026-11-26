@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { consumeAiAssist, getCurrentUser, isProUser } from "@/lib/user";
 import { generateWithFiles } from "@/lib/gemini";
 import { getHandwritingTranscriptionPrompt } from "@/lib/prompts/writing";
-import { MAX_TEXT_CHARS } from "@/lib/writing";
+import { MAX_TEXT_CHARS, cleanTranscription } from "@/lib/writing";
 
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 const MAX_FILES = 3;
@@ -67,7 +67,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Couldn't read the photos. Try again." }, { status: 502 });
     }
 
-    const text = typeof result.text === "string" ? result.text.trim().slice(0, MAX_TEXT_CHARS) : "";
+    const text = typeof result.text === "string" ? cleanTranscription(result.text).slice(0, MAX_TEXT_CHARS) : "";
     if (!text || result.isHandwrittenText === false) {
       return NextResponse.json({ error: "No handwritten text found in the photos." }, { status: 422 });
     }

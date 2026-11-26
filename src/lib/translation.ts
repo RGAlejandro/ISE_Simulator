@@ -1,7 +1,12 @@
 import type { ExamLevel } from "@/types";
 
-/** Sentences per round. */
-export const TRANSLATION_ROUND = 8;
+/** Sentences per round the learner can choose. */
+export const ROUND_SIZES = [5, 8, 12, 15] as const;
+export type RoundSize = (typeof ROUND_SIZES)[number];
+export const DEFAULT_ROUND: RoundSize = 8;
+export const isRoundSize = (n: unknown): n is RoundSize => ROUND_SIZES.includes(n as RoundSize);
+/** About how long a round takes, in minutes (~40 s a sentence). */
+export const roundMinutes = (n: number) => Math.max(3, Math.round(n * 0.65));
 /** Longest answer we accept (characters). */
 export const MAX_ANSWER = 400;
 
@@ -16,6 +21,31 @@ export interface TranslationItem {
   reference: string;
   /** Grammar point it practises, in English: "second conditional". */
   structure: string;
+  /** Hint 1: how the structure is built, in the learner's UI language. Older rounds don't have it. */
+  pattern?: string;
+  /** Hint 2: key words of the sentence with their English equivalent. */
+  words?: { from: string; to: string }[];
+}
+
+export type Hint =
+  | { kind: "pattern"; text: string }
+  | { kind: "words"; words: { from: string; to: string }[] }
+  | { kind: "start"; text: string };
+
+/** The first third of the reference, so the learner gets going without seeing the whole sentence. */
+export function sentenceStart(reference: string): string {
+  const words = reference.trim().split(/\s+/);
+  const k = Math.min(Math.max(2, Math.ceil(words.length * 0.35)), Math.max(1, words.length - 2));
+  return `${words.slice(0, k).join(" ")}…`;
+}
+
+/** The hints for a sentence, from least to most revealing. */
+export function hintsFor(item: TranslationItem): Hint[] {
+  const out: Hint[] = [];
+  out.push({ kind: "pattern", text: item.pattern || item.structure });
+  if (item.words?.length) out.push({ kind: "words", words: item.words });
+  out.push({ kind: "start", text: sentenceStart(item.reference) });
+  return out;
 }
 
 export interface TranslationResult {
@@ -27,6 +57,8 @@ export interface TranslationResult {
   note: string;
   /** A more natural / higher-band version, when it adds something. */
   natural: string;
+  /** Hints the learner opened before answering. */
+  hints?: number;
 }
 
 /**
@@ -69,7 +101,7 @@ export const EXAM_LEVEL_VALUES = Object.keys(LEVEL_STRUCTURES) as ExamLevel[];
 const clip = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 /** Validate the generator's output; drops malformed items and renumbers. */
-export function sanitizeItems(raw: unknown): TranslationItem[] {
+export function sanitizeItems(raw: unknown, max: number): TranslationItem[] {
   const list = Array.isArray((raw as { items?: unknown })?.items) ? (raw as { items: unknown[] }).items : [];
   const out: TranslationItem[] = [];
   for (const it of list) {
@@ -78,8 +110,15 @@ export function sanitizeItems(raw: unknown): TranslationItem[] {
     const reference = clip(o?.reference, 300);
     const structure = clip(o?.structure, 80);
     if (source.length < 8 || reference.length < 8) continue;
-    out.push({ id: `t${out.length + 1}`, source, reference, structure });
-    if (out.length === TRANSLATION_ROUND) break;
+    const pattern = clip(o?.pattern, 160);
+    const words = (Array.isArray(o?.words) ? o.words : [])
+      .map((w) => ({ from: clip((w as Record<string, unknown>)?.from, 60), to: clip((w as Record<string, unknown>)?.to, 60) }))
+      .filter((w) => w.from && w.to)
+      // A "key word" that is most of the answer isn't a hint any more.
+      .filter((w) => w.to.split(/\s+/).length <= 4)
+      .slice(0, 3);
+    out.push({ id: `t${out.length + 1}`, source, reference, structure, ...(pattern ? { pattern } : {}), ...(words.length ? { words } : {}) });
+    if (out.length === max) break;
   }
   return out;
 }

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Volume2, CheckCircle, XCircle, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { gapSentence } from "@/lib/vocab-quiz";
 import type { VocabCard } from "@/types";
 
 export type GameMode = "complete" | "gapfill" | "dictation";
@@ -20,6 +21,8 @@ interface WordGameStrings {
   completePrompt: string;
   gapfillPrompt: string;
   dictationPrompt: string;
+  /** "Complete" without hints: write the whole word from its meaning. */
+  recallPrompt?: string;
 }
 
 interface WordGameProps {
@@ -29,10 +32,24 @@ interface WordGameProps {
   onResult: (correct: boolean) => void;
   onSpeak: (text: string) => void;
   isPlaying?: boolean;
+  /** "Complete" mode: show some letters (default) or only the meaning. */
+  hints?: boolean;
 }
 
 function normalize(s: string): string {
-  return s.trim().toLowerCase().replace(/\s+/g, " ");
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/[’‘`]/g, "'")
+    .replace(/[.!?]+$/, "")
+    .replace(/\s+/g, " ");
+}
+
+/** Same word, also when the learner puts "to" before a verb stored without it. */
+function isRight(input: string, answer: string): boolean {
+  const a = normalize(answer);
+  const i = normalize(input);
+  return i === a || (!a.startsWith("to ") && i.startsWith("to ") && i.slice(3) === a);
 }
 
 /**
@@ -55,18 +72,7 @@ function maskWord(word: string): string {
     .join("");
 }
 
-/** Replace the target word (case-insensitive, basic inflection tolerance) with a gap. */
-function gapSentence(example: string, word: string): { sentence: string; found: boolean } {
-  // Try exact word, then word + common suffixes (s, es, ed, ing, d)
-  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(`\\b${escaped}(s|es|ed|ing|d)?\\b`, "i");
-  if (re.test(example)) {
-    return { sentence: example.replace(re, "______"), found: true };
-  }
-  return { sentence: example, found: false };
-}
-
-export function WordGame({ card, mode, strings, onResult, onSpeak, isPlaying }: WordGameProps) {
+export function WordGame({ card, mode, strings, onResult, onSpeak, isPlaying, hints = true }: WordGameProps) {
   // NOTE: parent must render this component with key={card.id} so state
   // resets naturally when the card changes.
   const [input, setInput] = useState("");
@@ -91,7 +97,7 @@ export function WordGame({ card, mode, strings, onResult, onSpeak, isPlaying }: 
 
   const check = useCallback(() => {
     if (result || !input.trim()) return;
-    const correct = normalize(input) === normalize(card.english);
+    const correct = isRight(input, card.english);
     setResult(correct ? "correct" : "wrong");
   }, [result, input, card.english]);
 
@@ -110,7 +116,19 @@ export function WordGame({ card, mode, strings, onResult, onSpeak, isPlaying }: 
     <Card className="overflow-hidden">
       <CardContent className="pt-6 pb-6 space-y-5">
         {/* Prompt area per mode */}
-        {mode === "complete" && (
+        {mode === "complete" && !hints && (
+          <div className="space-y-3 text-center">
+            <p className="text-xs uppercase tracking-wide text-zinc-400">{strings.recallPrompt ?? strings.completePrompt}</p>
+            <p className="text-2xl font-bold leading-snug text-zinc-900 dark:text-zinc-100 break-words" data-testid="recall-meaning">
+              {card.translation}
+            </p>
+            {card.partOfSpeech && card.partOfSpeech !== "word" && (
+              <p className="text-xs italic text-zinc-400">{card.partOfSpeech}</p>
+            )}
+          </div>
+        )}
+
+        {mode === "complete" && hints && (
           <div className="space-y-3 text-center">
             <p className="text-xs uppercase tracking-wide text-zinc-400">{strings.completePrompt}</p>
             <p className="font-mono text-2xl tracking-[0.3em] text-zinc-900 dark:text-zinc-100" data-testid="masked-word">
@@ -157,7 +175,8 @@ export function WordGame({ card, mode, strings, onResult, onSpeak, isPlaying }: 
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder={strings.typeAnswer}
-          disabled={!!result}
+          // Read-only (not disabled) once checked: it keeps focus, so Enter goes on to the next word.
+          readOnly={!!result}
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
