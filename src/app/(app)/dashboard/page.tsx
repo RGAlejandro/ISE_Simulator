@@ -6,6 +6,7 @@ import { DashboardClient } from "./dashboard-client";
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
+  if (!user.onboardedAt) redirect("/welcome");
   const data = await loadDashboardData(user);
   return <DashboardClient {...data} />;
 }

@@ -21,6 +21,10 @@ model User {
   /// Which Trinity ISE module(s) the learner still has to pass, and the band they aim for.
   examModules         ExamModules          @default(BOTH)
   targetBand          TargetBand           @default(PASS)
+  /// Set when the first-run welcome is finished; until then /dashboard and /practice send the learner to /welcome.
+  onboardedAt         DateTime?
+  /// Self-rated confidence per skill from the welcome, 1 (struggling) to 3 (confident). Only orders the first steps.
+  selfAssessment      Json?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   dailyUsage          DailyUsage[]

@@ -8,6 +8,7 @@ export default async function PracticePage({ searchParams }: { searchParams: Pro
   const { start } = await searchParams;
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
+  if (!user.onboardedAt) redirect("/welcome");
 
   const usage = await getDailyUsage(user.id);
 

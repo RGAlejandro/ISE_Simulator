@@ -18,8 +18,8 @@ const TARGET_OPTIONS: TargetBandValue[] = ["PASS", "MERIT", "DISTINCTION"];
 
 export interface ExamPlanData {
   goal: { examDate: string; examLevel: ExamLevel } | null;
-  /** Module(s) still to pass and the band aimed for (set even without a date). */
-  focus: { examModules: ExamModulesValue; targetBand: TargetBandValue };
+  /** Module(s) still to pass, the band aimed for and the level (set even without a date). */
+  focus: { examModules: ExamModulesValue; targetBand: TargetBandValue; examLevel: ExamLevel | null };
   levels: { value: ExamLevel; label: string }[];
   plan: {
     daysLeft: number;
@@ -53,7 +53,7 @@ export function ExamGoalForm({ data, onCancel }: { data: ExamPlanData; onCancel?
   const p = dict.dashboard.plan;
   const router = useRouter();
   const [date, setDate] = useState(data.goal?.examDate ?? "");
-  const [level, setLevel] = useState<ExamLevel>(data.goal?.examLevel ?? "ISE_III");
+  const [level, setLevel] = useState<ExamLevel>(data.focus.examLevel ?? "ISE_III");
   const [modules, setModules] = useState<ExamModulesValue>(data.focus.examModules);
   const [target, setTarget] = useState<TargetBandValue>(data.focus.targetBand);
   const [saving, setSaving] = useState(false);
@@ -117,7 +117,7 @@ export function ExamGoalForm({ data, onCancel }: { data: ExamPlanData; onCancel?
         <Button onClick={save} disabled={!date || saving} className="gap-1.5">
           {saving && <Loader2 className="h-4 w-4 animate-spin" />} {p.save}
         </Button>
-        {onCancel && data.goal && <Button variant="ghost" onClick={onCancel}>{p.cancel}</Button>}
+        {onCancel && <Button variant="ghost" onClick={onCancel}>{p.cancel}</Button>}
       </div>
       {error && <p className="text-sm text-pen">{error}</p>}
     </div>
@@ -164,7 +164,7 @@ export function ExamCountdown({ data, onEdit }: { data: ExamPlanData; onEdit?: (
 /** One line under the learner's name: level · module(s) still to pass · target band. */
 export function GoalSummary({ data }: { data: ExamPlanData }) {
   const { dict } = useI18n();
-  const level = data.goal ? data.levels.find((l) => l.value === data.goal!.examLevel)?.label : null;
+  const level = data.focus.examLevel ? data.levels.find((l) => l.value === data.focus.examLevel)?.label : null;
   const parts = [level, dict.goal.modules[data.focus.examModules], `${dict.goal.targetLabel}: ${dict.goal.targets[data.focus.targetBand]}`].filter(Boolean);
   return (
     <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">

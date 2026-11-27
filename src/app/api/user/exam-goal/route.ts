@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user";
 import { EXAM_LEVELS } from "@/lib/constants";
+import { parseSelfAssessment } from "@/lib/welcome";
 import type { ExamLevel } from "@/types";
 
 const VALID_LEVELS = EXAM_LEVELS.map((l) => l.value) as string[];
@@ -15,7 +16,8 @@ const MAX_DAYS_AHEAD = 730;
  * Update the learner's exam goal: date and level (dashboard countdown), which
  * module(s) they still have to pass and the band they aim for. Every field is
  * optional; whatever is sent is validated and saved, the rest is kept.
- * `examDate: null` clears the date.
+ * `examDate: null` clears the date. The first-run welcome also sends the
+ * learner's `selfAssessment` and `completeWelcome: true`.
  */
 export async function PUT(req: Request) {
   const { userId: clerkId } = await auth();
@@ -24,13 +26,16 @@ export async function PUT(req: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  let body: { examDate?: string | null; examLevel?: string | null; examModules?: string; targetBand?: string };
+  let body: {
+    examDate?: string | null; examLevel?: string | null; examModules?: string; targetBand?: string;
+    selfAssessment?: unknown; completeWelcome?: boolean;
+  };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
-  const { examDate, examLevel, examModules, targetBand } = body;
+  const { examDate, examLevel, examModules, targetBand, selfAssessment, completeWelcome } = body;
   const data: Prisma.UserUpdateInput = {};
 
   if (examModules !== undefined) {
@@ -59,6 +64,16 @@ export async function PUT(req: Request) {
     // A date only makes sense together with a level.
     if (!data.examLevel && !user.examLevel) return NextResponse.json({ error: "Invalid level" }, { status: 400 });
     data.examDate = date;
+  }
+  if (selfAssessment !== undefined) {
+    const parsed = parseSelfAssessment(selfAssessment);
+    if (!parsed) return NextResponse.json({ error: "Invalid self-assessment" }, { status: 400 });
+    data.selfAssessment = parsed;
+  }
+  if (completeWelcome === true) {
+    // The welcome can't finish without a level: every exercise is pitched at it.
+    if (!data.examLevel && !user.examLevel) return NextResponse.json({ error: "Invalid level" }, { status: 400 });
+    if (!user.onboardedAt) data.onboardedAt = new Date();
   }
   if (Object.keys(data).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 

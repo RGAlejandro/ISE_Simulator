@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, isProUser } from "@/lib/user";
 import { confirmCheckoutSession } from "@/lib/billing";
 import { SuccessClient } from "./success-client";
 
@@ -10,6 +10,9 @@ export default async function PricingSuccessPage({ searchParams }: { searchParam
   const { session_id } = await searchParams;
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
-  const result = session_id ? await confirmCheckoutSession(session_id, user.id).catch(() => "invalid" as const) : "invalid";
+  // Already Pro (e.g. the client refresh right after activation): no need to ask Stripe again.
+  const result = isProUser(user)
+    ? "active"
+    : session_id ? await confirmCheckoutSession(session_id, user.id).catch(() => "invalid" as const) : "invalid";
   return <SuccessClient result={result} />;
 }

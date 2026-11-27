@@ -6,6 +6,7 @@ import { daysUntil, leastPractisedGenre, phaseFor, startOfWeek, weeklyTargets } 
 import { getDailyUsage, isProUser } from "@/lib/user";
 import { getReadiness } from "@/lib/readiness-server";
 import { getStudentAssignments } from "@/lib/teams-server";
+import { firstStep, parseSelfAssessment } from "@/lib/welcome";
 import type { ExamPlanData } from "@/components/dashboard/exam-plan-card";
 import type { ExamLevel, WritingTaskType } from "@/types";
 import type { ExamModules, Plan, SubscriptionStatus, TargetBand } from "@prisma/client";
@@ -27,7 +28,7 @@ async function getExamPlan(user: {
   id: string; examDate: Date | null; examLevel: ExamLevel | null; examModules: ExamModules; targetBand: TargetBand;
 }): Promise<ExamPlanData> {
   const levels = EXAM_LEVELS.map((l) => ({ value: l.value as ExamLevel, label: `${l.label} (${l.cefr})` }));
-  const focus = { examModules: user.examModules, targetBand: user.targetBand };
+  const focus = { examModules: user.examModules, targetBand: user.targetBand, examLevel: user.examLevel };
   if (!user.examDate || !user.examLevel) return { goal: null, focus, levels, plan: null };
 
   const now = new Date();
@@ -119,6 +120,7 @@ type DashboardUser = {
   examLevel: ExamLevel | null;
   examModules: ExamModules;
   targetBand: TargetBand;
+  selfAssessment?: unknown;
   subscription?: { status: SubscriptionStatus; currentPeriodEnd: Date | null } | null;
 };
 
@@ -212,6 +214,7 @@ export async function loadDashboardData(user: DashboardUser) {
     levels: EXAM_LEVELS as unknown as Array<{ value: string; label: string; cefr: string; color: string }>,
     isPro: isProUser(user),
     examPlan: examPlan,
+    firstStep: firstStep(user.examModules, user.examLevel, parseSelfAssessment(user.selfAssessment)),
     assignments: assignments,
     readiness: readiness.report && readinessLevel ? { report: readiness.report, levelLabel: `${readinessLevel.label} (${readinessLevel.cefr})` } : null,
     stats: {

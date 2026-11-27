@@ -8,17 +8,43 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LanguageToggle } from "@/components/layout/language-toggle";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useT } from "@/components/i18n/language-provider";
+import { Stamp } from "@/components/notebook/notebook";
 import { BookOpen, ChevronDown, Menu, X, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface NavbarProps {
   isAdmin?: boolean;
+  /** Undefined when the plan isn't known (e.g. the landing page): no badge. */
+  isPro?: boolean;
 }
 
 type NavLink = { href: string; label: string };
 
-export function Navbar({ isAdmin = false }: NavbarProps) {
+/** Current plan; links to /pricing (upgrade for Free, renewal details for Pro). */
+function PlanBadge({ isPro, className, onClick }: { isPro: boolean; className?: string; onClick?: () => void }) {
+  const t = useT();
+  const label = isPro ? t("common.pro") : t("common.free");
+  return (
+    <Link
+      href="/pricing"
+      onClick={onClick}
+      aria-label={`${t("common.plan")}: ${label}`}
+      title={isPro ? undefined : t("common.upgrade")}
+      className={cn("items-center", className)}
+    >
+      {isPro ? (
+        <Stamp band="distinction">{label}</Stamp>
+      ) : (
+        <span className="rounded-[3px] border-2 border-ink-soft/40 px-1.5 py-px font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-ink-soft transition-colors hover:border-ink-soft hover:text-ink">
+          {label}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+export function Navbar({ isAdmin = false, isPro }: NavbarProps) {
   const pathname = usePathname();
   const { isSignedIn } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -115,11 +141,14 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
               </SignUpButton>
             </>
           ) : (
-            <UserButton
-              appearance={{
-                elements: { avatarBox: "h-9 w-9" },
-              }}
-            />
+            <>
+              {isPro !== undefined && <PlanBadge isPro={isPro} className="mr-1 hidden sm:inline-flex" />}
+              <UserButton
+                appearance={{
+                  elements: { avatarBox: "h-9 w-9" },
+                }}
+              />
+            </>
           )}
 
           {/* Mobile toggle */}
@@ -162,6 +191,12 @@ export function Navbar({ isAdmin = false }: NavbarProps) {
               <ShieldCheck className="h-4 w-4" />
               {t("nav.admin")}
             </Link>
+          )}
+          {isSignedIn && isPro !== undefined && (
+            <div className="mt-2 flex items-center justify-between border-t border-rule px-3 pt-4 pb-1 text-sm text-ink-soft">
+              {t("common.plan")}
+              <PlanBadge isPro={isPro} className="inline-flex" onClick={() => setMobileOpen(false)} />
+            </div>
           )}
           {!isSignedIn && (
             <div className="flex gap-2 pt-3 border-t border-rule mt-2">

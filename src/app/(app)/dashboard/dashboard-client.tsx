@@ -13,6 +13,7 @@ import type { StudentAssignment } from "@/lib/teams-server";
 import type { ReadinessReport } from "@/lib/readiness";
 import { cn } from "@/lib/utils";
 import { bandFromScore } from "@/lib/writing";
+import type { FirstStep } from "@/lib/welcome";
 import type { UserUsage } from "@/types";
 
 interface Stats {
@@ -40,6 +41,8 @@ interface DashboardClientProps {
   levels: Array<{ value: string; label: string; cefr: string; color: string }>;
   stats: Stats;
   examPlan: ExamPlanData;
+  /** The recommended first marked exercise (from the welcome's self-assessment). */
+  firstStep: FirstStep;
   readiness: { report: ReadinessReport; levelLabel: string } | null;
   assignments: StudentAssignment[];
   /** Admin viewing a learner: no editing, no action links, extra sections. */
@@ -169,7 +172,7 @@ export function ExamListRow({ exam, isPro, onDelete }: {
   );
 }
 
-export function DashboardClient({ user, isPro, recentExams, totalExams, stats, usage, examPlan, readiness, assignments, profile }: DashboardClientProps) {
+export function DashboardClient({ user, isPro, recentExams, totalExams, stats, usage, examPlan, firstStep, readiness, assignments, profile }: DashboardClientProps) {
   const { t, dict, locale } = useI18n();
   const nb = dict.dashboard.nb;
   const [editingGoal, setEditingGoal] = useState(false);
@@ -183,7 +186,8 @@ export function DashboardClient({ user, isPro, recentExams, totalExams, stats, u
   const readOnly = !!profile;
   // A brand-new learner gets a guided start instead of empty sections.
   const hasEvidence = (readiness?.report.overall.observations ?? 0) > 0;
-  const onboarding = !readOnly && (!examPlan.goal || !hasEvidence);
+  const hasLevel = !!examPlan.focus.examLevel;
+  const onboarding = !readOnly && (!hasLevel || !hasEvidence);
   const showToday = hasToday || !onboarding;
   const showReadiness = !!readiness && (hasEvidence || readOnly);
   const showActivity = totalExams > 0 || sessions14 > 0 || hasEvidence || readOnly;
@@ -222,7 +226,7 @@ export function DashboardClient({ user, isPro, recentExams, totalExams, stats, u
           aside={<ExamCountdown data={examPlan} onEdit={readOnly ? undefined : () => setEditingGoal(true)} />}
         />
 
-        {!readOnly && editingGoal && examPlan.goal && (
+        {!readOnly && editingGoal && (
           <Section title={dict.goal.change}>
             <ExamGoalForm data={examPlan} onCancel={() => setEditingGoal(false)} />
           </Section>
@@ -232,10 +236,16 @@ export function DashboardClient({ user, isPro, recentExams, totalExams, stats, u
           <Section n={num("start")} title={nb.start.title}>
             <p className="-mt-2 mb-4 max-w-2xl text-sm leading-relaxed text-ink-soft">{nb.start.intro}</p>
             <ol className="divide-y divide-rule border-y border-rule">
-              <StartStep n={1} done={!!examPlan.goal} title={nb.start.step1} meta={nb.start.step1Meta}>
-                {!examPlan.goal && <div className="pb-5 pl-12"><ExamGoalForm data={examPlan} /></div>}
+              <StartStep n={1} done={hasLevel} title={nb.start.step1} meta={nb.start.step1Meta}>
+                {!hasLevel && <div className="pb-5 pl-12"><ExamGoalForm data={examPlan} /></div>}
               </StartStep>
-              <StartStep n={2} done={hasEvidence || totalExams > 0} title={nb.start.step2} meta={nb.start.step2Meta} href="/practice" />
+              <StartStep
+                n={2}
+                done={hasEvidence || totalExams > 0}
+                title={t("dashboard.nb.start.step2", { skill: dict.readiness.skill[firstStep.skill] })}
+                meta={firstStep.selfRated ? dict.welcome.start.reasonSelf : dict.welcome.start.reasonDefault}
+                href={firstStep.href}
+              />
               <StartStep n={3} done={hasEvidence} title={nb.start.step3} meta={nb.start.step3Meta} href="/readiness" />
             </ol>
           </Section>

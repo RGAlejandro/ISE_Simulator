@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,10 @@ export function SuccessClient({ result }: { result: "active" | "pending" | "inva
   const { dict } = useI18n();
   const s = dict.pricing.success;
   const router = useRouter();
+  // The layout's navbar was rendered before Pro was switched on, so re-render it once.
+  useEffect(() => {
+    if (result === "active") router.refresh();
+  }, [result, router]);
   return (
     <div className="flex-1 bg-paper">
       <NotebookPage className="pb-16">
